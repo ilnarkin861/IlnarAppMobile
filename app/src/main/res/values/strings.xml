@@ -2,6 +2,6 @@
     <string name="app_name">IlnarApp</string>
     <string name="notes_title">Записи</string>
     <string name="tags_title">Теги</string>
-    <string name="archives_title">Архивы</string>
+    <string name="archives_title">Архив</string>
     <string name="search_title">Поиск</string>
 </resources>
