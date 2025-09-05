@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_bg_color">#FFF8F8F8</color>
+    <color name="primary_color">#4F00B4</color>
+    <color name="border_color">#FFE2E2E2</color>
+    <color name="bottom_navigation_color">#FF808080</color>
+</resources>
