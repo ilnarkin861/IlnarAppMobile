@@ -4,4 +4,5 @@
     <string name="tags_title">Теги</string>
     <string name="archives_title">Архив</string>
     <string name="search_title">Поиск</string>
+    <string name="settings_title">Настройки</string>
 </resources>
