@@ -14,6 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -26,14 +27,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.routes.NavRoutes
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar () {
+fun TopBar (navController: NavController) {
 	val borderColor = colorResource(R.color.border_color)
+
+	val navBackStackEntry by navController.currentBackStackEntryAsState()
+	val route = navBackStackEntry?.destination?.route
+
+	val title = when(route) {
+		NavRoutes.NotesScreen.route -> stringResource(R.string.notes_title)
+		NavRoutes.TagsScreen.route -> stringResource(R.string.tags_title)
+		NavRoutes.ArchiveScreen.route -> stringResource(R.string.archives_title)
+		NavRoutes.SearchScreen.route -> stringResource(R.string.search_title)
+		NavRoutes.SettingsScreen.route -> stringResource(R.string.settings_title)
+		else -> stringResource(R.string.app_name)
+	}
 
 	Column(Modifier
 		.fillMaxWidth()
@@ -60,7 +76,7 @@ fun TopBar () {
 		) {
 
 			Box {
-				Text(text = stringResource(R.string.notes_title),
+				Text(text = title,
 					color = colorResource(R.color.primary_color),
 					fontSize = dimensionResource(R.dimen.top_bar_title_font_size).value.sp,
 					fontFamily = getInterFont(),

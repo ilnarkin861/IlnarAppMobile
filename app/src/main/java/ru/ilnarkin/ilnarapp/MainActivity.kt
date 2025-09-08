@@ -42,7 +42,7 @@ fun Main(){
 	val navController = rememberNavController()
 
 	Column(Modifier.displayCutoutPadding()) {
-		TopBar()
+		TopBar(navController)
 		NavHost(
 			navController = navController,
 			startDestination = NavRoutes.NotesScreen.route,
