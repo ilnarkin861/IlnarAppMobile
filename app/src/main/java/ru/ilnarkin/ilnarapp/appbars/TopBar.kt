@@ -92,10 +92,8 @@ fun TopBar (navController: NavController) {
 							launchSingleTop = true
 							restoreState = false
 
-							route?.let {
-								popUpTo(it){
-									saveState = true
-								}
+							popUpTo(NavRoutes.SettingsScreen.route){
+								saveState = true
 							}
 						}
 					}
