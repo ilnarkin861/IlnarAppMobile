@@ -86,7 +86,20 @@ fun TopBar (navController: NavController) {
 			Row(verticalAlignment = Alignment.CenterVertically){
 				val color = colorResource(R.color.primary_color)
 
-				IconButton(onClick = {}) {
+				IconButton(onClick = {
+					if (route != NavRoutes.SettingsScreen.route){
+						navController.navigate(NavRoutes.SettingsScreen.route) {
+							launchSingleTop = true
+							restoreState = false
+
+							route?.let {
+								popUpTo(it){
+									saveState = true
+								}
+							}
+						}
+					}
+				}) {
 					Icon(
 						painter = painterResource(R.drawable.ic_settings),
 						contentDescription = "",
