@@ -1,24 +1,16 @@
 package ru.ilnarkin.ilnarapp.appbars
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -37,7 +29,6 @@ import ru.ilnarkin.ilnarapp.routes.NavRoutes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar (navController: NavController) {
-	val borderColor = colorResource(R.color.border_color)
 
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
 	val route = navBackStackEntry?.destination?.route
@@ -51,42 +42,29 @@ fun TopBar (navController: NavController) {
 		else -> stringResource(R.string.app_name)
 	}
 
-	Column(Modifier
-		.fillMaxWidth()
-		.height(dimensionResource(R.dimen.top_bar_height))
-		.background(Color.White)
-		.drawBehind {
-			var borderStrokeWidth = 2.dp
-			val strokeWidthPx = borderStrokeWidth.toPx()
+	TopAppBar(
+		modifier = Modifier.padding(bottom = 2.dp),
+		colors = TopAppBarDefaults.topAppBarColors(
+			containerColor = Color.White,
+			navigationIconContentColor = colorResource(R.color.primary_color),
+			titleContentColor = colorResource(R.color.primary_color)
+		),
 
-			drawLine(
-				color = borderColor,
-				start = Offset(0f, size.height),
-				end = Offset(size.width, size.height),
-				strokeWidth = strokeWidthPx
-			)
-		}) {
+		expandedHeight = dimensionResource(R.dimen.top_bar_height),
 
-		Row(
-			Modifier.fillMaxWidth()
-				.fillMaxHeight()
-				.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.SpaceBetween
-		) {
+		title = {
+			Text(text = title,
+				fontSize = dimensionResource(R.dimen.top_bar_title_font_size).value.sp,
+				fontFamily = getInterFont(),
+				fontWeight = FontWeight.ExtraBold)
+		},
 
-			Box {
-				Text(text = title,
-					color = colorResource(R.color.primary_color),
-					fontSize = dimensionResource(R.dimen.top_bar_title_font_size).value.sp,
-					fontFamily = getInterFont(),
-					fontWeight = FontWeight.ExtraBold)
-			}
-			
-			Row(verticalAlignment = Alignment.CenterVertically){
-				val color = colorResource(R.color.primary_color)
-
-				IconButton(onClick = {
+		actions = {
+			IconButton(
+				colors = IconButtonDefaults.iconButtonColors(
+					contentColor = colorResource(R.color.primary_color)
+				),
+				onClick = {
 					if (route != NavRoutes.SettingsScreen.route){
 						navController.navigate(NavRoutes.SettingsScreen.route) {
 							launchSingleTop = true
@@ -98,19 +76,21 @@ fun TopBar (navController: NavController) {
 						}
 					}
 				}) {
-					Icon(
-						painter = painterResource(R.drawable.ic_settings),
-						contentDescription = "",
-						tint = color)
-				}
+				Icon(
+					painter = painterResource(R.drawable.ic_settings),
+					contentDescription = "")
+			}
 
-				IconButton(onClick = {}) {
-					Icon(
-						painter = painterResource(R.drawable.ic_logout),
-						contentDescription = "",
-						tint = color)
-				}
+			IconButton(
+				colors = IconButtonDefaults.iconButtonColors(
+					contentColor = colorResource(R.color.primary_color)
+				),
+				onClick = {}) {
+				Icon(
+					painter = painterResource(R.drawable.ic_logout),
+					contentDescription = "")
 			}
 		}
-	}
+
+	)
 }
