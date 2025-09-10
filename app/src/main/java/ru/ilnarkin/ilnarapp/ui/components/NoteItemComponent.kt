@@ -1,0 +1,131 @@
+package ru.ilnarkin.ilnarapp.ui.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
+import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.models.Note
+
+
+@Composable
+fun NoteItemComponent(note: Note) {
+
+	val font = getInterFont()
+
+	Box(
+		Modifier.fillMaxSize()
+			.defaultMinSize(minHeight = 150.dp)
+			.padding(bottom = 15.dp)
+			.clip(RoundedCornerShape(10.dp))
+			.background(color = Color.White)
+
+	) {
+		Column (Modifier.padding(
+			start = 10.dp,
+			top = 15.dp,
+			end = 15.dp,
+			bottom = 20.dp
+		)){
+			Row {
+				Text(
+					text = note.title,
+					fontFamily = font,
+					fontWeight = FontWeight.SemiBold,
+					color = colorResource(R.color.title_color),
+					fontSize = dimensionResource(R.dimen.note_item_title_font_size).value.sp
+				)
+			}
+
+			Row(Modifier.padding(top = 5.dp)) {
+				Text(
+					text = note.date,
+					fontFamily = font,
+					color = colorResource(R.color.grey),
+					fontSize = dimensionResource(R.dimen.note_item_date_font_size).value.sp
+				)
+			}
+
+			Row(Modifier.padding(vertical = 15.dp)) {
+				HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
+			}
+
+			Row {
+				Text(
+					text = note.text,
+					maxLines = 3,
+					fontFamily = font,
+					lineHeight = 1.5.em,
+					color = colorResource(R.color.text_color),
+					fontSize = dimensionResource(R.dimen.note_item_text_font_size).value.sp
+				)
+			}
+
+			Row(
+				Modifier.padding(top = 30.dp).fillMaxWidth(),
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.SpaceBetween
+				) {
+				Row (
+					modifier = Modifier
+						.size(width = 140.dp, height = 40.dp)
+						.clip(RoundedCornerShape(10.dp))
+						.background(colorResource(R.color.primary_color))
+						.clickable(onClick = {
+
+						}),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.Center
+					) {
+					Text(
+						text = "Подробнее",
+						color = Color.White,
+						fontFamily = font,
+						fontWeight = FontWeight.Medium,
+						fontSize = 11.sp)
+				}
+
+				Row(verticalAlignment = Alignment.CenterVertically){
+					IconButton(onClick = {}) {
+						Icon(modifier = Modifier.size(22.dp),
+							painter = painterResource(
+							R.drawable.ic_edit), contentDescription = "",
+							tint = colorResource(R.color.primary_color))
+					}
+					IconButton(onClick = {}) {
+						Icon(
+							modifier = Modifier.size(22.dp),
+							painter = painterResource(
+							R.drawable.ic_trash), contentDescription = "",
+							tint = colorResource(R.color.danger_color))
+					}
+				}
+			}
+		}
+	}
+}
