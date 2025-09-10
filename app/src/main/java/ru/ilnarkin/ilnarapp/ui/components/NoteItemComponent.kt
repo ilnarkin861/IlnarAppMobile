@@ -106,8 +106,8 @@ fun NoteItemComponent(note: Note) {
 						text = "Подробнее",
 						color = Color.White,
 						fontFamily = font,
-						fontWeight = FontWeight.Medium,
-						fontSize = 11.sp)
+						fontWeight = FontWeight.SemiBold,
+						fontSize = 12.sp)
 				}
 
 				Row(verticalAlignment = Alignment.CenterVertically){
