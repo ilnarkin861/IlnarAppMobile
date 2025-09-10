@@ -18,6 +18,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -44,17 +45,18 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
 @Composable
 fun Main(){
 
 	val navController = rememberNavController()
 	val borderColor = colorResource(R.color.border_color)
 
-	Column(Modifier.displayCutoutPadding()) {
+	Column(Modifier.displayCutoutPadding()
+		.background(colorResource(R.color.app_bg_color))) {
+
 		Row(Modifier.fillMaxWidth()
 			.background(Color.White)
-
 			.drawBehind {
 				var borderStrokeWidth = 2.dp
 				val strokeWidthPx = borderStrokeWidth.toPx()
@@ -65,17 +67,14 @@ fun Main(){
 					end = Offset(size.width, size.height),
 					strokeWidth = strokeWidthPx
 				)
-			}) {
-			Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) { TopBar(navController) }
-
-		}
+			}) { TopBar(navController) }
 
 		NavHost(
 			navController = navController,
 			startDestination = NavRoutes.NotesScreen.route,
 			modifier = Modifier.fillMaxSize()
-				.weight(1f)
-				.background(colorResource(R.color.app_bg_color))) {
+				.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))
+				.weight(1f)) {
 			composable(NavRoutes.NotesScreen.route) { NotesScreen() }
 			composable(NavRoutes.TagsScreen.route) { TagsScreen() }
 			composable(NavRoutes.ArchiveScreen.route) { ArchiveScreen() }
