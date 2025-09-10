@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="top_bar_height">75dp</dimen>
-    <dimen name="container_horizontal_padding">10dp</dimen>
+    <dimen name="container_horizontal_padding">15dp</dimen>
     <dimen name="top_bar_title_font_size">20sp</dimen>
     <dimen name="bottom_bar_label_font_size">12sp</dimen>
+    <dimen name="note_item_title_font_size">15sp</dimen>
+    <dimen name="note_item_date_font_size">12sp</dimen>
+    <dimen name="note_item_text_font_size">14sp</dimen>
 </resources>
