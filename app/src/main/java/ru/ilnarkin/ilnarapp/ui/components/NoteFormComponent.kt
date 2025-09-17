@@ -99,7 +99,7 @@ fun NoteFormComponent() {
 		ExposedDropdownMenuBox(
 			modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
 			expanded = noteTypeMenuExpanded,
-			onExpandedChange = {}
+			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded }
 		) {
 			OutlinedTextField(
 				modifier = Modifier.fillMaxWidth()
