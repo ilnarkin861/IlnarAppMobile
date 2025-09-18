@@ -44,6 +44,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Archive
@@ -70,8 +74,8 @@ fun NoteFormComponent() {
 	var noteText = remember { mutableStateOf("") }
 	var isNoteTextError by remember { mutableStateOf(false) }
 
+	val dateDialogState = rememberMaterialDialogState()
 	var noteDate by remember {mutableStateOf(LocalDate.now())}
-
 	val formattedDate by remember {
 		derivedStateOf {
 			DateTimeFormatter
@@ -236,7 +240,7 @@ fun NoteFormComponent() {
 				unfocusedTextColor = colorResource(R.color.text_color),
 			),
 			trailingIcon = {
-				IconButton(onClick = {  }) {
+				IconButton(onClick = { dateDialogState.show() }) {
 					Icon(
 						painter = painterResource(R.drawable.ic_calendar),
 						contentDescription = "Выбрать дату",
@@ -246,6 +250,37 @@ fun NoteFormComponent() {
 			},
 			shape = RoundedCornerShape(10.dp)
 		)
+
+
+		MaterialDialog(
+			dialogState = dateDialogState,
+			buttons = {
+				positiveButton(
+					text = "Ок",
+					textStyle = TextStyle(
+						color = colorResource(R.color.primary_color),
+						fontFamily = getInterFont(),
+						fontWeight = FontWeight.Bold),
+					onClick = { dateDialogState.hide()},
+				)
+				negativeButton(
+					text = "Закрыть",
+					textStyle = TextStyle(
+						color = colorResource(R.color.primary_color),
+						fontFamily = getInterFont(),
+						fontWeight = FontWeight.Bold)
+				)
+			}
+		) {
+			datepicker(
+				title = "Выбрать дату",
+				colors = DatePickerDefaults.colors(
+					headerBackgroundColor = colorResource(R.color.primary_color),
+					dateActiveBackgroundColor = colorResource(R.color.primary_color)
+				)
+			) { noteDate = it }
+		}
+
 
 
 		// Archive dropdown
