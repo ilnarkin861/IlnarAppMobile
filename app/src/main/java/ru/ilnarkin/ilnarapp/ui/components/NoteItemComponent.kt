@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -92,22 +94,24 @@ fun NoteItemComponent(note: Note) {
 				horizontalArrangement = Arrangement.SpaceBetween
 				) {
 				Row (
-					modifier = Modifier
-						.size(width = 140.dp, height = 40.dp)
-						.clip(RoundedCornerShape(10.dp))
-						.background(colorResource(R.color.primary_color))
-						.clickable(onClick = {
-
-						}),
 					verticalAlignment = Alignment.CenterVertically,
 					horizontalArrangement = Arrangement.Center
 					) {
-					Text(
-						text = "Подробнее",
-						color = Color.White,
-						fontFamily = font,
-						fontWeight = FontWeight.SemiBold,
-						fontSize = 12.sp)
+					Button(
+						modifier = Modifier
+							.size(width = 140.dp, height = 40.dp),
+						colors = ButtonDefaults
+							.buttonColors(containerColor = colorResource(R.color.primary_color)),
+						shape = RoundedCornerShape(10.dp),
+						onClick = {}) {
+						Text(
+							text = "Подробнее",
+							color = Color.White,
+							fontFamily = font,
+							fontWeight = FontWeight.SemiBold,
+							fontSize = 12.sp)
+					}
+
 				}
 
 				Row(verticalAlignment = Alignment.CenterVertically){
