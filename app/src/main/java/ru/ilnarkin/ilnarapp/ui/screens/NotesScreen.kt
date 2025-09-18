@@ -21,6 +21,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
@@ -42,6 +44,7 @@ import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
+import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,26 +52,47 @@ import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 @Composable
 fun NotesScreen() {
 
-	val notes = getNotesList()
+	var notes = getNotesList()
 	var showBottomSheet by remember { mutableStateOf(false) }
 	val sheetState = rememberModalBottomSheetState()
 	var sheetTitle = remember { mutableStateOf("") }
 	val screenHeight = LocalWindowInfo.current.containerSize.height.dp
+	var loading by remember { mutableStateOf(false) }
 
+
+	LaunchedEffect(Unit) {
+		loading = true
+
+		delay(3000)
+
+		loading = false
+	}
 
 	Box(Modifier.fillMaxSize()) {
-		LazyColumn(contentPadding = PaddingValues(top = 30.dp, bottom = 60.dp)) {
-			item {
-				Row(Modifier.padding(bottom = 15.dp)) {
-					LoadButtonComponent(nextButton = false, action = {})
+
+		if (loading){
+			Box(
+				modifier = Modifier.fillMaxSize(),
+				contentAlignment = Alignment.Center){
+				ProgressIndicatorComponent(60)
+			}
+		}
+
+
+		if (!loading && !notes.isEmpty()){
+			LazyColumn(contentPadding = PaddingValues(top = 30.dp, bottom = 60.dp)) {
+				item {
+					Row(Modifier.padding(bottom = 15.dp)) {
+						LoadButtonComponent(nextButton = false, action = {})
+					}
 				}
-			}
-			items(notes) {value ->
-				NoteItemComponent(value)
-			}
-			item {
-				Row(Modifier.padding(top = 15.dp, bottom = 30.dp)) {
-					LoadButtonComponent(action = {})
+				items(notes) {value ->
+					NoteItemComponent(value)
+				}
+				item {
+					Row(Modifier.padding(top = 15.dp, bottom = 30.dp)) {
+						LoadButtonComponent(action = {})
+					}
 				}
 			}
 		}

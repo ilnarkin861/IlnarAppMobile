@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,8 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Archive
@@ -65,6 +68,9 @@ fun NoteFormComponent() {
 	val noteTypes = getNoteTypes()
 	val archives = getArchives()
 	val tags = getTags()
+
+	var loading by remember { mutableStateOf(false) }
+	val scope = rememberCoroutineScope()
 
 	var selectedNoteType by remember { mutableStateOf(noteTypes[0]) }
 	var noteTypeMenuExpanded by remember { mutableStateOf(false) }
@@ -432,7 +438,7 @@ fun NoteFormComponent() {
 
 				}
 
-				if (index != tags.count() -1){
+				if (index != addedTags.count() -1){
 					HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
 				}
 			}
@@ -443,22 +449,44 @@ fun NoteFormComponent() {
 		Row(
 			modifier = Modifier.fillMaxWidth().padding(top = 60.dp, bottom = 80.dp)
 		) {
-			Button(
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(60.dp),
-				shape = RoundedCornerShape(10.dp),
-				colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primary_color)),
-				onClick = {
-					isNoteTextError = noteText.value.isEmpty()
+			if(loading){
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.Center
+				) {
+					ProgressIndicatorComponent(30)
 				}
-			) {
-				Text(
-					text = "Сохранить",
-					fontFamily = getInterFont(),
-					fontSize = 16.sp,
-					fontWeight = FontWeight.SemiBold
-				)
+			}
+
+			if (!loading){
+				Button(
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(60.dp),
+					shape = RoundedCornerShape(10.dp),
+					colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primary_color)),
+					onClick = {
+						isNoteTextError = noteText.value.isEmpty()
+
+						if(!loading){
+							scope.launch {
+								loading = true
+
+								delay(2000)
+
+								loading = false
+							}
+						}
+					}
+				) {
+					Text(
+						text = "Сохранить",
+						fontFamily = getInterFont(),
+						fontSize = 16.sp,
+						fontWeight = FontWeight.SemiBold
+					)
+				}
+
 			}
 		}
 	}
