@@ -91,8 +91,9 @@ fun NoteFormComponent() {
 	var selectedTagsCount = remember { mutableIntStateOf(0) }
 	var uploadableTags = mutableListOf<Tag>()
 
+
 	Column(Modifier.fillMaxSize()
-		.padding(top = 30.dp, bottom = 50.dp)
+		.padding(top = 30.dp)
 		.verticalScroll(rememberScrollState())) {
 
 		//Note type dropdown menu
@@ -124,7 +125,8 @@ fun NoteFormComponent() {
 				shape = RoundedCornerShape(10.dp),
 				trailingIcon = {
 					Icon(
-						painter = painterResource(R.drawable.ic_arrow_down),
+						painter = if (noteTypeMenuExpanded) painterResource(R.drawable.ic_arrow_down)
+						else painterResource(R.drawable.ic_arrow_up),
 						contentDescription = "")
 				}
 			)
@@ -152,6 +154,7 @@ fun NoteFormComponent() {
 				}
 			}
 		}
+
 
 		//Note title field
 		OutlinedTextField(
@@ -207,8 +210,10 @@ fun NoteFormComponent() {
 			),
 			shape = RoundedCornerShape(10.dp))
 
+
 		if (isNoteTextError){
 			Text(
+				modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 				text = "Обязательное поле",
 				color = colorResource(R.color.danger_color),
 				fontFamily = getInterFont(),
@@ -216,9 +221,10 @@ fun NoteFormComponent() {
 			)
 		}
 
+
 		//Date field
 		OutlinedTextField(
-			modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 28.dp),
+			modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 20.dp),
 			readOnly = true,
 			enabled = false,
 			value = formattedDate,
@@ -272,10 +278,12 @@ fun NoteFormComponent() {
 				shape = RoundedCornerShape(10.dp),
 				trailingIcon = {
 					Icon(
-						painter = painterResource(R.drawable.ic_arrow_down),
+						painter = if (archiveMenuExpanded) painterResource(R.drawable.ic_arrow_down)
+						else painterResource(R.drawable.ic_arrow_up),
 						contentDescription = "")
 				}
 			)
+
 			ExposedDropdownMenu(
 				modifier = Modifier.background(Color.White),
 				expanded = archiveMenuExpanded,
@@ -357,7 +365,7 @@ fun NoteFormComponent() {
 		Column(
 			Modifier.fillMaxWidth().padding(top = 20.dp)
 		) {
-			Row(Modifier.fillMaxWidth()) {
+			Row(Modifier.fillMaxWidth().padding(bottom = 20.dp)) {
 				Text(
 					color = colorResource(R.color.title_color),
 					text = "Добавленные теги",
@@ -368,8 +376,7 @@ fun NoteFormComponent() {
 			}
 			addedTags.forEachIndexed {index, tag ->
 				Row(
-					modifier = Modifier.fillMaxWidth()
-						.padding(vertical = 15.dp),
+					modifier = Modifier.fillMaxWidth(),
 					verticalAlignment = Alignment.CenterVertically,
 					horizontalArrangement = Arrangement.SpaceBetween) {
 
@@ -396,9 +403,10 @@ fun NoteFormComponent() {
 			}
 		}
 
+
 		//Save button
 		Row(
-			modifier = Modifier.fillMaxWidth().padding(top = 40.dp)
+			modifier = Modifier.fillMaxWidth().padding(top = 60.dp, bottom = 80.dp)
 		) {
 			Button(
 				modifier = Modifier
@@ -406,7 +414,9 @@ fun NoteFormComponent() {
 					.height(60.dp),
 				shape = RoundedCornerShape(10.dp),
 				colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primary_color)),
-				onClick = {	}
+				onClick = {
+					isNoteTextError = noteText.value.isEmpty()
+				}
 			) {
 				Text(
 					text = "Сохранить",
@@ -418,6 +428,7 @@ fun NoteFormComponent() {
 		}
 	}
 }
+
 
 fun getNoteTypes(): List<NoteType>{
 	val noteTypes = mutableListOf<NoteType>()

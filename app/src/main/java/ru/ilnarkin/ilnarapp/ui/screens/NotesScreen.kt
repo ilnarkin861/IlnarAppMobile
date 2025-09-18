@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -51,6 +53,7 @@ fun NotesScreen() {
 	var showBottomSheet by remember { mutableStateOf(false) }
 	val sheetState = rememberModalBottomSheetState()
 	var sheetTitle = remember { mutableStateOf("") }
+	val screenHeight = LocalWindowInfo.current.containerSize.height.dp
 
 
 	Box(Modifier.fillMaxSize()) {
@@ -70,13 +73,16 @@ fun NotesScreen() {
 			}
 		}
 
+
 		if (showBottomSheet){
 			ModalBottomSheet(
+				modifier = Modifier.height(screenHeight * 0.7f),
 				onDismissRequest = { showBottomSheet = false },
 				containerColor = Color.White,
 				sheetState = sheetState
 			) {
-				Column(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
+				Column(Modifier
+					.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 					Row {
 						Text(
 							color = colorResource(R.color.title_color),
@@ -90,7 +96,6 @@ fun NotesScreen() {
 					NoteFormComponent()
 				}
 			}
-
 		}
 
 
