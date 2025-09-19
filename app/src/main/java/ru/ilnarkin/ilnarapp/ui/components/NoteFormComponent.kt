@@ -379,7 +379,7 @@ fun NoteFormComponent() {
 					color = Color.Gray,
 					text = "Выбрать теги (${selectedTagsCount.intValue})",
 					fontFamily = getInterFont(),
-					fontSize = 18.sp,
+					fontSize = 15.sp,
 					fontWeight = FontWeight.Bold
 				)
 			}
@@ -414,7 +414,7 @@ fun NoteFormComponent() {
 					color = Color.Gray,
 					text = "Добавленные теги",
 					fontFamily = getInterFont(),
-					fontSize = 18.sp,
+					fontSize = 15.sp,
 					fontWeight = FontWeight.Bold
 				)
 			}
