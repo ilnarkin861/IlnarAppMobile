@@ -43,6 +43,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -62,6 +64,7 @@ import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
 @Composable
 fun NoteFormComponent() {
 
@@ -108,7 +111,7 @@ fun NoteFormComponent() {
 
 		//Note type dropdown menu
 		ExposedDropdownMenuBox(
-			modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
+			modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
 			expanded = noteTypeMenuExpanded,
 			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded }
 		) {
@@ -170,7 +173,7 @@ fun NoteFormComponent() {
 		OutlinedTextField(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(bottom = 20.dp),
+				.padding(bottom = 10.dp),
 			textStyle = TextStyle(
 				fontFamily = getInterFont(),
 				fontSize = 15.sp,
@@ -373,7 +376,7 @@ fun NoteFormComponent() {
 		) {
 			Row(Modifier.fillMaxWidth().padding(bottom = 20.dp)) {
 				Text(
-					color = colorResource(R.color.title_color),
+					color = Color.Gray,
 					text = "Выбрать теги (${selectedTagsCount.intValue})",
 					fontFamily = getInterFont(),
 					fontSize = 18.sp,
@@ -408,7 +411,7 @@ fun NoteFormComponent() {
 		) {
 			Row(Modifier.fillMaxWidth().padding(bottom = 20.dp)) {
 				Text(
-					color = colorResource(R.color.title_color),
+					color = Color.Gray,
 					text = "Добавленные теги",
 					fontFamily = getInterFont(),
 					fontSize = 18.sp,

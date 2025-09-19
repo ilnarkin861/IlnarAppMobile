@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -56,7 +57,6 @@ fun NotesScreen() {
 	var showBottomSheet by remember { mutableStateOf(false) }
 	val sheetState = rememberModalBottomSheetState()
 	var sheetTitle = remember { mutableStateOf("") }
-	val screenHeight = LocalWindowInfo.current.containerSize.height.dp
 	var loading by remember { mutableStateOf(false) }
 
 
@@ -100,10 +100,10 @@ fun NotesScreen() {
 
 		if (showBottomSheet){
 			ModalBottomSheet(
-				modifier = Modifier.height(screenHeight * 0.7f),
 				onDismissRequest = { showBottomSheet = false },
 				containerColor = Color.White,
-				sheetState = sheetState
+				sheetState = sheetState,
+
 			) {
 				Column(Modifier
 					.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
