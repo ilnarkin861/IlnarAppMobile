@@ -41,6 +41,7 @@ import ru.ilnarkin.ilnarapp.models.Archive
 import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.models.Tag
+import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
@@ -56,7 +57,11 @@ fun NotesScreen() {
 	var showBottomSheet by remember { mutableStateOf(false) }
 	val sheetState = rememberModalBottomSheetState()
 	var sheetTitle = remember { mutableStateOf("") }
+	var alertTitle = remember { mutableStateOf("") }
 	var loading by remember { mutableStateOf(false) }
+	var showAlert by remember { mutableStateOf(false) }
+	var success by remember { mutableStateOf(true) }
+
 
 
 	LaunchedEffect(Unit) {
@@ -97,6 +102,13 @@ fun NotesScreen() {
 		}
 
 
+		AlertComponent(
+			success = success,
+			message = alertTitle.value,
+			showed = showAlert
+		) { }
+
+
 		if (showBottomSheet){
 			ModalBottomSheet(
 				onDismissRequest = { showBottomSheet = false },
@@ -129,9 +141,13 @@ fun NotesScreen() {
 						action = {
 							delay(3000)
 
-							//sheetState.hide()
+							alertTitle.value = "Запись успешно добавлена"
 
-							//showBottomSheet = false
+							showAlert = true
+
+							sheetState.hide()
+
+							showBottomSheet = false
 						}
 					)
 				}
