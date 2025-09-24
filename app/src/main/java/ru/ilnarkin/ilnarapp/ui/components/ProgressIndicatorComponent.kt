@@ -15,7 +15,7 @@ import ru.ilnarkin.ilnarapp.R
 fun ProgressIndicatorComponent(size: Int) {
 	CircularProgressIndicator(
 		modifier = Modifier.width(size.dp).height(size.dp),
-		strokeWidth = 3.dp,
+		strokeWidth = 2.dp,
 		color = colorResource(R.color.primary_color),
 		trackColor = MaterialTheme.colorScheme.surfaceVariant,
 	)
