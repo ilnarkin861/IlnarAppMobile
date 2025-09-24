@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -30,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -40,8 +37,10 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.models.Archive
 import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.models.NoteType
+import ru.ilnarkin.ilnarapp.models.Tag
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
@@ -63,7 +62,7 @@ fun NotesScreen() {
 	LaunchedEffect(Unit) {
 		loading = true
 
-		delay(3000)
+		delay(1500)
 
 		loading = false
 	}
@@ -103,7 +102,6 @@ fun NotesScreen() {
 				onDismissRequest = { showBottomSheet = false },
 				containerColor = Color.White,
 				sheetState = sheetState,
-
 			) {
 				Column(Modifier
 					.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
@@ -117,7 +115,25 @@ fun NotesScreen() {
 						)
 					}
 
-					NoteFormComponent()
+					NoteFormComponent(
+						noteTypes = getNoteTypes(),
+						archives = getArchives(),
+						tags = getTags(10),
+
+						loadTags = {count ->
+							delay(2000)
+
+							getTags(count)
+						},
+
+						action = {
+							delay(3000)
+
+							//sheetState.hide()
+
+							//showBottomSheet = false
+						}
+					)
 				}
 			}
 		}
@@ -148,11 +164,11 @@ fun getNotesList() : MutableList<Note>{
 		В маленьком городке, расположенном у подножия гор, ежегодно проходит фестиваль дружбы. Это событие собирает людей из разных уголков региона, и каждый год его темы отличаются.
 	""".trimIndent()
 	val noteDate = "12.09.2025"
-	val noteType = NoteType(id = "", title = "Note type")
+	val noteType = NoteType(id = "", title = "Событие")
 
 	for (i in 1..10){
 		notes.add(Note(
-			title = noteTitle,
+			title = "$noteTitle - $i",
 			text = noteText,
 			date = noteDate,
 			noteType =  noteType
@@ -160,4 +176,33 @@ fun getNotesList() : MutableList<Note>{
 	}
 
 	return notes
+}
+
+fun getNoteTypes(): List<NoteType>{
+	val noteTypes = mutableListOf<NoteType>()
+
+	noteTypes.add(NoteType(id = "", title = "Событие"))
+	noteTypes.add(NoteType(id = "", title = "Заметка"))
+
+	return noteTypes
+}
+
+fun getArchives(): List<Archive>{
+	val archives = mutableListOf<Archive>()
+
+	for (i in 1..5){
+		archives.add(Archive(id = "", title = "Архив ${i}"))
+	}
+
+	return archives
+}
+
+fun getTags(count: Int): MutableList<Tag>{
+	val tags = mutableListOf<Tag>()
+
+	for (i in 1..count){
+		tags.add(Tag(id = "", title = "Тег ${i}"))
+	}
+
+	return tags
 }

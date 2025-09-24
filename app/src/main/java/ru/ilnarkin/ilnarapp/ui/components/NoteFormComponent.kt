@@ -3,6 +3,8 @@ package ru.ilnarkin.ilnarapp.ui.components
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,19 +45,18 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Archive
+import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.models.Tag
 import java.time.LocalDate
@@ -64,16 +65,21 @@ import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
 @Composable
-fun NoteFormComponent() {
+fun NoteFormComponent(
+	note: Note? = null,
+	noteTypes: List<NoteType>,
+	archives: List<Archive>,
+	tags: MutableList<Tag>,
+	loadTags: suspend (count: Int) -> MutableList<Tag>,
+	action: suspend () -> Unit) {
 
-	val noteTypes = getNoteTypes()
-	val archives = getArchives()
-	val tags = getTags()
+	val selectableTags = tags
 
-	var loading by remember { mutableStateOf(false) }
+	var saving by remember { mutableStateOf(false) }
+	var tagsLoading by remember { mutableStateOf(false) }
 	val scope = rememberCoroutineScope()
+	val interactionSource = remember { MutableInteractionSource() }
 
 	var selectedNoteType by remember { mutableStateOf(noteTypes[0]) }
 	var noteTypeMenuExpanded by remember { mutableStateOf(false) }
@@ -100,6 +106,7 @@ fun NoteFormComponent() {
 	var selectedArchive by remember { mutableStateOf(Archive(id = "", title = "")) }
 
 	var addedTags = getAddedTags()
+
 	var selectedTags = remember { mutableStateListOf<Tag>() }
 	var selectedTagsCount = remember { mutableIntStateOf(0) }
 	var uploadableTags = mutableListOf<Tag>()
@@ -383,68 +390,108 @@ fun NoteFormComponent() {
 					fontWeight = FontWeight.Bold
 				)
 			}
-			tags.forEachIndexed {index, tag ->
+			selectableTags.forEachIndexed { index, tag ->
 				Row(Modifier.fillMaxWidth().padding(vertical = 15.dp)) {
-					TagCheckboxComponent(tag, onChecked = {})
+					TagCheckboxComponent(tag, onChecked = {tag ->
+						if (selectedTags.count() == 0){
+							selectedTags.add(tag)
+						}
+
+						else{
+							if (selectedTags.any{it.title == tag.title}){
+								selectedTags.remove(tag)
+							}
+
+							else selectedTags.add(tag)
+						}
+
+						selectedTagsCount.intValue = selectedTags.count()
+
+					})
 				}
 
-				if (index != tags.count() -1){
+				if (index != selectableTags.count() -1){
 					HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
 				}
 			}
 		}
 
 		Row(Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 40.dp)) {
-			Text(
-				color = colorResource(R.color.primary_color),
-				text = "Загрузить еще",
-				fontFamily = getInterFont(),
-				fontSize = 15.sp,
-				fontWeight = FontWeight.Bold
-			)
-		}
 
+			if (tagsLoading){
+				ProgressIndicatorComponent(25)
+			}
 
-		//Added tags
-		Column(
-			Modifier.fillMaxWidth().padding(top = 20.dp)
-		) {
-			Row(Modifier.fillMaxWidth().padding(bottom = 20.dp)) {
+			else{
 				Text(
-					color = Color.Gray,
-					text = "Добавленные теги",
+					modifier = Modifier.clickable(
+						interactionSource = interactionSource,
+						indication = null,
+						onClick = {
+							tagsLoading = true
+
+							scope.launch {
+								scope.async {
+									val tags = loadTags(selectableTags.count() + 10)
+									selectableTags.clear()
+									selectableTags.addAll(tags)
+								}.await()
+							}.invokeOnCompletion { tagsLoading = false }
+						}
+
+					),
+					color = colorResource(R.color.primary_color),
+					text = "Загрузить еще",
 					fontFamily = getInterFont(),
 					fontSize = 15.sp,
 					fontWeight = FontWeight.Bold
 				)
 			}
-			addedTags.forEachIndexed {index, tag ->
-				Row(
-					modifier = Modifier.fillMaxWidth(),
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.SpaceBetween) {
+		}
 
+		if (!addedTags.isEmpty()){
+			//Added tags
+			Column(
+				Modifier.fillMaxWidth().padding(top = 20.dp)
+			) {
+				Row(Modifier.fillMaxWidth().padding(bottom = 20.dp)) {
 					Text(
-						color = colorResource(R.color.text_color),
-						text = tag.title,
+						color = Color.Gray,
+						text = "Добавленные теги",
 						fontFamily = getInterFont(),
-						fontSize = 16.sp,
+						fontSize = 15.sp,
+						fontWeight = FontWeight.Bold
 					)
+				}
+				addedTags.forEachIndexed {index, tag ->
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						verticalAlignment = Alignment.CenterVertically,
+						horizontalArrangement = Arrangement.SpaceBetween) {
 
-					IconButton(onClick = {}) {
-						Icon(
-							modifier = Modifier.size(20.dp),
-							painter = painterResource(
-								R.drawable.ic_trash), contentDescription = "",
-							tint = colorResource(R.color.danger_color))
+						Text(
+							color = colorResource(R.color.text_color),
+							text = tag.title,
+							fontFamily = getInterFont(),
+							fontSize = 16.sp,
+						)
+
+						IconButton(onClick = { }) {
+							Icon(
+								modifier = Modifier.size(20.dp),
+								painter = painterResource(
+									R.drawable.ic_trash), contentDescription = "",
+								tint = colorResource(R.color.danger_color))
+						}
+
 					}
 
-				}
-
-				if (index != addedTags.count() -1){
-					HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
+					if (index != addedTags.count() -1){
+						HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
+					}
 				}
 			}
+
 		}
 
 
@@ -452,7 +499,7 @@ fun NoteFormComponent() {
 		Row(
 			modifier = Modifier.fillMaxWidth().padding(top = 60.dp, bottom = 80.dp)
 		) {
-			if(loading){
+			if(saving){
 				Row(
 					modifier = Modifier.fillMaxWidth(),
 					horizontalArrangement = Arrangement.Center
@@ -461,7 +508,7 @@ fun NoteFormComponent() {
 				}
 			}
 
-			if (!loading){
+			else{
 				Button(
 					modifier = Modifier
 						.fillMaxWidth()
@@ -471,15 +518,18 @@ fun NoteFormComponent() {
 					onClick = {
 						isNoteTextError = noteText.value.isEmpty()
 
-						if(!loading){
-							scope.launch {
-								loading = true
+						// if(isNoteTextError) ...
+						saving = true
 
-								delay(2000)
+						uploadableTags.addAll(selectedTags)
+						uploadableTags.addAll(addedTags)
 
-								loading = false
-							}
-						}
+						scope.launch {
+							scope.async {
+								action() }.await()
+						}.invokeOnCompletion { saving = false }
+
+
 					}
 				) {
 					Text(
@@ -495,35 +545,6 @@ fun NoteFormComponent() {
 	}
 }
 
-
-fun getNoteTypes(): List<NoteType>{
-	val noteTypes = mutableListOf<NoteType>()
-
-	noteTypes.add(NoteType(id = "", title = "Событие"))
-	noteTypes.add(NoteType(id = "", title = "Заметка"))
-
-	return noteTypes
-}
-
-fun getArchives(): List<Archive>{
-	val archives = mutableListOf<Archive>()
-
-	for (i in 1..5){
-		archives.add(Archive(id = "", title = "Архив ${i}"))
-	}
-
-	return archives
-}
-
-fun getTags(): MutableList<Tag>{
-	val tags = mutableListOf<Tag>()
-
-	for (i in 1..10){
-		tags.add(Tag(id = "", title = "Тег ${i}"))
-	}
-
-	return tags
-}
 
 fun getAddedTags(): MutableList<Tag>{
 	val tags = mutableListOf<Tag>()
