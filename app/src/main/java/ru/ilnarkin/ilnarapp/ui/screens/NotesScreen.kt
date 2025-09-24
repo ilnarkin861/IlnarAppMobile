@@ -106,7 +106,9 @@ fun NotesScreen() {
 			success = success,
 			message = alertTitle.value,
 			showed = showAlert,
-			action = {}
+			action = {
+				showAlert = false
+			}
 		)
 
 

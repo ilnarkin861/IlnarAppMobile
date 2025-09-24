@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
@@ -38,7 +39,7 @@ fun AlertComponent(
 	MaterialDialog(
 		dialogState = dialogState,
 		shape = MaterialTheme.shapes.small,
-		onCloseRequest = { dialogState.hide() },
+		onCloseRequest = { MaterialDialogState.Saver() },
 		buttons = {
 			positiveButton(
 				text = "Понятно",
