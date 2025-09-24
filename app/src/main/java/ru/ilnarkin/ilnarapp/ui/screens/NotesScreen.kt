@@ -86,16 +86,16 @@ fun NotesScreen() {
 		if (!loading && !notes.isEmpty()){
 			LazyColumn(contentPadding = PaddingValues(top = 30.dp, bottom = 60.dp)) {
 				item {
-					Row(Modifier.padding(bottom = 15.dp)) {
-						LoadButtonComponent(nextButton = false, action = {})
+					Row(Modifier.padding(bottom = 25.dp)) {
+						LoadButtonComponent(nextButton = false, action = { delay(1500) })
 					}
 				}
 				items(notes) {value ->
 					NoteItemComponent(value)
 				}
 				item {
-					Row(Modifier.padding(top = 15.dp, bottom = 30.dp)) {
-						LoadButtonComponent(action = {})
+					Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
+						LoadButtonComponent(action = { delay(1500) })
 					}
 				}
 			}
@@ -105,8 +105,9 @@ fun NotesScreen() {
 		AlertComponent(
 			success = success,
 			message = alertTitle.value,
-			showed = showAlert
-		) { }
+			showed = showAlert,
+			action = {}
+		)
 
 
 		if (showBottomSheet){
