@@ -19,6 +19,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +43,7 @@ import ru.ilnarkin.ilnarapp.models.Note
 fun NoteItemComponent(note: Note) {
 
 	val font = getInterFont()
+	var showConfirmAlert by remember { mutableStateOf(false) }
 
 	Box(
 		Modifier.fillMaxSize()
@@ -48,6 +53,15 @@ fun NoteItemComponent(note: Note) {
 			.background(color = Color.White)
 
 	) {
+
+		ConfirmComponent(
+			showed = showConfirmAlert,
+			action = {
+				showConfirmAlert = false
+			}
+		)
+
+
 		Column (Modifier.padding(
 			start = 10.dp,
 			top = 15.dp,
@@ -117,15 +131,15 @@ fun NoteItemComponent(note: Note) {
 				Row(verticalAlignment = Alignment.CenterVertically){
 					IconButton(onClick = {}) {
 						Icon(modifier = Modifier.size(22.dp),
-							painter = painterResource(
-							R.drawable.ic_edit), contentDescription = "",
+							painter = painterResource(R.drawable.ic_edit), contentDescription = "",
 							tint = colorResource(R.color.primary_color))
 					}
-					IconButton(onClick = {}) {
+					IconButton(onClick = {
+						showConfirmAlert = true
+					}) {
 						Icon(
 							modifier = Modifier.size(22.dp),
-							painter = painterResource(
-							R.drawable.ic_trash), contentDescription = "",
+							painter = painterResource(R.drawable.ic_trash), contentDescription = "",
 							tint = colorResource(R.color.danger_color))
 					}
 				}
