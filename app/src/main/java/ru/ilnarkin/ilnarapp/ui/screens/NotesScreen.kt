@@ -94,8 +94,12 @@ fun NotesScreen() {
 						LoadButtonComponent(nextButton = false, action = { delay(1500) })
 					}
 				}
-				items(notes) {value ->
-					NoteItemComponent(value)
+				items(notes) {note ->
+					NoteItemComponent(
+						note,
+						viewAction = {},
+						editAction = {},
+						deleteAction = {})
 				}
 				item {
 					Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {

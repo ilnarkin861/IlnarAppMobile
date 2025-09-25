@@ -39,7 +39,12 @@ import ru.ilnarkin.ilnarapp.models.Note
 
 
 @Composable
-fun NoteItemComponent(note: Note) {
+fun NoteItemComponent(
+	note: Note,
+	viewAction: (noteId: String) -> Unit,
+	editAction: (noteId: String) -> Unit,
+	deleteAction: (noteId: String) -> Unit
+	) {
 
 	val font = getInterFont()
 	var showConfirmAlert by remember { mutableStateOf(false) }
