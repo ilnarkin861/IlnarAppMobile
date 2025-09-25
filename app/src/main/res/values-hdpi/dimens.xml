@@ -7,4 +7,7 @@
     <dimen name="note_item_title_font_size">15sp</dimen>
     <dimen name="note_item_date_font_size">12sp</dimen>
     <dimen name="note_item_text_font_size">14sp</dimen>
+    <dimen name="note_title_font_size">20sp</dimen>
+    <dimen name="note_date_font_size">14sp</dimen>
+    <dimen name="note_text_font_size">16sp</dimen>
 </resources>
