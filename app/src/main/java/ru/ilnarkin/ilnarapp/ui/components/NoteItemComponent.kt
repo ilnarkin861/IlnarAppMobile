@@ -129,11 +129,10 @@ fun NoteItemComponent(
 							fontWeight = FontWeight.SemiBold,
 							fontSize = 12.sp)
 					}
-
 				}
 
 				Row(verticalAlignment = Alignment.CenterVertically){
-					IconButton(onClick = {}) {
+					IconButton(onClick = { viewAction(note)} ) {
 						Icon(modifier = Modifier.size(22.dp),
 							painter = painterResource(R.drawable.ic_edit), contentDescription = "",
 							tint = colorResource(R.color.primary_color))
