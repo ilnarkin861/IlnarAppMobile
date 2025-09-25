@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -55,6 +56,7 @@ fun NotesScreen() {
 
 	var notes = getNotesList()
 	var showBottomSheet by remember { mutableStateOf(false) }
+	val listState = rememberLazyListState()
 	val sheetState = rememberModalBottomSheetState()
 	var sheetTitle = remember { mutableStateOf("") }
 	var alertTitle = remember { mutableStateOf("") }
@@ -84,7 +86,9 @@ fun NotesScreen() {
 
 
 		if (!loading && !notes.isEmpty()){
-			LazyColumn(contentPadding = PaddingValues(top = 30.dp, bottom = 60.dp)) {
+			LazyColumn(
+				state = listState,
+				contentPadding = PaddingValues(top = 30.dp, bottom = 60.dp)) {
 				item {
 					Row(Modifier.padding(bottom = 25.dp)) {
 						LoadButtonComponent(nextButton = false, action = { delay(1500) })
@@ -95,7 +99,10 @@ fun NotesScreen() {
 				}
 				item {
 					Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
-						LoadButtonComponent(action = { delay(1500) })
+						LoadButtonComponent(action = {
+							delay(1500)
+							listState.scrollToItem(0)
+						})
 					}
 				}
 			}
