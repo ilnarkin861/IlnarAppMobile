@@ -41,9 +41,9 @@ import ru.ilnarkin.ilnarapp.models.Note
 @Composable
 fun NoteItemComponent(
 	note: Note,
-	viewAction: (noteId: String) -> Unit,
-	editAction: (noteId: String) -> Unit,
-	deleteAction: (noteId: String) -> Unit
+	viewAction: (note: Note) -> Unit,
+	editAction: (note: Note) -> Unit,
+	deleteAction: (note: Note) -> Unit
 	) {
 
 	val font = getInterFont()
