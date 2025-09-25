@@ -121,7 +121,7 @@ fun NoteItemComponent(
 						colors = ButtonDefaults
 							.buttonColors(containerColor = colorResource(R.color.primary_color)),
 						shape = RoundedCornerShape(10.dp),
-						onClick = {}) {
+						onClick = { viewAction(note) }) {
 						Text(
 							text = "Подробнее",
 							color = Color.White,
@@ -132,7 +132,7 @@ fun NoteItemComponent(
 				}
 
 				Row(verticalAlignment = Alignment.CenterVertically){
-					IconButton(onClick = { viewAction(note)} ) {
+					IconButton(onClick = { } ) {
 						Icon(modifier = Modifier.size(22.dp),
 							painter = painterResource(R.drawable.ic_edit), contentDescription = "",
 							tint = colorResource(R.color.primary_color))
