@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Archive
@@ -44,6 +48,7 @@ import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.models.Tag
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
+import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
@@ -55,16 +60,18 @@ import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 fun NotesScreen() {
 
 	var notes = getNotesList()
-	var showBottomSheet by remember { mutableStateOf(false) }
+	var showNoteFormSheet by remember { mutableStateOf(false) }
+	var showNoteDetailsSheet by remember { mutableStateOf(false) }
 	val listState = rememberLazyListState()
 	val noteFormSheetState = rememberModalBottomSheetState()
 	val noteDetailsSheetState = rememberModalBottomSheetState()
-	var sheetTitle = remember { mutableStateOf("") }
+	var noteFormSheetTitle = remember { mutableStateOf("") }
 	var alertTitle = remember { mutableStateOf("") }
 	var loading by remember { mutableStateOf(false) }
+	var noteDetailsLoading by remember { mutableStateOf(false) }
 	var showAlert by remember { mutableStateOf(false) }
 	var success by remember { mutableStateOf(true) }
-
+	val scope = rememberCoroutineScope()
 
 
 	LaunchedEffect(Unit) {
@@ -98,7 +105,16 @@ fun NotesScreen() {
 				items(notes) {note ->
 					NoteItemComponent(
 						note,
-						viewAction = {},
+						viewAction = {
+							showNoteDetailsSheet = true
+
+							noteDetailsLoading = true
+
+							scope.launch {
+								delay(2500)
+							}.invokeOnCompletion { noteDetailsLoading = false }
+						},
+
 						editAction = {},
 						deleteAction = {})
 				}
@@ -120,13 +136,31 @@ fun NotesScreen() {
 			showed = showAlert,
 			action = {
 				showAlert = false
+
+				// еще что-то делаем
 			}
 		)
 
 
-		if (showBottomSheet){
+		FloatingActionButton(
+			containerColor = colorResource(R.color.primary_color),
+			contentColor = Color.White,
+			shape = CircleShape,
+			modifier = Modifier
+				.align(Alignment.BottomEnd)
+				.absolutePadding(bottom = 30.dp, right = 30.dp)
+				.background(Color.Transparent),
+			onClick = {
+				noteFormSheetTitle.value = "Добавить запись"
+				showNoteFormSheet = true
+			}) {
+			Icon(painter = painterResource(R.drawable.ic_plus), contentDescription = "Добавить")
+		}
+
+
+		if (showNoteFormSheet){
 			ModalBottomSheet(
-				onDismissRequest = { showBottomSheet = false },
+				onDismissRequest = { showNoteFormSheet = false },
 				containerColor = Color.White,
 				sheetState = noteFormSheetState,
 			) {
@@ -135,7 +169,7 @@ fun NotesScreen() {
 					Row {
 						Text(
 							color = colorResource(R.color.title_color),
-							text = sheetTitle.value,
+							text = noteFormSheetTitle.value,
 							fontFamily = getInterFont(),
 							fontSize = 18.sp,
 							fontWeight = FontWeight.Bold
@@ -162,7 +196,7 @@ fun NotesScreen() {
 
 							noteFormSheetState.hide()
 
-							showBottomSheet = false
+							showNoteFormSheet = false
 						}
 					)
 				}
@@ -170,19 +204,27 @@ fun NotesScreen() {
 		}
 
 
-		FloatingActionButton(
-			containerColor = colorResource(R.color.primary_color),
-			contentColor = Color.White,
-			shape = CircleShape,
-			modifier = Modifier
-				.align(Alignment.BottomEnd)
-				.absolutePadding(bottom = 30.dp, right = 30.dp)
-				.background(Color.Transparent),
-			onClick = {
-				sheetTitle.value = "Добавить запись"
-				showBottomSheet = true
-			}) {
-			Icon(painter = painterResource(R.drawable.ic_plus), contentDescription = "Добавить")
+		if (showNoteDetailsSheet){
+			ModalBottomSheet(
+				onDismissRequest = { showNoteDetailsSheet = false },
+				containerColor = Color.White,
+				sheetState = noteDetailsSheetState,
+			) {
+				if (noteDetailsLoading){
+					Box(
+						modifier = Modifier.fillMaxWidth().height(200.dp),
+						contentAlignment = Alignment.Center
+					) {
+						ProgressIndicatorComponent(50)
+					}
+				}
+
+				else {
+					NoteDetailsComponent()
+				}
+
+
+			}
 		}
 	}
 }
