@@ -57,7 +57,8 @@ fun NotesScreen() {
 	var notes = getNotesList()
 	var showBottomSheet by remember { mutableStateOf(false) }
 	val listState = rememberLazyListState()
-	val sheetState = rememberModalBottomSheetState()
+	val noteFormSheetState = rememberModalBottomSheetState()
+	val noteDetailsSheetState = rememberModalBottomSheetState()
 	var sheetTitle = remember { mutableStateOf("") }
 	var alertTitle = remember { mutableStateOf("") }
 	var loading by remember { mutableStateOf(false) }
@@ -127,7 +128,7 @@ fun NotesScreen() {
 			ModalBottomSheet(
 				onDismissRequest = { showBottomSheet = false },
 				containerColor = Color.White,
-				sheetState = sheetState,
+				sheetState = noteFormSheetState,
 			) {
 				Column(Modifier
 					.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
@@ -159,7 +160,7 @@ fun NotesScreen() {
 
 							showAlert = true
 
-							sheetState.hide()
+							noteFormSheetState.hide()
 
 							showBottomSheet = false
 						}
