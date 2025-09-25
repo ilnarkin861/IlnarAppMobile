@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -48,8 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -499,39 +500,41 @@ fun NoteFormComponent(
 		Row(
 			modifier = Modifier.fillMaxWidth().padding(top = 60.dp, bottom = 80.dp)
 		) {
-			if(saving){
-				Row(
-					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.Center
-				) {
-					ProgressIndicatorComponent(30)
+			Button(
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(60.dp),
+				enabled = !saving,
+				shape = RoundedCornerShape(10.dp),
+				colors = ButtonDefaults.buttonColors(
+					containerColor = colorResource(R.color.primary_color),
+					disabledContainerColor = colorResource(R.color.primary_color).copy(alpha = 0.8f)),
+				onClick = {
+					isNoteTextError = noteText.value.isEmpty()
+
+					// if(isNoteTextError) ...
+					saving = true
+
+					uploadableTags.addAll(selectedTags)
+					uploadableTags.addAll(addedTags)
+
+					scope.launch {
+						scope.async {
+							action() }.await()
+					}.invokeOnCompletion { saving = false }
+
+
 				}
-			}
-
-			else{
-				Button(
-					modifier = Modifier
-						.fillMaxWidth()
-						.height(60.dp),
-					shape = RoundedCornerShape(10.dp),
-					colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primary_color)),
-					onClick = {
-						isNoteTextError = noteText.value.isEmpty()
-
-						// if(isNoteTextError) ...
-						saving = true
-
-						uploadableTags.addAll(selectedTags)
-						uploadableTags.addAll(addedTags)
-
-						scope.launch {
-							scope.async {
-								action() }.await()
-						}.invokeOnCompletion { saving = false }
-
-
-					}
-				) {
+			) {
+				if (saving){
+					CircularProgressIndicator(
+						modifier = Modifier.size(20.dp),
+						strokeWidth = 2.dp,
+						color = Color.White,
+						trackColor = Color.Transparent,
+					)
+				}
+				else{
 					Text(
 						text = "Сохранить",
 						fontFamily = getInterFont(),
@@ -539,7 +542,6 @@ fun NoteFormComponent(
 						fontWeight = FontWeight.SemiBold
 					)
 				}
-
 			}
 		}
 	}
