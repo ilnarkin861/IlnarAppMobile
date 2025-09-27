@@ -59,6 +59,7 @@ import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 @Composable
 fun NotesScreen() {
 
+	var currentNote by remember { mutableStateOf<Note?>(null) }
 	var notes = getNotesList()
 	var showNoteFormSheet by remember { mutableStateOf(false) }
 	var showNoteDetailsSheet by remember { mutableStateOf(false) }
@@ -72,6 +73,13 @@ fun NotesScreen() {
 	var showAlert by remember { mutableStateOf(false) }
 	var success by remember { mutableStateOf(true) }
 	val scope = rememberCoroutineScope()
+	val noteFullText = """
+		В маленьком городке, расположенном у подножия гор, ежегодно проходит фестиваль дружбы. Это событие собирает людей из разных уголков региона, и каждый год его темы отличаются.
+
+		В этом году открыл его известный местный музыкант, который исполнил песни о дружбе и единстве. На главной площади горько улыбалась выступление детей из местной школы. Их танец, который они подготовили специально для этого дня, зацепил сердца всех зрителей.
+			
+		Фестиваль дружбы становится не только местом встречи старых друзей, но и возможностью завести новые знакомства. Люди разных возрастов и национальностей объединяются под общим девизом: "Вместе мы сильнее!" По завершении праздника жители обещали встречаться чаще и продолжать развивать дружеские связи, возникающие в течение этого неповторимого дня.
+		""".trimIndent()
 
 
 	LaunchedEffect(Unit) {
@@ -102,17 +110,23 @@ fun NotesScreen() {
 						LoadButtonComponent(nextButton = false, action = { delay(1500) })
 					}
 				}
-				items(notes) {note ->
+				items(notes) {value ->
 					NoteItemComponent(
-						note,
-						viewAction = {
+						value,
+						viewAction = {note ->
+							currentNote = null
+
 							showNoteDetailsSheet = true
 
 							noteDetailsLoading = true
 
 							scope.launch {
 								delay(2500)
-							}.invokeOnCompletion { noteDetailsLoading = false }
+							}.invokeOnCompletion {
+								note.text = noteFullText
+								currentNote = note
+								noteDetailsLoading = false
+							}
 						},
 
 						editAction = {},
@@ -219,11 +233,7 @@ fun NotesScreen() {
 					}
 				}
 
-				else {
-					NoteDetailsComponent()
-				}
-
-
+				else { NoteDetailsComponent(currentNote) }
 			}
 		}
 	}
