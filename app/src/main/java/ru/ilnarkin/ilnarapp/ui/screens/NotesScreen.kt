@@ -249,12 +249,19 @@ fun getNotesList() : MutableList<Note>{
 	val noteDate = "12.09.2025"
 	val noteType = NoteType(id = "", title = "Событие")
 
+	var tags = getTags(5)
+
+
+
+
 	for (i in 1..10){
 		notes.add(Note(
 			title = "$noteTitle - $i",
 			text = noteText,
 			date = noteDate,
-			noteType =  noteType
+			noteType =  noteType,
+			tags = tags,
+			archive = Archive(id = "", title = "Архив 1")
 		))
 	}
 
