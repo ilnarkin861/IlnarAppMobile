@@ -66,7 +66,7 @@ fun NotesScreen() {
 	val listState = rememberLazyListState()
 	val noteFormSheetState = rememberModalBottomSheetState()
 	val noteDetailsSheetState = rememberModalBottomSheetState()
-	var noteFormSheetTitle = remember { mutableStateOf("") }
+	var sheetTitle = remember { mutableStateOf("") }
 	var alertTitle = remember { mutableStateOf("") }
 	var loading by remember { mutableStateOf(false) }
 	var noteDetailsLoading by remember { mutableStateOf(false) }
@@ -129,7 +129,11 @@ fun NotesScreen() {
 							}
 						},
 
-						editAction = {},
+						editAction = {note ->
+							currentNote = note
+							showNoteFormSheet = true
+
+						},
 						deleteAction = {})
 				}
 				item {
@@ -165,7 +169,7 @@ fun NotesScreen() {
 				.absolutePadding(bottom = 30.dp, right = 30.dp)
 				.background(Color.Transparent),
 			onClick = {
-				noteFormSheetTitle.value = "Добавить запись"
+				sheetTitle.value = "Добавить запись"
 				showNoteFormSheet = true
 			}) {
 			Icon(painter = painterResource(R.drawable.ic_plus), contentDescription = "Добавить")
@@ -174,7 +178,10 @@ fun NotesScreen() {
 
 		if (showNoteFormSheet){
 			ModalBottomSheet(
-				onDismissRequest = { showNoteFormSheet = false },
+				onDismissRequest = {
+					currentNote = null
+					showNoteFormSheet = false
+				},
 				containerColor = Color.White,
 				sheetState = noteFormSheetState,
 			) {
@@ -183,7 +190,7 @@ fun NotesScreen() {
 					Row {
 						Text(
 							color = colorResource(R.color.title_color),
-							text = noteFormSheetTitle.value,
+							text = sheetTitle.value,
 							fontFamily = getInterFont(),
 							fontSize = 18.sp,
 							fontWeight = FontWeight.Bold
@@ -191,6 +198,7 @@ fun NotesScreen() {
 					}
 
 					NoteFormComponent(
+						currentNote,
 						noteTypes = getNoteTypes(),
 						archives = getArchives(),
 						tags = getTags(10),
@@ -246,13 +254,10 @@ fun getNotesList() : MutableList<Note>{
 	val noteText = """
 		В маленьком городке, расположенном у подножия гор, ежегодно проходит фестиваль дружбы. Это событие собирает людей из разных уголков региона, и каждый год его темы отличаются.
 	""".trimIndent()
-	val noteDate = "12.09.2025"
-	val noteType = NoteType(id = "", title = "Событие")
+	val noteDate = "2023-10-20"
+	val noteType = NoteType(id = "", title = "Заметка")
 
 	var tags = getTags(5)
-
-
-
 
 	for (i in 1..10){
 		notes.add(Note(

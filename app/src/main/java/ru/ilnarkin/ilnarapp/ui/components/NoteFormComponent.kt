@@ -39,6 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -73,7 +74,7 @@ fun NoteFormComponent(
 	archives: List<Archive>,
 	tags: MutableList<Tag>,
 	loadTags: suspend (count: Int) -> MutableList<Tag>,
-	action: suspend () -> Unit) {
+	action: suspend (note: Note) -> Unit) {
 
 	val selectableTags = tags
 
@@ -82,17 +83,19 @@ fun NoteFormComponent(
 	val scope = rememberCoroutineScope()
 	val interactionSource = remember { MutableInteractionSource() }
 
-	var selectedNoteType by remember { mutableStateOf(noteTypes[0]) }
 	var noteTypeMenuExpanded by remember { mutableStateOf(false) }
 
-	var noteTitle = remember { mutableStateOf("") }
+	val selectedNoteType = remember { mutableStateOf(note?.noteType ?: noteTypes[0]) }
 
-	var noteText = remember { mutableStateOf("") }
+	val noteTitle = remember { mutableStateOf(note?.title ?: "") }
+
+	val noteText = remember { mutableStateOf(note?.text ?: "") }
+
 	var isNoteTextError by remember { mutableStateOf(false) }
 
 	val dateDialogState = rememberMaterialDialogState()
-	var noteDate by remember {mutableStateOf(LocalDate.now())}
-	val formattedDate by remember {
+	var noteDate by remember {mutableStateOf(if (note != null) LocalDate.parse(note.date) else LocalDate.now())}
+	val formattedDate = remember {
 		derivedStateOf {
 			DateTimeFormatter
 				.ofPattern("dd.MM.yyyy")
@@ -102,36 +105,46 @@ fun NoteFormComponent(
 
 	val unSelectedArchiveTitle = "Архив не выбран"
 	var selectedArchiveTitle by remember { mutableStateOf(unSelectedArchiveTitle) }
-	var archiveSelected by remember { mutableStateOf(false) }
 	var archiveMenuExpanded by remember { mutableStateOf(false) }
-	var selectedArchive by remember { mutableStateOf(Archive(id = "", title = "")) }
+	var archiveIsSelected by remember { mutableStateOf(false) }
+	var selectedArchive: Archive? by remember { mutableStateOf(null) }
 
-	var addedTags = getAddedTags()
+	if (note != null && note.archive != null){
+		archiveIsSelected = true
+		selectedArchiveTitle = note.archive!!.title
+		selectedArchive = note.archive
+	}
 
-	var selectedTags = remember { mutableStateListOf<Tag>() }
-	var selectedTagsCount = remember { mutableIntStateOf(0) }
-	var uploadableTags = mutableListOf<Tag>()
+	val addedTags = remember { note?.tags?.toMutableStateList() ?: mutableStateListOf()}
+
+	val selectedTags = remember { mutableStateListOf<Tag>() }
+	val selectedTagsCount = remember { mutableIntStateOf(0) }
+	val uploadableTags = mutableListOf<Tag>()
 
 
-	Column(Modifier.fillMaxSize()
+	Column(Modifier
+		.fillMaxSize()
 		.padding(top = 30.dp)
 		.verticalScroll(rememberScrollState())) {
 
 		//Note type dropdown menu
 		ExposedDropdownMenuBox(
-			modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(bottom = 10.dp),
 			expanded = noteTypeMenuExpanded,
 			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded }
 		) {
 			OutlinedTextField(
-				modifier = Modifier.fillMaxWidth()
-					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
+				modifier = Modifier
+					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
+					.fillMaxWidth(),
 				textStyle = TextStyle(
 					fontFamily = getInterFont(),
 					fontSize = 15.sp,
 					),
-				value = selectedNoteType.title,
-				onValueChange = {},
+				value = selectedNoteType.value.title,
+				onValueChange = {selectedNoteType.value.title = it},
 				readOnly = true,
 				colors = OutlinedTextFieldDefaults.colors(
 					unfocusedBorderColor = colorResource(R.color.inputs_border_color),
@@ -168,7 +181,7 @@ fun NoteFormComponent(
 								fontSize = 15.sp
 							)},
 						onClick = {
-							selectedNoteType = noteType
+							selectedNoteType.value = noteType
 							noteTypeMenuExpanded = false
 						}
 					)
@@ -189,7 +202,7 @@ fun NoteFormComponent(
 			value = noteTitle.value,
 			singleLine = true,
 			label = { Text("Заголовок") },
-			onValueChange = {text -> noteTitle.value = text},
+			onValueChange = {text -> noteTitle.value = text	},
 			colors = OutlinedTextFieldDefaults.colors(
 				unfocusedBorderColor = colorResource(R.color.inputs_border_color),
 				focusedBorderColor = colorResource(R.color.primary_color),
@@ -245,10 +258,12 @@ fun NoteFormComponent(
 
 		//Date field
 		OutlinedTextField(
-			modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 20.dp),
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(top = 10.dp, bottom = 20.dp),
 			readOnly = true,
 			enabled = false,
-			value = formattedDate,
+			value = formattedDate.value,
 			onValueChange = {},
 			colors = OutlinedTextFieldDefaults.colors(
 				unfocusedBorderColor = colorResource(R.color.inputs_border_color),
@@ -302,7 +317,9 @@ fun NoteFormComponent(
 
 		// Archive dropdown
 		ExposedDropdownMenuBox(
-			modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(bottom = 20.dp),
 			expanded = archiveMenuExpanded,
 			onExpandedChange = { archiveMenuExpanded = !archiveMenuExpanded }
 		){
@@ -352,7 +369,7 @@ fun NoteFormComponent(
 							)},
 					onClick = {
 						selectedArchiveTitle = unSelectedArchiveTitle
-						archiveSelected = false
+						archiveIsSelected = false
 						archiveMenuExpanded = false
 					}
 				)
@@ -369,7 +386,7 @@ fun NoteFormComponent(
 						onClick = {
 							selectedArchive = archive
 							selectedArchiveTitle = archive.title
-							archiveSelected = true
+							archiveIsSelected = true
 							archiveMenuExpanded = false
 						}
 					)
@@ -377,12 +394,19 @@ fun NoteFormComponent(
 			}
 		}
 
+		selectedTags.forEach { tag ->
+			Text(tag.title)
+		}
 
 		//Selectable tags
 		Column(
-			Modifier.fillMaxWidth().padding(top = 20.dp)
+			Modifier
+				.fillMaxWidth()
+				.padding(top = 20.dp)
 		) {
-			Row(Modifier.fillMaxWidth().padding(bottom = 20.dp)) {
+			Row(Modifier
+				.fillMaxWidth()
+				.padding(bottom = 20.dp)) {
 				Text(
 					color = Color.Gray,
 					text = "Выбрать теги (${selectedTagsCount.intValue})",
@@ -392,7 +416,9 @@ fun NoteFormComponent(
 				)
 			}
 			selectableTags.forEachIndexed { index, tag ->
-				Row(Modifier.fillMaxWidth().padding(vertical = 15.dp)) {
+				Row(Modifier
+					.fillMaxWidth()
+					.padding(vertical = 15.dp)) {
 					TagCheckboxComponent(tag, onChecked = {tag ->
 						if (selectedTags.count() == 0){
 							selectedTags.add(tag)
@@ -407,7 +433,6 @@ fun NoteFormComponent(
 						}
 
 						selectedTagsCount.intValue = selectedTags.count()
-
 					})
 				}
 
@@ -417,7 +442,9 @@ fun NoteFormComponent(
 			}
 		}
 
-		Row(Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 40.dp)) {
+		Row(Modifier
+			.fillMaxWidth()
+			.padding(top = 20.dp, bottom = 40.dp)) {
 
 			if (tagsLoading){
 				ProgressIndicatorComponent(25)
@@ -453,9 +480,13 @@ fun NoteFormComponent(
 		if (!addedTags.isEmpty()){
 			//Added tags
 			Column(
-				Modifier.fillMaxWidth().padding(top = 20.dp)
+				Modifier
+					.fillMaxWidth()
+					.padding(top = 20.dp)
 			) {
-				Row(Modifier.fillMaxWidth().padding(bottom = 20.dp)) {
+				Row(Modifier
+					.fillMaxWidth()
+					.padding(bottom = 20.dp)) {
 					Text(
 						color = Color.Gray,
 						text = "Добавленные теги",
@@ -477,14 +508,13 @@ fun NoteFormComponent(
 							fontSize = 16.sp,
 						)
 
-						IconButton(onClick = { }) {
+						IconButton(onClick = { addedTags.removeAt(index) }) {
 							Icon(
 								modifier = Modifier.size(20.dp),
 								painter = painterResource(
 									R.drawable.ic_trash), contentDescription = "",
 								tint = colorResource(R.color.danger_color))
 						}
-
 					}
 
 					if (index != addedTags.count() -1){
@@ -498,7 +528,9 @@ fun NoteFormComponent(
 
 		//Save button
 		Row(
-			modifier = Modifier.fillMaxWidth().padding(top = 60.dp, bottom = 80.dp)
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(top = 60.dp, bottom = 80.dp)
 		) {
 			Button(
 				modifier = Modifier
@@ -512,18 +544,28 @@ fun NoteFormComponent(
 				onClick = {
 					isNoteTextError = noteText.value.isEmpty()
 
-					// if(isNoteTextError) ...
-					saving = true
-
-					uploadableTags.addAll(selectedTags)
-					uploadableTags.addAll(addedTags)
-
-					scope.launch {
-						scope.async {
-							action() }.await()
-					}.invokeOnCompletion { saving = false }
 
 
+					if(!isNoteTextError){
+						saving = true
+
+						uploadableTags.addAll(selectedTags)
+						uploadableTags.addAll(addedTags)
+
+						val note = Note(
+							title = noteTitle.value,
+							text = noteText.value,
+							noteType = selectedNoteType.value,
+							date = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(noteDate),
+							archive = selectedArchive,
+							tags =  uploadableTags
+						)
+
+						scope.launch {
+							scope.async {
+								action(note) }.await()
+						}.invokeOnCompletion { saving = false }
+					}
 				}
 			) {
 				if (saving){
@@ -545,15 +587,4 @@ fun NoteFormComponent(
 			}
 		}
 	}
-}
-
-
-fun getAddedTags(): MutableList<Tag>{
-	val tags = mutableListOf<Tag>()
-
-	for (i in 1..5){
-		tags.add(Tag(id = "", title = "Добавленный тег ${i}"))
-	}
-
-	return tags
 }

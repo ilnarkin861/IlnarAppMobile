@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.sp
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 @Composable
@@ -84,7 +86,9 @@ fun NoteItemComponent(
 
 			Row(Modifier.padding(top = 5.dp)) {
 				Text(
-					text = note.date,
+					text = DateTimeFormatter
+						.ofPattern("dd.MM.yyyy")
+						.format(LocalDate.parse(note.date)),
 					fontFamily = font,
 					color = colorResource(R.color.grey),
 					fontSize = dimensionResource(R.dimen.note_item_date_font_size).value.sp
@@ -132,7 +136,9 @@ fun NoteItemComponent(
 				}
 
 				Row(verticalAlignment = Alignment.CenterVertically){
-					IconButton(onClick = { } ) {
+					IconButton(onClick = {
+						editAction(note)
+					}) {
 						Icon(modifier = Modifier.size(22.dp),
 							painter = painterResource(R.drawable.ic_edit), contentDescription = "",
 							tint = colorResource(R.color.primary_color))
