@@ -394,10 +394,6 @@ fun NoteFormComponent(
 			}
 		}
 
-		selectedTags.forEach { tag ->
-			Text(tag.title)
-		}
-
 		//Selectable tags
 		Column(
 			Modifier
