@@ -60,14 +60,14 @@ import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 fun NotesScreen() {
 
 	var currentNote by remember { mutableStateOf<Note?>(null) }
-	var notes = getNotesList()
+	val notes = getNotesList()
 	var showNoteFormSheet by remember { mutableStateOf(false) }
 	var showNoteDetailsSheet by remember { mutableStateOf(false) }
 	val listState = rememberLazyListState()
 	val noteFormSheetState = rememberModalBottomSheetState()
 	val noteDetailsSheetState = rememberModalBottomSheetState()
-	var sheetTitle = remember { mutableStateOf("") }
-	var alertTitle = remember { mutableStateOf("") }
+	val sheetTitle = remember { mutableStateOf("") }
+	val alertTitle = remember { mutableStateOf("") }
 	var loading by remember { mutableStateOf(false) }
 	var noteDetailsLoading by remember { mutableStateOf(false) }
 	var showAlert by remember { mutableStateOf(false) }
@@ -257,7 +257,7 @@ fun getNotesList() : MutableList<Note>{
 	val noteDate = "2023-10-20"
 	val noteType = NoteType(id = "", title = "Заметка")
 
-	var tags = getTags(5)
+	val tags = getTags(5)
 
 	for (i in 1..10){
 		notes.add(Note(
