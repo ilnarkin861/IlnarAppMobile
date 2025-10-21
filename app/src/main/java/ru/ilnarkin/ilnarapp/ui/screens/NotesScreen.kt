@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Archive
 import ru.ilnarkin.ilnarapp.models.Note
@@ -59,6 +60,7 @@ import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 @Composable
 fun NotesScreen() {
 
+	var actionType by remember { mutableStateOf(ActionType.CREATE) }
 	var currentNote by remember { mutableStateOf<Note?>(null) }
 	val notes = getNotesList()
 	var showNoteFormSheet by remember { mutableStateOf(false) }
@@ -130,9 +132,19 @@ fun NotesScreen() {
 						},
 
 						editAction = {note ->
-							currentNote = note
+							actionType = ActionType.UPDATE
+							sheetTitle.value = "Изменить запись"
+
+							noteDetailsLoading = true
 							showNoteFormSheet = true
 
+							scope.launch {
+								delay(2500)
+							}.invokeOnCompletion {
+								note.text = noteFullText
+								currentNote = note
+								noteDetailsLoading = false
+							}
 						},
 						deleteAction = {})
 				}
@@ -169,6 +181,7 @@ fun NotesScreen() {
 				.absolutePadding(bottom = 30.dp, right = 30.dp)
 				.background(Color.Transparent),
 			onClick = {
+				actionType = ActionType.CREATE
 				sheetTitle.value = "Добавить запись"
 				showNoteFormSheet = true
 			}) {
@@ -197,30 +210,58 @@ fun NotesScreen() {
 						)
 					}
 
-					NoteFormComponent(
-						currentNote,
-						noteTypes = getNoteTypes(),
-						archives = getArchives(),
-						tags = getTags(10),
-
-						loadTags = {count ->
-							delay(2000)
-
-							getTags(count)
-						},
-
-						action = {
-							delay(3000)
-
-							alertTitle.value = "Запись успешно добавлена"
-
-							showAlert = true
-
-							noteFormSheetState.hide()
-
-							showNoteFormSheet = false
+					if (noteDetailsLoading){
+						Box(
+							modifier = Modifier
+								.fillMaxWidth()
+								.height(200.dp),
+							contentAlignment = Alignment.Center
+						) {
+							ProgressIndicatorComponent(50)
 						}
-					)
+					}
+
+					else{
+						NoteFormComponent(
+							currentNote,
+							noteTypes = getNoteTypes(),
+							archives = getArchives(),
+							tags = getTags(10),
+
+							loadTags = {count ->
+								delay(2000)
+
+								getTags(count)
+							},
+
+							action = {note ->
+
+								delay(3000)
+
+								if (actionType == ActionType.CREATE){
+
+									// Save to db
+
+									alertTitle.value = "Запись успешно добавлена"
+								}
+
+								else{
+
+									// Save to db
+
+									alertTitle.value = "Запись успешно изменена"
+								}
+
+								showAlert = true
+
+								noteFormSheetState.hide()
+
+								showNoteFormSheet = false
+
+								currentNote = null
+							}
+						)
+					}
 				}
 			}
 		}
@@ -234,7 +275,9 @@ fun NotesScreen() {
 			) {
 				if (noteDetailsLoading){
 					Box(
-						modifier = Modifier.fillMaxWidth().height(200.dp),
+						modifier = Modifier
+							.fillMaxWidth()
+							.height(200.dp),
 						contentAlignment = Alignment.Center
 					) {
 						ProgressIndicatorComponent(50)

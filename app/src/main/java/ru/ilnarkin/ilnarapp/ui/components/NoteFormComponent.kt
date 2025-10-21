@@ -104,16 +104,11 @@ fun NoteFormComponent(
 	}
 
 	val unSelectedArchiveTitle = "Архив не выбран"
-	var selectedArchiveTitle by remember { mutableStateOf(unSelectedArchiveTitle) }
+	var selectedArchiveTitle by remember { mutableStateOf(note?.archive?.title ?: unSelectedArchiveTitle) }
 	var archiveMenuExpanded by remember { mutableStateOf(false) }
-	var archiveIsSelected by remember { mutableStateOf(false) }
-	var selectedArchive: Archive? by remember { mutableStateOf(null) }
+	var archiveIsSelected by remember { mutableStateOf(note?.archive ?: false) }
+	var selectedArchive: Archive? by remember { mutableStateOf(note?.archive) }
 
-	if (note != null && note.archive != null){
-		archiveIsSelected = true
-		selectedArchiveTitle = note.archive!!.title
-		selectedArchive = note.archive
-	}
 
 	val addedTags = remember { note?.tags?.toMutableStateList() ?: mutableStateListOf()}
 
