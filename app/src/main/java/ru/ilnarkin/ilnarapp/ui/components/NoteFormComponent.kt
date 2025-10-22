@@ -73,6 +73,7 @@ fun NoteFormComponent(
 	noteTypes: List<NoteType>,
 	archives: List<Archive>,
 	tags: MutableList<Tag>,
+	hasNextTags: Boolean = true,
 	loadTags: suspend (count: Int) -> MutableList<Tag>,
 	action: suspend (note: Note) -> Unit) {
 
@@ -433,38 +434,40 @@ fun NoteFormComponent(
 			}
 		}
 
-		Row(Modifier
-			.fillMaxWidth()
-			.padding(top = 20.dp, bottom = 40.dp)) {
+		if (hasNextTags){
+			Row(Modifier
+				.fillMaxWidth()
+				.padding(top = 20.dp, bottom = 40.dp)) {
 
-			if (tagsLoading){
-				ProgressIndicatorComponent(25)
-			}
+				if (tagsLoading){
+					ProgressIndicatorComponent(25)
+				}
 
-			else{
-				Text(
-					modifier = Modifier.clickable(
-						interactionSource = interactionSource,
-						indication = null,
-						onClick = {
-							tagsLoading = true
+				else{
+					Text(
+						modifier = Modifier.clickable(
+							interactionSource = interactionSource,
+							indication = null,
+							onClick = {
+								tagsLoading = true
 
-							scope.launch {
-								scope.async {
-									val tags = loadTags(selectableTags.count() + 10)
-									selectableTags.clear()
-									selectableTags.addAll(tags)
-								}.await()
-							}.invokeOnCompletion { tagsLoading = false }
-						}
+								scope.launch {
+									scope.async {
+										val tags = loadTags(selectableTags.count() + 10)
+										selectableTags.clear()
+										selectableTags.addAll(tags)
+									}.await()
+								}.invokeOnCompletion { tagsLoading = false }
+							}
 
-					),
-					color = colorResource(R.color.primary_color),
-					text = "Загрузить еще",
-					fontFamily = getInterFont(),
-					fontSize = 15.sp,
-					fontWeight = FontWeight.Bold
-				)
+						),
+						color = colorResource(R.color.primary_color),
+						text = "Загрузить еще",
+						fontFamily = getInterFont(),
+						fontSize = 15.sp,
+						fontWeight = FontWeight.Bold
+					)
+				}
 			}
 		}
 
