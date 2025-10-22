@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 @Composable
@@ -47,7 +49,7 @@ fun NoteDetailsComponent(note: Note?) {
 
 		Row(Modifier.padding(top = 10.dp)) {
 			Text(
-				text = note!!.date,
+				text = DateTimeFormatter.ofPattern("dd.MM.yyyy").format(LocalDate.parse(note!!.date)),
 				fontFamily = fontFamily,
 				color = colorResource(R.color.grey),
 				fontSize = dimensionResource(R.dimen.note_date_font_size).value.sp
