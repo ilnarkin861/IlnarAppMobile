@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
@@ -45,11 +48,13 @@ fun NoteItemComponent(
 	note: Note,
 	viewAction: (note: Note) -> Unit,
 	editAction: (note: Note) -> Unit,
-	deleteAction: (note: Note) -> Unit
+	deleteAction: suspend (note: Note) -> Unit
 	) {
 
-	val font = getInterFont()
+	var deleting by remember { mutableStateOf(false) }
+	val scope = rememberCoroutineScope()
 	var showConfirmAlert by remember { mutableStateOf(false) }
+	val font = getInterFont()
 
 	Box(
 		Modifier.fillMaxSize()
@@ -62,7 +67,21 @@ fun NoteItemComponent(
 
 		ConfirmComponent(
 			showed = showConfirmAlert,
-			action = {
+			action = {confirmed ->
+
+				if (confirmed){
+					deleting = true
+
+					scope.launch {
+						scope.async {
+							deleteAction(note)
+						}.await()
+					}.invokeOnCompletion{ deleting = false }
+
+				}
+
+
+
 				showConfirmAlert = false
 			}
 		)
@@ -143,13 +162,20 @@ fun NoteItemComponent(
 							painter = painterResource(R.drawable.ic_edit), contentDescription = "",
 							tint = colorResource(R.color.primary_color))
 					}
-					IconButton(onClick = {
-						showConfirmAlert = true
-					}) {
-						Icon(
-							modifier = Modifier.size(22.dp),
-							painter = painterResource(R.drawable.ic_trash), contentDescription = "",
-							tint = colorResource(R.color.danger_color))
+
+					if (deleting){
+						ProgressIndicatorComponent(25)
+					}
+
+					else{
+						IconButton(onClick = {
+							showConfirmAlert = true
+						}) {
+							Icon(
+								modifier = Modifier.size(22.dp),
+								painter = painterResource(R.drawable.ic_trash), contentDescription = "",
+								tint = colorResource(R.color.danger_color))
+						}
 					}
 				}
 			}

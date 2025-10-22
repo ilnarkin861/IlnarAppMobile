@@ -146,7 +146,11 @@ fun NotesScreen() {
 								noteDetailsLoading = false
 							}
 						},
-						deleteAction = {})
+						deleteAction = {
+							delay(1500)
+							alertTitle.value = "Запись успешно удалена"
+							showAlert = true
+						})
 				}
 				item {
 					Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
