@@ -164,7 +164,9 @@ fun NoteItemComponent(
 					}
 
 					if (deleting){
-						ProgressIndicatorComponent(25)
+						Row(Modifier.padding(start = 20.dp, end = 10.dp)) {
+							ProgressIndicatorComponent(25)
+						}
 					}
 
 					else{
