@@ -65,27 +65,6 @@ fun NoteItemComponent(
 
 	) {
 
-		ConfirmComponent(
-			showed = showConfirmAlert,
-			action = {confirmed ->
-
-				if (confirmed){
-					deleting = true
-
-					scope.launch {
-						scope.async {
-							deleteAction(note)
-						}.await()
-					}.invokeOnCompletion{ deleting = false }
-
-				}
-
-
-
-				showConfirmAlert = false
-			}
-		)
-
 
 		Column (Modifier.padding(
 			start = 10.dp,
@@ -183,4 +162,23 @@ fun NoteItemComponent(
 			}
 		}
 	}
+
+	ConfirmComponent(
+		showed = showConfirmAlert,
+		action = {confirmed ->
+
+			if (confirmed){
+				deleting = true
+
+				scope.launch {
+					scope.async {
+						deleteAction(note)
+					}.await()
+				}.invokeOnCompletion{ deleting = false }
+
+			}
+
+			showConfirmAlert = false
+		}
+	)
 }

@@ -39,23 +39,6 @@ fun ListItemComponent(
     val scope = rememberCoroutineScope()
     var showConfirmAlert by remember { mutableStateOf(false) }
 
-    ConfirmComponent(
-        showed = showConfirmAlert,
-        action = {confirmed ->
-
-            if (confirmed){
-                deleting = true
-
-                scope.launch {
-                    scope.async {
-                        deleteAction(id)
-                    }.await()
-                }.invokeOnCompletion{ deleting = false }
-            }
-
-            showConfirmAlert = false
-        }
-    )
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -100,4 +83,22 @@ fun ListItemComponent(
 
         }
     }
+
+    ConfirmComponent(
+        showed = showConfirmAlert,
+        action = {confirmed ->
+
+            if (confirmed){
+                deleting = true
+
+                scope.launch {
+                    scope.async {
+                        deleteAction(id)
+                    }.await()
+                }.invokeOnCompletion{ deleting = false }
+            }
+
+            showConfirmAlert = false
+        }
+    )
 }

@@ -109,17 +109,6 @@ fun TagsScreen() {
 			}
 		}
 
-		AlertComponent(
-			success = success,
-			message = alertTitle.value,
-			showed = showAlert,
-			action = {
-				showAlert = false
-
-				// еще что-то делаем
-			}
-		)
-
 
 		FloatingActionButton(
 			containerColor = colorResource(R.color.primary_color),
@@ -129,9 +118,18 @@ fun TagsScreen() {
 				.align(Alignment.BottomEnd)
 				.absolutePadding(bottom = 30.dp, right = 30.dp)
 				.background(Color.Transparent),
-			onClick = {}) {
-			Icon(painter = painterResource(R.drawable.ic_plus), contentDescription = "Добавить")
+			onClick = {}) {	Icon(painter = painterResource(R.drawable.ic_plus), contentDescription = "Добавить") }
+	}// Box
+
+	AlertComponent(
+		success = success,
+		message = alertTitle.value,
+		showed = showAlert,
+		action = {
+			showAlert = false
+
+			// еще что-то делаем
 		}
-	}
+	)
 }
 

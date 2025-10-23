@@ -240,7 +240,6 @@ fun NoteFormComponent(
 			),
 			shape = RoundedCornerShape(10.dp))
 
-
 		if (isNoteTextError){
 			Text(
 				modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
@@ -279,7 +278,6 @@ fun NoteFormComponent(
 			shape = RoundedCornerShape(10.dp)
 		)
 
-
 		MaterialDialog(
 			dialogState = dateDialogState,
 			buttons = {
@@ -308,7 +306,6 @@ fun NoteFormComponent(
 				)
 			) { noteDate = it }
 		}
-
 
 
 		// Archive dropdown
@@ -389,6 +386,7 @@ fun NoteFormComponent(
 				}
 			}
 		}
+
 
 		//Selectable tags
 		Column(

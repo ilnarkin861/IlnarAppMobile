@@ -99,7 +99,6 @@ fun NotesScreen() {
 			}
 		}
 
-
 		if (!loading && !notes.isEmpty()){
 			LazyColumn(
 				state = listState,
@@ -160,19 +159,6 @@ fun NotesScreen() {
 			}
 		}
 
-
-		AlertComponent(
-			success = success,
-			message = alertTitle.value,
-			showed = showAlert,
-			action = {
-				showAlert = false
-
-				// еще что-то делаем
-			}
-		)
-
-
 		FloatingActionButton(
 			containerColor = colorResource(R.color.primary_color),
 			contentColor = Color.White,
@@ -188,92 +174,43 @@ fun NotesScreen() {
 			}) {
 			Icon(painter = painterResource(R.drawable.ic_plus), contentDescription = "Добавить")
 		}
+	}
 
 
-		if (showNoteFormSheet){
-			ModalBottomSheet(
-				onDismissRequest = {
-					currentNote = null
-					showNoteFormSheet = false
-				},
-				containerColor = Color.White,
-				sheetState = noteFormSheetState,
-			) {
-				Column(Modifier
-					.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
-					Row {
-						Text(
-							color = colorResource(R.color.title_color),
-							text = sheetTitle.value,
-							fontFamily = getInterFont(),
-							fontSize = 18.sp,
-							fontWeight = FontWeight.Bold
-						)
-					}
+	AlertComponent(
+		success = success,
+		message = alertTitle.value,
+		showed = showAlert,
+		action = {
+			showAlert = false
 
-					if (noteDetailsLoading){
-						Box(
-							modifier = Modifier
-								.fillMaxWidth()
-								.height(200.dp),
-							contentAlignment = Alignment.Center
-						) {
-							ProgressIndicatorComponent(50)
-						}
-					}
-
-					else{
-						NoteFormComponent(
-							currentNote,
-							noteTypes = getNoteTypes(),
-							archives = getArchives(),
-							tags = getTags(10),
-
-							loadTags = {count ->
-								delay(2000)
-
-								getTags(count)
-							},
-
-							action = {note ->
-
-								delay(3000)
-
-								if (actionType == ActionType.CREATE){
-
-									// Save to db
-
-									alertTitle.value = "Запись успешно добавлена"
-								}
-
-								else{
-
-									// Save to db
-
-									alertTitle.value = "Запись успешно изменена"
-								}
-
-								showAlert = true
-
-								noteFormSheetState.hide()
-
-								showNoteFormSheet = false
-
-								currentNote = null
-							}
-						)
-					}
-				}
-			}
+			// еще что-то делаем
 		}
+	)
 
 
-		if (showNoteDetailsSheet){
-			ModalBottomSheet(
-				onDismissRequest = { showNoteDetailsSheet = false },
-				containerColor = Color.White,
-				sheetState = noteDetailsSheetState,
-			) {
+	// Form sheet
+	if (showNoteFormSheet){
+		ModalBottomSheet(
+			onDismissRequest = {
+				currentNote = null
+				showNoteFormSheet = false
+			},
+			containerColor = Color.White,
+			sheetState = noteFormSheetState,
+		) {
+			Column(Modifier
+				.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
+				Row {
+					Text(
+						color = colorResource(R.color.title_color),
+						text = sheetTitle.value,
+						fontFamily = getInterFont(),
+						fontSize = 18.sp,
+						fontWeight = FontWeight.Bold
+					)
+				}
+
 				if (noteDetailsLoading){
 					Box(
 						modifier = Modifier
@@ -285,8 +222,71 @@ fun NotesScreen() {
 					}
 				}
 
-				else { NoteDetailsComponent(currentNote) }
+				else{
+					NoteFormComponent(
+						currentNote,
+						noteTypes = getNoteTypes(),
+						archives = getArchives(),
+						tags = getTags(10),
+
+						loadTags = {count ->
+							delay(2000)
+
+							getTags(count)
+						},
+
+						action = {note ->
+
+							delay(3000)
+
+							if (actionType == ActionType.CREATE){
+
+								// Save to db
+
+								alertTitle.value = "Запись успешно добавлена"
+							}
+
+							else{
+
+								// Save to db
+
+								alertTitle.value = "Запись успешно изменена"
+							}
+
+							showAlert = true
+
+							noteFormSheetState.hide()
+
+							showNoteFormSheet = false
+
+							currentNote = null
+						}
+					)
+				}
 			}
+		}
+	}
+
+
+	// Details sheet
+	if (showNoteDetailsSheet){
+		ModalBottomSheet(
+			onDismissRequest = { showNoteDetailsSheet = false },
+			containerColor = Color.White,
+			sheetState = noteDetailsSheetState,
+		) {
+			if (noteDetailsLoading){
+				Box(
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(200.dp),
+					contentAlignment = Alignment.Center
+				) {
+					ProgressIndicatorComponent(50)
+				}
+			}
+
+			else { NoteDetailsComponent(currentNote) }
 		}
 	}
 }
