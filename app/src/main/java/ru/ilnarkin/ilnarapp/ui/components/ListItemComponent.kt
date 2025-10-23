@@ -3,11 +3,17 @@ package ru.ilnarkin.ilnarapp.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -16,6 +22,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 
@@ -25,7 +33,29 @@ fun ListItemComponent(
     id: String,
     title: String,
     editAction: () -> Unit,
-    deleteAction: () -> Unit) {
+    deleteAction: suspend (id: String) -> Unit) {
+
+    var deleting by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    var showConfirmAlert by remember { mutableStateOf(false) }
+
+    ConfirmComponent(
+        showed = showConfirmAlert,
+        action = {confirmed ->
+
+            if (confirmed){
+                deleting = true
+
+                scope.launch {
+                    scope.async {
+                        deleteAction(id)
+                    }.await()
+                }.invokeOnCompletion{ deleting = false }
+            }
+
+            showConfirmAlert = false
+        }
+    )
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -42,19 +72,32 @@ fun ListItemComponent(
             )
         }
 
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { }) {
                 Icon(modifier = Modifier.size(22.dp),
                     painter = painterResource(R.drawable.ic_edit), contentDescription = "",
                     tint = colorResource(R.color.primary_color))
             }
 
-            IconButton(onClick = { }) {
-                Icon(
-                    modifier = Modifier.size(22.dp),
-                    painter = painterResource(R.drawable.ic_trash), contentDescription = "",
-                    tint = colorResource(R.color.danger_color))
+            Row {
+                if (deleting){
+                    Row(Modifier.padding(start = 12.dp, end = 10.dp)) {
+                        ProgressIndicatorComponent(25)
+                    }
+                }
+
+                else{
+                    IconButton(onClick = {
+                        showConfirmAlert = true
+                    }) {
+                        Icon(
+                            modifier = Modifier.size(22.dp),
+                            painter = painterResource(R.drawable.ic_trash), contentDescription = "",
+                            tint = colorResource(R.color.danger_color))
+                    }
+                }
             }
+
         }
     }
 }

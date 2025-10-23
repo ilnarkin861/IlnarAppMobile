@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
@@ -43,6 +44,9 @@ fun TagsScreen() {
 	val tags = getTags(20)
 	var loading by remember { mutableStateOf(false) }
 	val listState = rememberLazyListState()
+	val alertTitle = remember { mutableStateOf("") }
+	var showAlert by remember { mutableStateOf(false) }
+	var success by remember { mutableStateOf(true) }
 
 
 	LaunchedEffect(Unit) {
@@ -82,7 +86,11 @@ fun TagsScreen() {
 							tag.id,
 							tag.title,
 							editAction = {},
-							deleteAction = {})
+							deleteAction = {
+								delay(1500)
+								alertTitle.value = "Тег успешно удален"
+								showAlert = true
+							})
 					}
 
 					if (index != tags.count() -1){
@@ -100,6 +108,17 @@ fun TagsScreen() {
 				}
 			}
 		}
+
+		AlertComponent(
+			success = success,
+			message = alertTitle.value,
+			showed = showAlert,
+			action = {
+				showAlert = false
+
+				// еще что-то делаем
+			}
+		)
 
 
 		FloatingActionButton(
