@@ -95,7 +95,7 @@ fun NotesScreen() {
 			Box(
 				modifier = Modifier.fillMaxSize(),
 				contentAlignment = Alignment.Center){
-				ProgressIndicatorComponent(60)
+				ProgressIndicatorComponent(60, colorResource(R.color.primary_color))
 			}
 		}
 
@@ -218,7 +218,7 @@ fun NotesScreen() {
 							.height(200.dp),
 						contentAlignment = Alignment.Center
 					) {
-						ProgressIndicatorComponent(50)
+						ProgressIndicatorComponent(50, colorResource(R.color.primary_color))
 					}
 				}
 
@@ -282,7 +282,7 @@ fun NotesScreen() {
 						.height(200.dp),
 					contentAlignment = Alignment.Center
 				) {
-					ProgressIndicatorComponent(50)
+					ProgressIndicatorComponent(50, colorResource(R.color.primary_color))
 				}
 			}
 

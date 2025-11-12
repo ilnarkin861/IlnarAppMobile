@@ -75,7 +75,7 @@ fun TagsScreen() {
 			Box(
 				modifier = Modifier.fillMaxSize(),
 				contentAlignment = Alignment.Center){
-				ProgressIndicatorComponent(60)
+				ProgressIndicatorComponent(60, colorResource(R.color.primary_color))
 			}
 		}
 

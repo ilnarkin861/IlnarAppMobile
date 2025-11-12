@@ -60,7 +60,7 @@ fun ListItemComponent(
             Row {
                 if (loading){
                     Row(Modifier.padding(end = 12.dp)) {
-                        ProgressIndicatorComponent(25)
+                        ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
                     }
                 }
 
@@ -86,7 +86,7 @@ fun ListItemComponent(
             Row {
                 if (deleting){
                     Row(Modifier.padding(start = 12.dp, end = 10.dp)) {
-                        ProgressIndicatorComponent(25)
+                        ProgressIndicatorComponent(25, colorResource(R.color.danger_color))
                     }
                 }
 

@@ -35,7 +35,7 @@ fun LoadButtonComponent(nextButton: Boolean = true, action: suspend () -> Unit) 
 		horizontalArrangement = Arrangement.Center
 	){
 		if (loading){
-			ProgressIndicatorComponent(25)
+			ProgressIndicatorComponent(25, Color.Gray)
 		}
 
 		else{

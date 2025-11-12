@@ -1,5 +1,7 @@
 package ru.ilnarkin.ilnarapp.ui.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +45,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NoteItemComponent(
 	note: Note,
@@ -144,7 +147,7 @@ fun NoteItemComponent(
 
 					if (deleting){
 						Row(Modifier.padding(start = 20.dp, end = 10.dp)) {
-							ProgressIndicatorComponent(25)
+							ProgressIndicatorComponent(25, colorResource(R.color.danger_color))
 						}
 					}
 

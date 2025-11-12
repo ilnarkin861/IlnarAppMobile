@@ -438,7 +438,7 @@ fun NoteFormComponent(
 				.padding(top = 20.dp, bottom = 40.dp)) {
 
 				if (tagsLoading){
-					ProgressIndicatorComponent(25)
+					ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
 				}
 
 				else{
