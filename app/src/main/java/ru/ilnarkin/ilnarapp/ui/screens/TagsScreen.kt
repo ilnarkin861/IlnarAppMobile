@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,9 +30,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.MaterialDialogState
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
+import ru.ilnarkin.ilnarapp.ui.components.ItemModalFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
@@ -44,9 +50,14 @@ fun TagsScreen() {
 	val tags = getTags(20)
 	var loading by remember { mutableStateOf(false) }
 	val listState = rememberLazyListState()
+	val itemText = remember { mutableStateOf("") }
 	val alertTitle = remember { mutableStateOf("") }
 	var showAlert by remember { mutableStateOf(false) }
+	var showModalForm by remember { mutableStateOf(false) }
+	var modalFormLabel by remember { mutableStateOf("") }
 	var success by remember { mutableStateOf(true) }
+	val dialogState = rememberMaterialDialogState()
+	var actionType by remember { mutableStateOf(ActionType.CREATE) }
 
 
 	LaunchedEffect(Unit) {
@@ -85,12 +96,24 @@ fun TagsScreen() {
 						ListItemComponent(
 							tag.id,
 							tag.title,
-							editAction = {},
+
+							editAction = { tag ->
+
+								delay(1500)
+
+								actionType = ActionType.UPDATE
+								modalFormLabel = "Изменить тег"
+								itemText.value = tag
+								showModalForm = true
+								dialogState.show()
+							},
+
 							deleteAction = {
 								delay(1500)
 								alertTitle.value = "Тег успешно удален"
 								showAlert = true
-							})
+							}
+						)
 					}
 
 					if (index != tags.count() -1){
@@ -118,8 +141,16 @@ fun TagsScreen() {
 				.align(Alignment.BottomEnd)
 				.absolutePadding(bottom = 30.dp, right = 30.dp)
 				.background(Color.Transparent),
-			onClick = {}) {	Icon(painter = painterResource(R.drawable.ic_plus), contentDescription = "Добавить") }
+			onClick = {
+				actionType = ActionType.CREATE
+				modalFormLabel = "Добавить тег"
+				itemText.value = ""
+				showModalForm = true
+				dialogState.show()
+			}) { Icon(painter = painterResource(R.drawable.ic_plus), contentDescription = "Добавить") }
 	}// Box
+
+
 
 	AlertComponent(
 		success = success,
@@ -128,8 +159,45 @@ fun TagsScreen() {
 		action = {
 			showAlert = false
 
-			// еще что-то делаем
+			// еще что-то делаем, может
 		}
 	)
+
+
+	MaterialDialog(
+		dialogState = dialogState,
+		shape = MaterialTheme.shapes.small,
+		onCloseRequest = { MaterialDialogState.Saver() },
+	){
+		ItemModalFormComponent(
+			itemText.value,
+			modalFormLabel,
+			showed = showModalForm,
+			action = {
+
+				delay(1000)
+
+				if (actionType == ActionType.CREATE){
+
+					// Save to db
+
+					alertTitle.value = "Тег успешно добавлен"
+				}
+
+				else{
+
+					// Save to db
+
+					alertTitle.value = "Тег успешно изменен"
+				}
+
+				showAlert = true
+
+				dialogState.hide()
+
+			},
+			close = { dialogState.hide() }
+		)
+	}
 }
 
