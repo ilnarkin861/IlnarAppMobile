@@ -32,13 +32,13 @@ import ru.ilnarkin.ilnarapp.helpers.getInterFont
 fun ListItemComponent(
     id: String,
     title: String,
-    editAction: () -> Unit,
+    editAction: suspend (id: String) -> Unit,
     deleteAction: suspend (id: String) -> Unit) {
 
+    var loading by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var showConfirmAlert by remember { mutableStateOf(false) }
-
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -56,10 +56,31 @@ fun ListItemComponent(
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { }) {
-                Icon(modifier = Modifier.size(22.dp),
-                    painter = painterResource(R.drawable.ic_edit), contentDescription = "",
-                    tint = colorResource(R.color.primary_color))
+
+            Row {
+                if (loading){
+                    Row(Modifier.padding(end = 12.dp)) {
+                        ProgressIndicatorComponent(25)
+                    }
+                }
+
+                else{
+                    IconButton(onClick = {
+                        loading = true
+
+                        scope.launch {
+                            scope.async {
+                                // в идеале передаем айдишники, достаем по ним из бд и передаем в форму
+                                editAction(title)
+                            }.await()
+                        }.invokeOnCompletion{ loading = false }
+
+                    }) {
+                        Icon(modifier = Modifier.size(22.dp),
+                            painter = painterResource(R.drawable.ic_edit), contentDescription = "",
+                            tint = colorResource(R.color.primary_color))
+                    }
+                }
             }
 
             Row {
@@ -80,7 +101,6 @@ fun ListItemComponent(
                     }
                 }
             }
-
         }
     }
 
