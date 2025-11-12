@@ -164,26 +164,27 @@ fun ItemModalFormComponent(
 				}
 			}
 
-
-			Row(
-				modifier = Modifier.fillMaxWidth().padding(top = 25.dp),
-				horizontalArrangement = Arrangement.Center
-			) {
-				Text(
-					modifier = Modifier.clickable(
-						interactionSource = interactionSource,
-						indication = null,
-						onClick = {
-							dialogState.hide()
-							close()
-						}
-					),
-					text = "Закрыть",
-					fontWeight = FontWeight.SemiBold,
-					fontSize = 15.sp,
-					color = Color.Gray,
-					fontFamily = fontFamily,
-				)
+			if (!saving){
+				Row(
+					modifier = Modifier.fillMaxWidth().padding(top = 25.dp),
+					horizontalArrangement = Arrangement.Center
+				) {
+					Text(
+						modifier = Modifier.clickable(
+							interactionSource = interactionSource,
+							indication = null,
+							onClick = {
+								dialogState.hide()
+								close()
+							}
+						),
+						text = "Закрыть",
+						fontWeight = FontWeight.SemiBold,
+						fontSize = 15.sp,
+						color = Color.Gray,
+						fontFamily = fontFamily,
+					)
+				}
 			}
 		}
 	}
