@@ -39,10 +39,10 @@ fun getNoteTypes(): List<NoteType>{
     return noteTypes
 }
 
-fun getArchives(): List<Archive>{
+fun getArchives(count: Int): List<Archive>{
     val archives = mutableListOf<Archive>()
 
-    for (i in 1..5){
+    for (i in 1..count){
         archives.add(Archive(id = "", title = "Архив ${i}"))
     }
 
