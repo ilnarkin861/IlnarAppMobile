@@ -2,6 +2,7 @@ package ru.ilnarkin.ilnarapp.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -57,11 +58,11 @@ fun ListItemComponent(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
 
-            Row {
+            Row(Modifier.size(35.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically) {
                 if (loading){
-                    Row(Modifier.padding(end = 12.dp)) {
-                        ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
-                    }
+                    ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
                 }
 
                 else{
@@ -83,11 +84,12 @@ fun ListItemComponent(
                 }
             }
 
-            Row {
+
+            Row(Modifier.size(35.dp).padding(start = 10.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically) {
                 if (deleting){
-                    Row(Modifier.padding(start = 12.dp, end = 10.dp)) {
-                        ProgressIndicatorComponent(25, colorResource(R.color.danger_color))
-                    }
+                    ProgressIndicatorComponent(25, colorResource(R.color.danger_color))
                 }
 
                 else{

@@ -3,6 +3,7 @@ package ru.ilnarkin.ilnarapp.ui.components
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -137,28 +138,37 @@ fun NoteItemComponent(
 				}
 
 				Row(verticalAlignment = Alignment.CenterVertically){
-					IconButton(onClick = {
-						editAction(note)
-					}) {
-						Icon(modifier = Modifier.size(22.dp),
-							painter = painterResource(R.drawable.ic_edit), contentDescription = "",
-							tint = colorResource(R.color.primary_color))
-					}
 
-					if (deleting){
-						Row(Modifier.padding(start = 20.dp, end = 10.dp)) {
-							ProgressIndicatorComponent(25, colorResource(R.color.danger_color))
+					Row(Modifier.size(35.dp),
+						horizontalArrangement = Arrangement.Center,
+						verticalAlignment = Alignment.CenterVertically) {
+						IconButton(onClick = {
+							editAction(note)
+						}) {
+							Icon(modifier = Modifier.size(22.dp),
+								painter = painterResource(R.drawable.ic_edit), contentDescription = "",
+								tint = colorResource(R.color.primary_color))
 						}
 					}
 
-					else{
-						IconButton(onClick = {
-							showConfirmAlert = true
-						}) {
-							Icon(
-								modifier = Modifier.size(22.dp),
-								painter = painterResource(R.drawable.ic_trash), contentDescription = "",
-								tint = colorResource(R.color.danger_color))
+					Row(Modifier.size(35.dp).padding(start = 10.dp)) {
+						if (deleting){
+							Row(modifier = Modifier.fillMaxSize(),
+								horizontalArrangement = Arrangement.Center,
+								verticalAlignment = Alignment.CenterVertically) {
+								ProgressIndicatorComponent(25, colorResource(R.color.danger_color))
+							}
+						}
+
+						else{
+							IconButton(onClick = {
+								showConfirmAlert = true
+							}) {
+								Icon(
+									modifier = Modifier.size(22.dp),
+									painter = painterResource(R.drawable.ic_trash), contentDescription = "",
+									tint = colorResource(R.color.danger_color))
+							}
 						}
 					}
 				}
