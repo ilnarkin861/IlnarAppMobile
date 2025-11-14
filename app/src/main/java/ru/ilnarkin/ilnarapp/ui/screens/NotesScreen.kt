@@ -226,7 +226,7 @@ fun NotesScreen() {
 					NoteFormComponent(
 						currentNote,
 						noteTypes = getNoteTypes(),
-						archives = getArchives(),
+						archives = getArchives(5),
 						tags = getTags(10),
 
 						loadTags = {count ->
