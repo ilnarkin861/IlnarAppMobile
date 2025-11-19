@@ -23,7 +23,7 @@ fun getNotesList() : MutableList<Note>{
             date = noteDate,
             noteType =  noteType,
             tags = tags,
-            archive = Archive(id = "", title = "Архив 1")
+            archive = Archive(id = i.toString(), title = "Архив 1")
         ))
     }
 
@@ -33,8 +33,8 @@ fun getNotesList() : MutableList<Note>{
 fun getNoteTypes(): List<NoteType>{
     val noteTypes = mutableListOf<NoteType>()
 
-    noteTypes.add(NoteType(id = "", title = "Событие"))
-    noteTypes.add(NoteType(id = "", title = "Заметка"))
+    noteTypes.add(NoteType(id = "1", title = "Событие"))
+    noteTypes.add(NoteType(id = "2", title = "Заметка"))
 
     return noteTypes
 }
@@ -43,7 +43,7 @@ fun getArchives(count: Int): List<Archive>{
     val archives = mutableListOf<Archive>()
 
     for (i in 1..count){
-        archives.add(Archive(id = "", title = "Архив ${i}"))
+        archives.add(Archive(id = i.toString(), title = "Архив ${i}"))
     }
 
     return archives
@@ -53,7 +53,7 @@ fun getTags(count: Int): MutableList<Tag>{
     val tags = mutableListOf<Tag>()
 
     for (i in 1..count){
-        tags.add(Tag(id = "", title = "Тег ${i}"))
+        tags.add(Tag(id = i.toString(), title = "Тег ${i}"))
     }
 
     return tags
