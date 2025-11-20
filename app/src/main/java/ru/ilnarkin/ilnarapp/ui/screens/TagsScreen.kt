@@ -37,6 +37,7 @@ import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
+import ru.ilnarkin.ilnarapp.ui.components.EmptyListMessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.ItemModalFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
@@ -130,6 +131,10 @@ fun TagsScreen() {
 					}
 				}
 			}
+		}
+
+		if (!loading && tags.isEmpty()){
+			EmptyListMessageComponent("Тегов нет")
 		}
 
 

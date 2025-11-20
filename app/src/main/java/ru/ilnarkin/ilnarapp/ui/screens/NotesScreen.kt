@@ -45,6 +45,7 @@ import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
+import ru.ilnarkin.ilnarapp.ui.components.EmptyListMessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
@@ -157,6 +158,10 @@ fun NotesScreen() {
 					}
 				}
 			}
+		}
+
+		if (!loading && notes.isEmpty()){
+			EmptyListMessageComponent("Записей нет")
 		}
 
 		FloatingActionButton(
