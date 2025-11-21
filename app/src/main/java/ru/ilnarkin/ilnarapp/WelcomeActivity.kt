@@ -11,7 +11,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
-import ru.ilnarkin.ilnarapp.ui.screens.NotesScreen
 import ru.ilnarkin.ilnarapp.ui.screens.WelcomeScreen
 
 class WelcomeActivity : ComponentActivity() {
