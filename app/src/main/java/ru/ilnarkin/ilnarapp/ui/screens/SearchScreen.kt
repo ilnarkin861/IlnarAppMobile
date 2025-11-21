@@ -47,6 +47,7 @@ import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.EmptyListMessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
+import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
@@ -165,7 +166,10 @@ fun SearchScreen() {
 		}
 
 		if (!loading && notes.isEmpty()){
-			EmptyListMessageComponent("Записей нет")
+			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
+				contentAlignment = Alignment.Center){
+				MessageComponent("Записей нет")
+			}
 		}
 
 		FloatingActionButton(

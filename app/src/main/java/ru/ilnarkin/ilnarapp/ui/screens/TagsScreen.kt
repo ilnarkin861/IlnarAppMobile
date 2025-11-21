@@ -41,6 +41,7 @@ import ru.ilnarkin.ilnarapp.ui.components.EmptyListMessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.ItemModalFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
+import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 
 
@@ -134,7 +135,10 @@ fun TagsScreen() {
 		}
 
 		if (!loading && tags.isEmpty()){
-			EmptyListMessageComponent("Тегов нет")
+			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
+				contentAlignment = Alignment.Center){
+				MessageComponent("Тегов нет")
+			}
 		}
 
 

@@ -39,6 +39,7 @@ import ru.ilnarkin.ilnarapp.ui.components.EmptyListMessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.ItemModalFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
+import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 
 
@@ -131,7 +132,10 @@ fun ArchiveScreen() {
 		}
 
 		if (!loading && archives.isEmpty()){
-			EmptyListMessageComponent("Архивов нет")
+			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
+				contentAlignment = Alignment.Center){
+				MessageComponent("Архивов нет")
+			}
 		}
 
 

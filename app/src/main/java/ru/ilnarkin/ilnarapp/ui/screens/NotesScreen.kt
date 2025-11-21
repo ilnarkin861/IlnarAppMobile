@@ -47,6 +47,7 @@ import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.EmptyListMessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
+import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
@@ -61,6 +62,7 @@ fun NotesScreen() {
 	var actionType by remember { mutableStateOf(ActionType.CREATE) }
 	var currentNote by remember { mutableStateOf<Note?>(null) }
 	val notes = getNotesList()
+	notes.clear()
 	var showNoteFormSheet by remember { mutableStateOf(false) }
 	var showNoteDetailsSheet by remember { mutableStateOf(false) }
 	val listState = rememberLazyListState()
@@ -161,7 +163,10 @@ fun NotesScreen() {
 		}
 
 		if (!loading && notes.isEmpty()){
-			EmptyListMessageComponent("Записей нет")
+			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
+				contentAlignment = Alignment.Center){
+				MessageComponent("Записей нет")
+			}
 		}
 
 		FloatingActionButton(
