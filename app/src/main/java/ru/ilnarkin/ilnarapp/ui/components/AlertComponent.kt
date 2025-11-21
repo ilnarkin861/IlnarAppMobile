@@ -37,7 +37,7 @@ fun AlertComponent(
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 	val dialogState = rememberMaterialDialogState()
-	val fontFamily = getInterFont()
+	val font = getInterFont()
 
 	if (showed) dialogState.show()
 
@@ -75,7 +75,7 @@ fun AlertComponent(
 					text = message,
 					fontWeight = FontWeight.Bold,
 					fontSize = 18.sp,
-					fontFamily = fontFamily,
+					fontFamily = font,
 
 					color = if (!success) colorResource(R.color.danger_color)
 						else colorResource(R.color.primary_color)
@@ -99,7 +99,7 @@ fun AlertComponent(
 					fontWeight = FontWeight.SemiBold,
 					fontSize = 15.sp,
 					color = Color.Gray,
-					fontFamily = fontFamily,
+					fontFamily = font,
 				)
 			}
 		}

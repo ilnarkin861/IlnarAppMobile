@@ -79,19 +79,18 @@ fun NoteFormComponent(
 
 	val selectableTags = tags
 
+	val font = getInterFont()
+
 	var saving by remember { mutableStateOf(false) }
 	var tagsLoading by remember { mutableStateOf(false) }
 	val scope = rememberCoroutineScope()
 	val interactionSource = remember { MutableInteractionSource() }
 
 	var noteTypeMenuExpanded by remember { mutableStateOf(false) }
-
 	val selectedNoteType = remember { mutableStateOf(note?.noteType ?: noteTypes[0]) }
 
 	val noteTitle = remember { mutableStateOf(note?.title ?: "") }
-
 	val noteText = remember { mutableStateOf(note?.text ?: "") }
-
 	var isNoteTextError by remember { mutableStateOf(false) }
 
 	val dateDialogState = rememberMaterialDialogState()
@@ -136,7 +135,7 @@ fun NoteFormComponent(
 					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
 					.fillMaxWidth(),
 				textStyle = TextStyle(
-					fontFamily = getInterFont(),
+					fontFamily = font,
 					fontSize = 15.sp,
 					),
 				value = selectedNoteType.value.title,
@@ -173,7 +172,7 @@ fun NoteFormComponent(
 						text = {
 							Text(
 								text = noteType.title,
-								fontFamily = getInterFont(),
+								fontFamily = font,
 								fontSize = 15.sp
 							)},
 						onClick = {
@@ -192,7 +191,7 @@ fun NoteFormComponent(
 				.fillMaxWidth()
 				.padding(bottom = 10.dp),
 			textStyle = TextStyle(
-				fontFamily = getInterFont(),
+				fontFamily = font,
 				fontSize = 15.sp,
 			),
 			value = noteTitle.value,
@@ -217,7 +216,7 @@ fun NoteFormComponent(
 				.padding(bottom = 10.dp)
 				.height(250.dp),
 			textStyle = TextStyle(
-				fontFamily = getInterFont(),
+				fontFamily = font,
 				fontSize = 15.sp,
 			),
 			value = noteText.value,
@@ -245,7 +244,7 @@ fun NoteFormComponent(
 				modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 				text = "Обязательное поле",
 				color = colorResource(R.color.danger_color),
-				fontFamily = getInterFont(),
+				fontFamily = font,
 				fontSize = 13.sp
 			)
 		}
@@ -285,7 +284,7 @@ fun NoteFormComponent(
 					text = "Ок",
 					textStyle = TextStyle(
 						color = colorResource(R.color.primary_color),
-						fontFamily = getInterFont(),
+						fontFamily = font,
 						fontWeight = FontWeight.Bold),
 					onClick = { dateDialogState.hide()},
 				)
@@ -293,7 +292,7 @@ fun NoteFormComponent(
 					text = "Закрыть",
 					textStyle = TextStyle(
 						color = colorResource(R.color.primary_color),
-						fontFamily = getInterFont(),
+						fontFamily = font,
 						fontWeight = FontWeight.Bold)
 				)
 			}
@@ -324,7 +323,7 @@ fun NoteFormComponent(
 				onValueChange = {},
 				readOnly = true,
 				textStyle = TextStyle(
-					fontFamily = getInterFont(),
+					fontFamily = font,
 					fontSize = 15.sp,
 				),
 				colors = OutlinedTextFieldDefaults.colors(
@@ -357,7 +356,7 @@ fun NoteFormComponent(
 					text = {
 						Text(
 							text = unSelectedArchiveTitle,
-							fontFamily = getInterFont(),
+							fontFamily = font,
 							fontSize = 15.sp
 							)},
 					onClick = {
@@ -373,7 +372,7 @@ fun NoteFormComponent(
 						text = {
 							Text(
 								text = archive.title,
-								fontFamily = getInterFont(),
+								fontFamily = font,
 								fontSize = 15.sp
 							)},
 						onClick = {
@@ -400,7 +399,7 @@ fun NoteFormComponent(
 				Text(
 					color = Color.Gray,
 					text = "Выбрать теги (${selectedTagsCount.intValue})",
-					fontFamily = getInterFont(),
+					fontFamily = font,
 					fontSize = 15.sp,
 					fontWeight = FontWeight.Bold
 				)
@@ -461,7 +460,7 @@ fun NoteFormComponent(
 						),
 						color = colorResource(R.color.primary_color),
 						text = "Загрузить еще",
-						fontFamily = getInterFont(),
+						fontFamily = font,
 						fontSize = 15.sp,
 						fontWeight = FontWeight.Bold
 					)
@@ -482,7 +481,7 @@ fun NoteFormComponent(
 					Text(
 						color = Color.Gray,
 						text = "Добавленные теги",
-						fontFamily = getInterFont(),
+						fontFamily = font,
 						fontSize = 15.sp,
 						fontWeight = FontWeight.Bold
 					)
@@ -496,7 +495,7 @@ fun NoteFormComponent(
 						Text(
 							color = colorResource(R.color.text_color),
 							text = tag.title,
-							fontFamily = getInterFont(),
+							fontFamily = font,
 							fontSize = 16.sp,
 						)
 
@@ -571,7 +570,7 @@ fun NoteFormComponent(
 				else{
 					Text(
 						text = "Сохранить",
-						fontFamily = getInterFont(),
+						fontFamily = font,
 						fontSize = 16.sp,
 						fontWeight = FontWeight.SemiBold
 					)

@@ -47,7 +47,7 @@ fun ItemModalFormComponent(
 	action: suspend (text: String) -> Unit,
 	close: () -> Unit
 ) {
-	val fontFamily = getInterFont()
+	val font = getInterFont()
 	
 	val mutableItemText = remember { mutableStateOf(itemText?: "") }
 
@@ -75,7 +75,7 @@ fun ItemModalFormComponent(
 				Text(
 					color = colorResource(R.color.title_color),
 					text = label,
-					fontFamily = fontFamily,
+					fontFamily = font,
 					fontSize = 18.sp,
 					fontWeight = FontWeight.Bold
 				)
@@ -87,7 +87,7 @@ fun ItemModalFormComponent(
 				OutlinedTextField(
 					modifier = Modifier.fillMaxWidth(),
 					textStyle = TextStyle(
-						fontFamily = fontFamily,
+						fontFamily = font,
 						fontSize = 15.sp,
 					),
 					value = mutableItemText.value,
@@ -113,7 +113,7 @@ fun ItemModalFormComponent(
 					Text(
 						text = "Обязательное поле",
 						color = colorResource(R.color.danger_color),
-						fontFamily = fontFamily,
+						fontFamily = font,
 						fontSize = 13.sp
 					)
 				}
@@ -156,7 +156,7 @@ fun ItemModalFormComponent(
 					else{
 						Text(
 							text = "Сохранить",
-							fontFamily = fontFamily,
+							fontFamily = font,
 							fontSize = 16.sp,
 							fontWeight = FontWeight.SemiBold
 						)
@@ -182,7 +182,7 @@ fun ItemModalFormComponent(
 						fontWeight = FontWeight.SemiBold,
 						fontSize = 15.sp,
 						color = Color.Gray,
-						fontFamily = fontFamily,
+						fontFamily = font,
 					)
 				}
 			}

@@ -33,7 +33,7 @@ fun ConfirmComponent(showed: Boolean = false, action: (confirmed: Boolean) -> Un
 
 	val interactionSource = remember { MutableInteractionSource() }
 	val dialogState = rememberMaterialDialogState()
-	val fontFamily = getInterFont()
+	val font = getInterFont()
 
 	if (showed) dialogState.show()
 
@@ -62,7 +62,7 @@ fun ConfirmComponent(showed: Boolean = false, action: (confirmed: Boolean) -> Un
 					text = "Точно хочешь удалить?",
 					fontWeight = FontWeight.Bold,
 					fontSize = 18.sp,
-					fontFamily = fontFamily,
+					fontFamily = font,
 					color = colorResource(R.color.warning_color)
 				)
 			}
@@ -85,7 +85,7 @@ fun ConfirmComponent(showed: Boolean = false, action: (confirmed: Boolean) -> Un
 						fontWeight = FontWeight.SemiBold,
 						fontSize = 15.sp,
 						color = Color.Gray,
-						fontFamily = fontFamily,
+						fontFamily = font,
 					)
 
 					Text(
@@ -101,7 +101,7 @@ fun ConfirmComponent(showed: Boolean = false, action: (confirmed: Boolean) -> Un
 						fontWeight = FontWeight.SemiBold,
 						fontSize = 15.sp,
 						color = colorResource(R.color.danger_color),
-						fontFamily = fontFamily,
+						fontFamily = font,
 					)
 				}
 			}

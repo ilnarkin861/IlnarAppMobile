@@ -31,7 +31,7 @@ import java.time.format.DateTimeFormatter
 fun NoteDetailsComponent(note: Note?) {
 
 	val containerPadding = dimensionResource(R.dimen.container_horizontal_padding)
-	val fontFamily = getInterFont()
+	val font = getInterFont()
 
 	Column(Modifier.fillMaxSize()
 		.padding(start = containerPadding, top = 30.dp, end = containerPadding)
@@ -41,7 +41,7 @@ fun NoteDetailsComponent(note: Note?) {
 			Text(
 				color = colorResource(R.color.title_color),
 				text = note?.title ?: "Без названия",
-				fontFamily = fontFamily,
+				fontFamily = font,
 				fontSize = dimensionResource(R.dimen.note_title_font_size).value.sp,
 				fontWeight = FontWeight.Bold
 			)
@@ -50,7 +50,7 @@ fun NoteDetailsComponent(note: Note?) {
 		Row(Modifier.padding(top = 10.dp)) {
 			Text(
 				text = DateTimeFormatter.ofPattern("dd.MM.yyyy").format(LocalDate.parse(note!!.date)),
-				fontFamily = fontFamily,
+				fontFamily = font,
 				color = colorResource(R.color.grey),
 				fontSize = dimensionResource(R.dimen.note_date_font_size).value.sp
 			)
@@ -63,7 +63,7 @@ fun NoteDetailsComponent(note: Note?) {
 		Row {
 			Text(
 				text = note!!.text,
-				fontFamily = fontFamily,
+				fontFamily = font,
 				lineHeight = 1.5.em,
 				color = colorResource(R.color.text_color),
 				fontSize = dimensionResource(R.dimen.note_text_font_size).value.sp
@@ -77,7 +77,7 @@ fun NoteDetailsComponent(note: Note?) {
 		Row(Modifier.padding(bottom = 10.dp)) {
 			Text(
 				text = "Тип: ",
-				fontFamily = fontFamily,
+				fontFamily = font,
 				fontWeight = FontWeight.Bold,
 				fontSize = 15.sp,
 				color = colorResource(R.color.title_color),
@@ -85,7 +85,7 @@ fun NoteDetailsComponent(note: Note?) {
 
 			Text(
 				text = note!!.noteType.title,
-				fontFamily = fontFamily,
+				fontFamily = font,
 				fontSize = 15.sp,
 				color = colorResource(R.color.text_color),
 			)
@@ -95,7 +95,7 @@ fun NoteDetailsComponent(note: Note?) {
 			Row(Modifier.padding(bottom = 10.dp)) {
 				Text(
 					text = "Архив: ",
-					fontFamily = fontFamily,
+					fontFamily = font,
 					fontWeight = FontWeight.Bold,
 					fontSize = 15.sp,
 					color = colorResource(R.color.title_color),
@@ -103,7 +103,7 @@ fun NoteDetailsComponent(note: Note?) {
 
 				Text(
 					text = note.archive!!.title,
-					fontFamily = fontFamily,
+					fontFamily = font,
 					fontSize = 15.sp,
 					color = colorResource(R.color.text_color),
 				)

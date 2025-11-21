@@ -67,7 +67,7 @@ fun SearchFormComponent(
 
 	val selectableTags = tags
 
-
+	val font = getInterFont()
 	var tagsLoading by remember { mutableStateOf(false) }
 	val scope = rememberCoroutineScope()
 	val interactionSource = remember { MutableInteractionSource() }
@@ -126,7 +126,7 @@ fun SearchFormComponent(
 					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
 					.fillMaxWidth(),
 				textStyle = TextStyle(
-					fontFamily = getInterFont(),
+					fontFamily = font,
 					fontSize = 15.sp,
 				),
 				value = selectedNoteType.value.title,
@@ -163,7 +163,7 @@ fun SearchFormComponent(
 						text = {
 							Text(
 								text = noteType.title,
-								fontFamily = getInterFont(),
+								fontFamily = font,
 								fontSize = 15.sp
 							)},
 						onClick = {
@@ -192,7 +192,7 @@ fun SearchFormComponent(
 				onValueChange = {},
 				readOnly = true,
 				textStyle = TextStyle(
-					fontFamily = getInterFont(),
+					fontFamily = font,
 					fontSize = 15.sp,
 				),
 				colors = OutlinedTextFieldDefaults.colors(
@@ -225,7 +225,7 @@ fun SearchFormComponent(
 					text = {
 						Text(
 							text = unSelectedYearTitle,
-							fontFamily = getInterFont(),
+							fontFamily = font,
 							fontSize = 15.sp
 						)},
 					onClick = {
@@ -244,7 +244,7 @@ fun SearchFormComponent(
 						text = {
 							Text(
 								text = year.toString(),
-								fontFamily = getInterFont(),
+								fontFamily = font,
 								fontSize = 15.sp
 							)},
 						onClick = {
@@ -276,7 +276,7 @@ fun SearchFormComponent(
 					onValueChange = {},
 					readOnly = true,
 					textStyle = TextStyle(
-						fontFamily = getInterFont(),
+						fontFamily = font,
 						fontSize = 15.sp,
 					),
 					colors = OutlinedTextFieldDefaults.colors(
@@ -309,7 +309,7 @@ fun SearchFormComponent(
 						text = {
 							Text(
 								text = unSelectedYearTitle,
-								fontFamily = getInterFont(),
+								fontFamily = font,
 								fontSize = 15.sp
 							)},
 						onClick = {
@@ -325,7 +325,7 @@ fun SearchFormComponent(
 							text = {
 								Text(
 									text = month,
-									fontFamily = getInterFont(),
+									fontFamily = font,
 									fontSize = 15.sp
 								)},
 							onClick = {
@@ -357,7 +357,7 @@ fun SearchFormComponent(
 				onValueChange = {},
 				readOnly = true,
 				textStyle = TextStyle(
-					fontFamily = getInterFont(),
+					fontFamily = font,
 					fontSize = 15.sp,
 				),
 				colors = OutlinedTextFieldDefaults.colors(
@@ -390,7 +390,7 @@ fun SearchFormComponent(
 					text = {
 						Text(
 							text = unSelectedArchiveTitle,
-							fontFamily = getInterFont(),
+							fontFamily = font,
 							fontSize = 15.sp
 						)},
 					onClick = {
@@ -407,7 +407,7 @@ fun SearchFormComponent(
 						text = {
 							Text(
 								text = archive.title,
-								fontFamily = getInterFont(),
+								fontFamily = font,
 								fontSize = 15.sp
 							)},
 						onClick = {
@@ -434,7 +434,7 @@ fun SearchFormComponent(
 				Text(
 					color = Color.Gray,
 					text = "Выбрать теги (${selectedTagsCount.intValue})",
-					fontFamily = getInterFont(),
+					fontFamily = font,
 					fontSize = 15.sp,
 					fontWeight = FontWeight.Bold
 				)
@@ -495,7 +495,7 @@ fun SearchFormComponent(
 						),
 						color = colorResource(R.color.primary_color),
 						text = "Загрузить еще",
-						fontFamily = getInterFont(),
+						fontFamily = font,
 						fontSize = 15.sp,
 						fontWeight = FontWeight.Bold
 					)
@@ -540,7 +540,7 @@ fun SearchFormComponent(
 			) {
 				Text(
 					text = "Искать",
-					fontFamily = getInterFont(),
+					fontFamily = font,
 					fontSize = 16.sp,
 					fontWeight = FontWeight.SemiBold
 				)
