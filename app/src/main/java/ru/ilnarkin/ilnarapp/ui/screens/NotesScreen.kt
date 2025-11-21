@@ -62,7 +62,6 @@ fun NotesScreen() {
 	var actionType by remember { mutableStateOf(ActionType.CREATE) }
 	var currentNote by remember { mutableStateOf<Note?>(null) }
 	val notes = getNotesList()
-	notes.clear()
 	var showNoteFormSheet by remember { mutableStateOf(false) }
 	var showNoteDetailsSheet by remember { mutableStateOf(false) }
 	val listState = rememberLazyListState()
