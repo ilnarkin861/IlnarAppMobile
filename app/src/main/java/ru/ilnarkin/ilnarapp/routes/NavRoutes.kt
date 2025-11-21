@@ -7,4 +7,5 @@ sealed class NavRoutes(val route: String) {
 	object ArchiveScreen : NavRoutes("archive")
 	object SearchScreen : NavRoutes("search")
 	object SettingsScreen : NavRoutes("settings")
+	object WelcomeScreen : NavRoutes("welcome")
 }
