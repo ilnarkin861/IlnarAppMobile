@@ -1,5 +1,6 @@
 package ru.ilnarkin.ilnarapp.appbars
 
+import android.content.Intent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.WelcomeActivity
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 
@@ -29,6 +32,9 @@ import ru.ilnarkin.ilnarapp.routes.NavRoutes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar (navController: NavController) {
+
+	val context = LocalContext.current
+	val intent = Intent(context, WelcomeActivity::class.java)
 
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
 	val route = navBackStackEntry?.destination?.route
@@ -85,7 +91,10 @@ fun TopBar (navController: NavController) {
 				colors = IconButtonDefaults.iconButtonColors(
 					contentColor = colorResource(R.color.primary_color)
 				),
-				onClick = {}) {
+				onClick = {
+					// удаляем токен
+					context.startActivity(intent)
+				}) {
 				Icon(
 					painter = painterResource(R.drawable.ic_logout),
 					contentDescription = "")

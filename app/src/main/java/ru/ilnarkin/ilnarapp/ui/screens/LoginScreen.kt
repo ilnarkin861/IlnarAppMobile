@@ -86,7 +86,7 @@ fun LoginScreen() {
 		}
 
 
-		Column(Modifier.fillMaxWidth().padding(top = 50.dp)) {
+		Column(Modifier.fillMaxWidth().padding(top = 80.dp)) {
 			Row(Modifier.fillMaxWidth()) {
 				OutlinedTextField(
 					modifier = Modifier
