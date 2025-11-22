@@ -33,7 +33,7 @@ fun WelcomeScreen() {
 		contentAlignment = Alignment.Center){
 
 		Image(
-			painter = painterResource(R.drawable.ilnarapp_logo),
+			painter = painterResource(R.drawable.logo),
 			contentDescription = "Logo")
 	}
 }
