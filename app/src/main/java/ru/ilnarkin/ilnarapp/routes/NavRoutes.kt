@@ -8,4 +8,5 @@ sealed class NavRoutes(val route: String) {
 	object SearchScreen : NavRoutes("search")
 	object SettingsScreen : NavRoutes("settings")
 	object WelcomeScreen : NavRoutes("welcome")
+	object LoginScreen : NavRoutes("login")
 }

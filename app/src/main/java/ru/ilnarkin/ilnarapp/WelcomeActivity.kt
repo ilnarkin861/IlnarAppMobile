@@ -11,7 +11,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
+import ru.ilnarkin.ilnarapp.ui.screens.LoginScreen
 import ru.ilnarkin.ilnarapp.ui.screens.WelcomeScreen
+
 
 class WelcomeActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +35,8 @@ fun Welcome(){
 			navController = navController,
 			startDestination = NavRoutes.WelcomeScreen.route
 		){
-			composable(NavRoutes.WelcomeScreen.route) { WelcomeScreen() }
+			composable(NavRoutes.WelcomeScreen.route) { WelcomeScreen(navController) }
+			composable(NavRoutes.LoginScreen.route) { LoginScreen() }
 		}
 	}
 
