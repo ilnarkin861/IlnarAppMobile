@@ -9,4 +9,5 @@ sealed class NavRoutes(val route: String) {
 	object SettingsScreen : NavRoutes("settings")
 	object WelcomeScreen : NavRoutes("welcome")
 	object LoginScreen : NavRoutes("login")
+	object PinLockScreen : NavRoutes("pin")
 }
