@@ -22,7 +22,13 @@ fun WelcomeScreen(navController: NavController) {
 
 	LaunchedEffect(Unit) {
 		delay(2000)
-		navController.navigate(NavRoutes.LoginScreen.route){
+		/*navController.navigate(NavRoutes.LoginScreen.route){
+			popUpTo(navController.graph.findStartDestination().id) {
+				inclusive = true
+			}
+		}*/
+
+		navController.navigate(NavRoutes.PinLockScreen.route){
 			popUpTo(navController.graph.findStartDestination().id) {
 				inclusive = true
 			}
