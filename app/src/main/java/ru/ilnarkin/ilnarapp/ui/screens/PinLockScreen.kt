@@ -95,12 +95,12 @@ fun PinLockScreen() {
 				modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.Center) {
 				Image(
-					painter = painterResource(R.drawable.logo_blue),
-					contentDescription = "Logo",
-					alpha = 0.6f)
+					painter = painterResource(R.drawable.ic_pin_lock),
+					contentDescription = "Lock",
+					alpha = 0.4f)
 			}
 
-			Row(modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
+			Row(modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
 				horizontalArrangement = Arrangement.Center) {
 				Row(Modifier.padding(bottom = 40.dp)) {
 					(0 until 4).forEach {

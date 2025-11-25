@@ -81,12 +81,13 @@ fun LoginScreen() {
 			modifier = Modifier.fillMaxWidth().padding(top = 100.dp),
 			horizontalArrangement = Arrangement.Center) {
 				Image(
-					painter = painterResource(R.drawable.logo_blue),
-					contentDescription = "Logo")
+					painter = painterResource(R.drawable.ic_lock),
+					contentDescription = "Lock",
+					alpha = 0.4f)
 		}
 
 
-		Column(Modifier.fillMaxWidth().padding(top = 80.dp)) {
+		Column(Modifier.fillMaxWidth().padding(top = 50.dp)) {
 			Row(Modifier.fillMaxWidth()) {
 				OutlinedTextField(
 					modifier = Modifier
