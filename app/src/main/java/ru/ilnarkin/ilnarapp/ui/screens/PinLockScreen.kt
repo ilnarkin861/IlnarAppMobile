@@ -104,12 +104,12 @@ fun PinLockScreen() {
 				horizontalArrangement = Arrangement.Center) {
 				Row(Modifier.padding(bottom = 40.dp)) {
 					(0 until 4).forEach {
-						Box(modifier = Modifier.padding(10.dp)
+						Box(modifier = Modifier.padding(5.dp)
 							.alpha(if (inputPin.size > it) 1f else 0.5f)
 							.background(
 								color =  Color.DarkGray,
 								shape = CircleShape)
-							.size(20.dp)) {  }
+							.size(15.dp)) {  }
 					}
 				}
 			}
@@ -243,7 +243,7 @@ fun PinLockScreen() {
 					bordered = false
 				) {
 					Icon(
-						modifier = Modifier.size(30.dp),
+						modifier = Modifier.size(30.dp).alpha(0.5f),
 						painter = painterResource(R.drawable.ic_backspace),
 						contentDescription = "Delete",
 						tint = Color.Gray)
