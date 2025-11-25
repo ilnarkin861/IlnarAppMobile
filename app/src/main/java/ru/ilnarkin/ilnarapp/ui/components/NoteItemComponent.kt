@@ -123,7 +123,7 @@ fun NoteItemComponent(
 						Icon(modifier = Modifier.size(35.dp),
 							painter = painterResource(R.drawable.ic_note_view),
 							contentDescription = "",
-							tint = colorResource(R.color.primary_color))
+							tint = colorResource(R.color.grey))
 					}
 				}
 
