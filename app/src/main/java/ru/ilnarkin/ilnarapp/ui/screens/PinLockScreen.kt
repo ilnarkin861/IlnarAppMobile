@@ -19,10 +19,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +46,7 @@ import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.ui.components.ConfirmComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 
 
@@ -60,6 +61,7 @@ fun PinLockScreen() {
 	val font = getInterFont()
 	val inputPin = remember { mutableStateListOf<Int>() }
 	var incorrectPin by remember { mutableStateOf(false) }
+	var showConfirmAlert by remember { mutableStateOf(false) }
 	val dialogState = rememberMaterialDialogState()
 
 	if (inputPin.size == 4){
@@ -205,7 +207,9 @@ fun PinLockScreen() {
 				horizontalArrangement = Arrangement.Center) {
 
 				PinKeyComponent(
-					onClick = {	},
+					onClick = {
+						showConfirmAlert = true
+					},
 
 					bordered = false
 				) {
@@ -272,6 +276,15 @@ fun PinLockScreen() {
 			}
 		}
 	}
+
+	ConfirmComponent(
+		showed = showConfirmAlert,
+		text = "Чтобы восстановить PIN-код, нужно будет заново зайти в систему. Продолжить?",
+		action = {confirmed ->
+
+			showConfirmAlert = false
+		}
+	)
 }
 
 
