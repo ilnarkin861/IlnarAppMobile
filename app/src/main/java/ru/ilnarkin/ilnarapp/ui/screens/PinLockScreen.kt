@@ -1,6 +1,7 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,7 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -57,12 +62,17 @@ fun PinLockScreen() {
 	val context = LocalContext.current
 	val intent = Intent(context, MainActivity::class.java)
 
+	val orientation = LocalConfiguration.current.orientation
+	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
+	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
+
 	val testPin = "1234"
 	val font = getInterFont()
 	val inputPin = remember { mutableStateListOf<Int>() }
 	var incorrectPin by remember { mutableStateOf(false) }
 	var showConfirmAlert by remember { mutableStateOf(false) }
 	val dialogState = rememberMaterialDialogState()
+	val scrollState = rememberScrollState()
 
 	if (inputPin.size == 4){
 		LaunchedEffect(true) {
@@ -86,13 +96,12 @@ fun PinLockScreen() {
 	}
 
 
-	Column(Modifier.fillMaxSize().padding(
+	Column(modifier.fillMaxSize().padding(
 		start = dimensionResource(R.dimen.container_horizontal_padding),
-		end = dimensionResource(R.dimen.container_horizontal_padding),
-		top = 100.dp),
+		end = dimensionResource(R.dimen.container_horizontal_padding)).verticalScroll(scrollState),
 		verticalArrangement = Arrangement.SpaceBetween) {
 
-		Column {
+		Column(Modifier.padding(top = 100.dp)) {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.Center) {
@@ -102,7 +111,8 @@ fun PinLockScreen() {
 					alpha = 0.4f)
 			}
 
-			Row(modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+			Row(modifier = Modifier.fillMaxWidth().padding(
+				top = 20.dp),
 				horizontalArrangement = Arrangement.Center) {
 				Row(Modifier.padding(bottom = 40.dp)) {
 					(0 until 4).forEach {
@@ -127,7 +137,10 @@ fun PinLockScreen() {
 			}
 		}
 
-		Column(modifier = Modifier.fillMaxWidth().padding(bottom = 100.dp)) {
+		Column(modifier = Modifier.fillMaxWidth().padding(
+			top = if(isLandscape) 100.dp else 0.dp,
+			bottom = 100.dp
+		)) {
 			Row(modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.Center) {
 				Row {
