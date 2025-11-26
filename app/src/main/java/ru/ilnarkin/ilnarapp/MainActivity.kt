@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -42,7 +44,9 @@ class MainActivity : ComponentActivity() {
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
 		setContent {
-			Main()
+			Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+				Main()
+			}
 		}
 	}
 }
@@ -62,7 +66,7 @@ fun Main(){
 		Row(Modifier.fillMaxWidth()
 			.background(Color.White)
 			.drawBehind {
-				var borderStrokeWidth = 2.dp
+				val borderStrokeWidth = 2.dp
 				val strokeWidthPx = borderStrokeWidth.toPx()
 
 				drawLine(
