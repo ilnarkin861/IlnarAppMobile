@@ -73,8 +73,7 @@ fun AlertComponent(
 			) {
 				Text(
 					text = message,
-					fontWeight = FontWeight.Bold,
-					fontSize = 18.sp,
+					fontSize = 16.sp,
 					fontFamily = font,
 
 					color = if (!success) colorResource(R.color.danger_color)

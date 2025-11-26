@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -29,7 +30,10 @@ import ru.ilnarkin.ilnarapp.helpers.getInterFont
 
 
 @Composable
-fun ConfirmComponent(showed: Boolean = false, action: (confirmed: Boolean) -> Unit) {
+fun ConfirmComponent(
+	showed: Boolean = false,
+	text: String = "Точно хочешь удалить?",
+	action: (confirmed: Boolean) -> Unit) {
 
 	val interactionSource = remember { MutableInteractionSource() }
 	val dialogState = rememberMaterialDialogState()
@@ -59,9 +63,9 @@ fun ConfirmComponent(showed: Boolean = false, action: (confirmed: Boolean) -> Un
 				horizontalArrangement = Arrangement.Center
 			) {
 				Text(
-					text = "Точно хочешь удалить?",
-					fontWeight = FontWeight.Bold,
-					fontSize = 18.sp,
+					text = text,
+					textAlign = TextAlign.Center,
+					fontSize = 16.sp,
 					fontFamily = font,
 					color = colorResource(R.color.warning_color)
 				)
