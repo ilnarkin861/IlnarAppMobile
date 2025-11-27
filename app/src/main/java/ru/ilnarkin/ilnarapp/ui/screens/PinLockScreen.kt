@@ -52,6 +52,7 @@ import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.ui.components.ConfirmComponent
+import ru.ilnarkin.ilnarapp.ui.components.PinKeypadItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 
 
@@ -145,7 +146,7 @@ fun PinLockScreen() {
 				horizontalArrangement = Arrangement.Center) {
 				Row {
 					(1..3).forEach {
-						PinKeyComponent(
+						PinKeypadItemComponent(
 							onClick = {
 								incorrectPin = false
 
@@ -170,7 +171,7 @@ fun PinLockScreen() {
 				horizontalArrangement = Arrangement.Center) {
 				Row {
 					(4..6).forEach {
-						PinKeyComponent(
+						PinKeypadItemComponent(
 							onClick = {
 								incorrectPin = false
 
@@ -195,7 +196,7 @@ fun PinLockScreen() {
 				horizontalArrangement = Arrangement.Center) {
 				Row {
 					(7..9).forEach {
-						PinKeyComponent(
+						PinKeypadItemComponent(
 							onClick = {
 								incorrectPin = false
 
@@ -219,7 +220,7 @@ fun PinLockScreen() {
 			Row(modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.Center) {
 
-				PinKeyComponent(
+				PinKeypadItemComponent(
 					onClick = {
 						showConfirmAlert = true
 					},
@@ -237,7 +238,7 @@ fun PinLockScreen() {
 					)
 				}
 
-				PinKeyComponent(
+				PinKeypadItemComponent(
 					onClick = {
 						incorrectPin = false
 
@@ -255,7 +256,7 @@ fun PinLockScreen() {
 					)
 				}
 
-				PinKeyComponent(
+				PinKeypadItemComponent(
 					onClick = { if(!inputPin.isEmpty()) inputPin.removeAt(inputPin.lastIndex) },
 					bordered = false
 				) {
@@ -298,25 +299,4 @@ fun PinLockScreen() {
 			showConfirmAlert = false
 		}
 	)
-}
-
-
-@Composable
-fun PinKeyComponent(
-	onClick: () -> Unit,
-	bordered: Boolean = true,
-	content: @Composable () -> Unit
-) {
-	Surface(
-		modifier = Modifier.padding(10.dp)
-			.clip(shape = CircleShape)
-			.border(width = if (bordered) 1.dp else 0.dp,
-				color = if (bordered) Color.Gray else Color.Transparent,
-				shape = CircleShape
-			).size(70.dp),
-		onClick = onClick,
-	) {
-		Box(modifier = Modifier.fillMaxSize().background(colorResource(R.color.app_bg_color)),
-			contentAlignment = Alignment.Center) {  content() }
-	}
 }
