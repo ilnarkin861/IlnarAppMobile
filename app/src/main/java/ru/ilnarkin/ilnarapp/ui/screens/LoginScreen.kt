@@ -1,7 +1,6 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
 import android.content.Intent
-import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +46,7 @@ import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.helpers.validEmail
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 
 
@@ -250,8 +250,3 @@ fun LoginScreen() {
 	)
 }
 
-
-
-fun validEmail(email: String): Boolean{
-	return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-}
