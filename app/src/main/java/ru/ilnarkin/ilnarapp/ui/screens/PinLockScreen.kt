@@ -234,7 +234,7 @@ fun PinLockScreen(navController: NavController) {
 				) {
 
 					Text(
-						"Забыл\nкод?",
+						"Я забыл\nкод",
 						color = Color.Gray,
 						textAlign = TextAlign.Center,
 						fontFamily = font,
