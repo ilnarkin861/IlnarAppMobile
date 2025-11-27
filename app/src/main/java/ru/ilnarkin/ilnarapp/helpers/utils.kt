@@ -9,7 +9,7 @@ import ru.ilnarkin.ilnarapp.R
 
 const val PREFS_NAME = "AppSettings"
 const val KEY_PIN = "pin"
-const val KEY_IS_LOGGED_IN = "isLoggedIn"
+const val KEY_TOKEN = "token"
 
 
 fun getInterFont(): FontFamily{
@@ -21,6 +21,7 @@ fun getInterFont(): FontFamily{
 
 	return FontFamily(Font(googleFont = GoogleFont("Inter"), provider))
 }
+
 
 fun validEmail(email: String): Boolean{
 	return Patterns.EMAIL_ADDRESS.matcher(email).matches()
