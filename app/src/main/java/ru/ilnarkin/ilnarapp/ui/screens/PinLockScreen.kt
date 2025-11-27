@@ -1,5 +1,6 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -37,34 +38,39 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.helpers.KEY_PIN
+import ru.ilnarkin.ilnarapp.helpers.KEY_TOKEN
+import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.ConfirmComponent
 import ru.ilnarkin.ilnarapp.ui.components.PinKeypadItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 
 
 @Composable
-@Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
-fun PinLockScreen() {
+fun PinLockScreen(navController: NavController) {
 
 	val context = LocalContext.current
 	val intent = Intent(context, MainActivity::class.java)
+	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
 	val orientation = LocalConfiguration.current.orientation
 	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
 	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
 
-	val testPin = "1234"
+
 	val font = getInterFont()
 	val inputPin = remember { mutableStateListOf<Int>() }
 	var incorrectPin by remember { mutableStateOf(false) }
@@ -79,7 +85,9 @@ fun PinLockScreen() {
 
 			delay(2000)
 
-			if (inputPin.joinToString("") != testPin){
+			val pin = sharedPreferences.getString(KEY_PIN, null)
+
+			if (pin != null && pin != inputPin.joinToString("")){
 				incorrectPin = true
 				dialogState.hide()
 			}
@@ -292,6 +300,16 @@ fun PinLockScreen() {
 		showed = showConfirmAlert,
 		text = "Чтобы восстановить PIN-код, нужно будет заново зайти в систему. Продолжить?",
 		action = {confirmed ->
+
+			if (confirmed){
+				sharedPreferences.edit{ putString(KEY_TOKEN, null) }
+
+				navController.navigate(NavRoutes.WelcomeScreen.route){
+					popUpTo(navController.graph.findStartDestination().id) {
+						inclusive = true
+					}
+				}
+			}
 
 			showConfirmAlert = false
 		}
