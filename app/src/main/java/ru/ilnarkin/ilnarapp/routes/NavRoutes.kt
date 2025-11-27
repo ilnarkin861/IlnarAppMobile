@@ -10,4 +10,5 @@ sealed class NavRoutes(val route: String) {
 	object WelcomeScreen : NavRoutes("welcome")
 	object LoginScreen : NavRoutes("login")
 	object PinLockScreen : NavRoutes("pin")
+	object PinResetScreen : NavRoutes("pin_reset")
 }

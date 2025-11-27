@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.screens.LoginScreen
 import ru.ilnarkin.ilnarapp.ui.screens.PinLockScreen
+import ru.ilnarkin.ilnarapp.ui.screens.PinResetScreen
 import ru.ilnarkin.ilnarapp.ui.screens.WelcomeScreen
 
 
@@ -33,7 +34,6 @@ class WelcomeActivity : ComponentActivity() {
 }
 
 
-
 @Composable
 fun Welcome(){
 	val navController = rememberNavController()
@@ -46,6 +46,7 @@ fun Welcome(){
 			composable(NavRoutes.WelcomeScreen.route) { WelcomeScreen(navController) }
 			composable(NavRoutes.LoginScreen.route) { LoginScreen() }
 			composable(NavRoutes.PinLockScreen.route) { PinLockScreen() }
+			composable(NavRoutes.PinResetScreen.route) { PinResetScreen() }
 		}
 	}
 
