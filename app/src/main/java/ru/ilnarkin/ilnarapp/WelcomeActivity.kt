@@ -44,8 +44,8 @@ fun Welcome(){
 			startDestination = NavRoutes.WelcomeScreen.route
 		){
 			composable(NavRoutes.WelcomeScreen.route) { WelcomeScreen(navController) }
-			composable(NavRoutes.LoginScreen.route) { LoginScreen() }
-			composable(NavRoutes.PinLockScreen.route) { PinLockScreen() }
+			composable(NavRoutes.LoginScreen.route) { LoginScreen(navController) }
+			composable(NavRoutes.PinLockScreen.route) { PinLockScreen(navController) }
 			composable(NavRoutes.PinResetScreen.route) { PinResetScreen() }
 		}
 	}
