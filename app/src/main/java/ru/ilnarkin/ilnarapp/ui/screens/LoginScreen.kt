@@ -1,6 +1,6 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
-import android.content.Intent
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,25 +37,27 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.helpers.KEY_TOKEN
+import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.helpers.validEmail
+import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 
 
 @Composable
-@Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
-fun LoginScreen() {
+fun LoginScreen(navController: NavController) {
 
 	val context = LocalContext.current
-	val intent = Intent(context, MainActivity::class.java)
+	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
 	val testEmail = "info@example.com"
 	val testPassword = "qwerty1234"
@@ -214,7 +216,13 @@ fun LoginScreen() {
 
 								else{
 									loading = false
-									context.startActivity(intent)
+									sharedPreferences.edit { putString(KEY_TOKEN, "token_from_api")}
+
+									navController.navigate(NavRoutes.PinResetScreen.route){
+										popUpTo(navController.graph.findStartDestination().id) {
+											inclusive = true
+										}
+									}
 								}
 							}
 						}
@@ -230,7 +238,7 @@ fun LoginScreen() {
 					}
 					else{
 						Text(
-							text = "Войти",
+							text = "Авторизоваться",
 							fontFamily = font,
 							fontSize = 16.sp,
 							fontWeight = FontWeight.SemiBold
