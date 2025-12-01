@@ -31,6 +31,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -101,6 +102,7 @@ fun NoteItemComponent(
 				Text(
 					text = note.text,
 					maxLines = 3,
+					overflow = TextOverflow.Ellipsis,
 					fontFamily = font,
 					lineHeight = 1.5.em,
 					color = colorResource(R.color.text_color),
