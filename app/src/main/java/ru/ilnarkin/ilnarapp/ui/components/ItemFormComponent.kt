@@ -32,7 +32,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
@@ -40,10 +39,9 @@ import ru.ilnarkin.ilnarapp.helpers.getInterFont
 
 
 @Composable
-fun ItemModalFormComponent(
+fun ItemFormComponent(
 	itemText: String?,
 	label: String,
-	showed: Boolean = false,
 	action: suspend (text: String) -> Unit,
 	close: () -> Unit
 ) {
@@ -58,10 +56,6 @@ fun ItemModalFormComponent(
 	val scope = rememberCoroutineScope()
 
 	var saving by remember { mutableStateOf(false) }
-
-	val dialogState = rememberMaterialDialogState()
-
-	if (showed) dialogState.show()
 
 
 	Column(modifier = Modifier.background(Color.White)) {
@@ -173,10 +167,7 @@ fun ItemModalFormComponent(
 						modifier = Modifier.clickable(
 							interactionSource = interactionSource,
 							indication = null,
-							onClick = {
-								dialogState.hide()
-								close()
-							}
+							onClick = {	close()	}
 						),
 						text = "Закрыть",
 						fontWeight = FontWeight.SemiBold,

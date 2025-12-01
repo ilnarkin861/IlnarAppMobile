@@ -36,7 +36,7 @@ import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
-import ru.ilnarkin.ilnarapp.ui.components.ItemModalFormComponent
+import ru.ilnarkin.ilnarapp.ui.components.ItemFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
@@ -103,7 +103,6 @@ fun ArchiveScreen() {
 								actionType = ActionType.UPDATE
 								modalFormLabel = "Изменить архив"
 								itemText.value = tag
-								showModalForm = true
 								dialogState.show()
 							},
 
@@ -151,7 +150,6 @@ fun ArchiveScreen() {
 				actionType = ActionType.CREATE
 				modalFormLabel = "Создать архив"
 				itemText.value = ""
-				showModalForm = true
 				dialogState.show()
 			}) {
 			Icon(
@@ -179,10 +177,10 @@ fun ArchiveScreen() {
 		shape = MaterialTheme.shapes.small,
 		onCloseRequest = { MaterialDialogState.Saver() },
 	){
-		ItemModalFormComponent(
+		ItemFormComponent(
 			itemText.value,
 			modalFormLabel,
-			showed = showModalForm,
+
 			action = {
 
 				delay(1000)

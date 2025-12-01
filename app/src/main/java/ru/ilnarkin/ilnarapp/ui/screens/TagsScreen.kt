@@ -38,7 +38,7 @@ import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
-import ru.ilnarkin.ilnarapp.ui.components.ItemModalFormComponent
+import ru.ilnarkin.ilnarapp.ui.components.ItemFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
@@ -55,7 +55,6 @@ fun TagsScreen() {
 	val itemText = remember { mutableStateOf("") }
 	val alertTitle = remember { mutableStateOf("") }
 	var showAlert by remember { mutableStateOf(false) }
-	var showModalForm by remember { mutableStateOf(false) }
 	var modalFormLabel by remember { mutableStateOf("") }
 	var success by remember { mutableStateOf(true) }
 	val dialogState = rememberMaterialDialogState()
@@ -106,7 +105,6 @@ fun TagsScreen() {
 								actionType = ActionType.UPDATE
 								modalFormLabel = "Изменить тег"
 								itemText.value = tag
-								showModalForm = true
 								dialogState.show()
 							},
 
@@ -154,7 +152,6 @@ fun TagsScreen() {
 				actionType = ActionType.CREATE
 				modalFormLabel = "Добавить тег"
 				itemText.value = ""
-				showModalForm = true
 				dialogState.show()
 			}) {
 			Icon(
@@ -182,10 +179,9 @@ fun TagsScreen() {
 		shape = MaterialTheme.shapes.small,
 		onCloseRequest = { MaterialDialogState.Saver() },
 	){
-		ItemModalFormComponent(
+		ItemFormComponent(
 			itemText.value,
 			modalFormLabel,
-			showed = showModalForm,
 			action = {
 
 				delay(1000)
