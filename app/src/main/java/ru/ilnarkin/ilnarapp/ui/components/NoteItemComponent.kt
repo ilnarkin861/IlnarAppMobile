@@ -3,6 +3,8 @@ package ru.ilnarkin.ilnarapp.ui.components
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +55,7 @@ fun NoteItemComponent(
 	deleteAction: suspend (note: Note) -> Unit
 	) {
 
+	val interactionSource = remember { MutableInteractionSource() }
 	var deleting by remember { mutableStateOf(false) }
 	val scope = rememberCoroutineScope()
 	var showConfirmAlert by remember { mutableStateOf(false) }
@@ -120,13 +123,18 @@ fun NoteItemComponent(
 					horizontalArrangement = Arrangement.Center
 					) {
 
-					IconButton (
-						onClick = { viewAction(note) }) {
-						Icon(modifier = Modifier.size(35.dp),
-							painter = painterResource(R.drawable.ic_note_view),
-							contentDescription = "",
-							tint = colorResource(R.color.grey))
-					}
+					Text(
+						modifier = Modifier.clickable(
+							interactionSource = interactionSource,
+							indication = null,
+							onClick = { viewAction(note) }
+						),
+						color = colorResource(R.color.primary_color),
+						text = "Читаем полностью",
+						fontFamily = font,
+						fontSize = 15.sp,
+						fontWeight = FontWeight.Bold
+					)
 				}
 
 				Row(verticalAlignment = Alignment.CenterVertically){
