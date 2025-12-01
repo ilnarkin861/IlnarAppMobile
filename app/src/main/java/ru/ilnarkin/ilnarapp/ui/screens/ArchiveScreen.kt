@@ -52,7 +52,6 @@ fun ArchiveScreen() {
 	val itemText = remember { mutableStateOf("") }
 	val alertTitle = remember { mutableStateOf("") }
 	var showAlert by remember { mutableStateOf(false) }
-	var showModalForm by remember { mutableStateOf(false) }
 	var modalFormLabel by remember { mutableStateOf("") }
 	var success by remember { mutableStateOf(true) }
 	val dialogState = rememberMaterialDialogState()
