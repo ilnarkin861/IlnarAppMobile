@@ -1,5 +1,7 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -20,20 +22,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.WelcomeActivity
+import ru.ilnarkin.ilnarapp.helpers.KEY_TOKEN
+import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.EmailFormComponent
+import ru.ilnarkin.ilnarapp.ui.components.PasswordFormComponent
 
 
 @Composable
@@ -41,8 +49,13 @@ import ru.ilnarkin.ilnarapp.ui.components.EmailFormComponent
 fun SettingsScreen() {
 
 	val testEmail = "info@example.com"
+	val testPassword = "qwerty1234"
 
 	val font = getInterFont()
+
+	val context = LocalContext.current
+	val intent = Intent(context, WelcomeActivity::class.java)
+	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
 	val interactionSource = remember { MutableInteractionSource() }
 
@@ -53,7 +66,6 @@ fun SettingsScreen() {
 
 	val emailFormDialogState = rememberMaterialDialogState()
 	val passwordFormDialogState = rememberMaterialDialogState()
-	val pinFormDialogState = rememberMaterialDialogState()
 
 
 	Column(Modifier.fillMaxSize().padding(top = 30.dp)) {
@@ -69,7 +81,7 @@ fun SettingsScreen() {
 					modifier = Modifier.size(25.dp),
 					painter = painterResource(R.drawable.ic_mail),
 					contentDescription = "Mail",
-					tint = colorResource(R.color.grey).copy(alpha = 0.7f)
+					tint = colorResource(R.color.grey)
 				)
 				Text(text = "Изменить Email",
 					modifier = Modifier.padding(start = 10.dp),
@@ -88,14 +100,16 @@ fun SettingsScreen() {
 			}
 		}
 
+
 		HorizontalDivider(
 			thickness = 1.dp,
 			color = colorResource(R.color.border_color))
 
+
 		Row(Modifier.fillMaxWidth().padding(vertical = 20.dp).clickable(
 			interactionSource = interactionSource,
 			indication = null,
-			onClick = {}
+			onClick = { passwordFormDialogState.show() }
 		),
 			horizontalArrangement = Arrangement.SpaceBetween,
 			verticalAlignment = Alignment.CenterVertically) {
@@ -104,7 +118,7 @@ fun SettingsScreen() {
 					modifier = Modifier.size(25.dp),
 					painter = painterResource(R.drawable.ic_password),
 					contentDescription = "Password",
-					tint = colorResource(R.color.grey).copy(alpha = 0.7f)
+					tint = colorResource(R.color.grey)
 				)
 				Text(text = "Сменить пароль",
 					modifier = Modifier.padding(start = 10.dp),
@@ -123,9 +137,11 @@ fun SettingsScreen() {
 			}
 		}
 
+
 		HorizontalDivider(
 			thickness = 1.dp,
 			color = colorResource(R.color.border_color))
+
 
 		Row(Modifier.fillMaxWidth().padding(vertical = 20.dp).clickable(
 			interactionSource = interactionSource,
@@ -139,7 +155,7 @@ fun SettingsScreen() {
 					modifier = Modifier.size(25.dp),
 					painter = painterResource(R.drawable.ic_padlock),
 					contentDescription = "Padlock",
-					tint = colorResource(R.color.grey).copy(alpha = 0.7f)
+					tint = colorResource(R.color.grey)
 				)
 				Text(text = "Изменить PIN-код",
 					modifier = Modifier.padding(start = 10.dp),
@@ -177,17 +193,41 @@ fun SettingsScreen() {
 		EmailFormComponent(
 			email = testEmail,
 			action = {
-
 				delay(2000)
-
 				alertTitle.value = "Email успешно изменен"
-
 				showAlert = true
-
-				dialogState.hide()
+				emailFormDialogState.hide()
 			},
 
 			close = { emailFormDialogState.hide() }
+		)
+	}
+
+	// Password change form
+	MaterialDialog(
+		dialogState = passwordFormDialogState,
+		shape = MaterialTheme.shapes.small,
+		onCloseRequest = { MaterialDialogState.Saver() },
+	){
+		PasswordFormComponent(
+			action = { passwordModel ->
+
+				delay(2000)
+
+				if (passwordModel.oldPassword != testPassword){
+					success = false
+					alertTitle.value = "Неверный старый пароль"
+					showAlert = true
+				}
+
+				else{
+					passwordFormDialogState.hide()
+					sharedPreferences.edit{ putString(KEY_TOKEN, null) }
+					context.startActivity(intent)
+				}
+			},
+
+			close = { passwordFormDialogState.hide()}
 		)
 	}
 }
