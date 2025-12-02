@@ -140,7 +140,7 @@ fun EmailFormComponent(
 					onClick = {
 						emailIsError = mutableEmail.value.isEmpty()
 
-						if(!emailIsError){
+						if(!emailIsError && validEmail(mutableEmail.value)){
 							saving = true
 
 							scope.launch {
