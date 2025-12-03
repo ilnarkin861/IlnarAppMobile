@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.WelcomeActivity
 import ru.ilnarkin.ilnarapp.helpers.KEY_TOKEN
@@ -42,6 +44,7 @@ import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.EmailFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.PasswordFormComponent
+import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 
 
 @Composable
@@ -57,12 +60,18 @@ fun SettingsScreen() {
 	val intent = Intent(context, WelcomeActivity::class.java)
 	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+	val scope = rememberCoroutineScope()
+
 	val interactionSource = remember { MutableInteractionSource() }
 
 	var success by remember { mutableStateOf(true) }
 
 	val alertTitle = remember { mutableStateOf("") }
 	var showAlert by remember { mutableStateOf(false) }
+
+	var emailLoading by remember { mutableStateOf(false) }
+
+	var infoLoading by remember { mutableStateOf(false) }
 
 	val emailFormDialogState = rememberMaterialDialogState()
 	val passwordFormDialogState = rememberMaterialDialogState()
@@ -73,7 +82,74 @@ fun SettingsScreen() {
 		Row(Modifier.fillMaxWidth().padding(vertical = 20.dp).clickable(
 			interactionSource = interactionSource,
 			indication = null,
-			onClick = { emailFormDialogState.show() }
+			onClick = {
+
+				scope.launch {
+					infoLoading = true
+
+					delay(1500)
+
+					infoLoading = false
+
+				}
+			}
+		),
+			horizontalArrangement = Arrangement.SpaceBetween,
+			verticalAlignment = Alignment.CenterVertically) {
+			Row(verticalAlignment = Alignment.CenterVertically) {
+				Icon(
+					modifier = Modifier.size(25.dp),
+					painter = painterResource(R.drawable.ic_user),
+					contentDescription = "Padlock",
+					tint = colorResource(R.color.grey)
+				)
+				Text(text = "Изменить основную информацию",
+					modifier = Modifier.padding(start = 10.dp),
+					fontFamily = font,
+					fontSize = 16.sp,
+					color = colorResource(R.color.grey))
+			}
+
+			Row(modifier = Modifier.size(25.dp),
+				horizontalArrangement = Arrangement.Center,
+				verticalAlignment = Alignment.CenterVertically) {
+
+				if (infoLoading){
+					ProgressIndicatorComponent(15, colorResource(R.color.grey).copy(alpha = 0.7f))
+				}
+
+				else{
+					Icon(
+						modifier = Modifier.size(15.dp),
+						painter = painterResource(R.drawable.ic_arrow_right),
+						contentDescription = "Arrow right",
+						tint = colorResource(R.color.grey).copy(alpha = 0.7f)
+					)
+				}
+			}
+		}
+
+
+		HorizontalDivider(
+			thickness = 1.dp,
+			color = colorResource(R.color.border_color))
+
+
+		Row(Modifier.fillMaxWidth().padding(vertical = 20.dp).clickable(
+			interactionSource = interactionSource,
+			indication = null,
+			onClick = {
+
+				scope.launch {
+					emailLoading = true
+
+					delay(1500)
+
+					emailLoading = false
+
+					emailFormDialogState.show()
+				}
+			}
 		),
 			horizontalArrangement = Arrangement.SpaceBetween) {
 			Row(verticalAlignment = Alignment.CenterVertically) {
@@ -90,13 +166,22 @@ fun SettingsScreen() {
 					color = colorResource(R.color.grey))
 			}
 
-			Row {
-				Icon(
-					modifier = Modifier.size(15.dp),
-					painter = painterResource(R.drawable.ic_arrow_right),
-					contentDescription = "Arrow right",
-					tint = colorResource(R.color.grey).copy(alpha = 0.7f)
-				)
+			Row(modifier = Modifier.size(25.dp),
+				horizontalArrangement = Arrangement.Center,
+				verticalAlignment = Alignment.CenterVertically) {
+
+				if (emailLoading){
+					ProgressIndicatorComponent(15, colorResource(R.color.grey).copy(alpha = 0.7f))
+				}
+
+				else{
+					Icon(
+						modifier = Modifier.size(15.dp),
+						painter = painterResource(R.drawable.ic_arrow_right),
+						contentDescription = "Arrow right",
+						tint = colorResource(R.color.grey).copy(alpha = 0.7f)
+					)
+				}
 			}
 		}
 
@@ -127,44 +212,9 @@ fun SettingsScreen() {
 					color = colorResource(R.color.grey))
 			}
 
-			Row {
-				Icon(
-					modifier = Modifier.size(15.dp),
-					painter = painterResource(R.drawable.ic_arrow_right),
-					contentDescription = "Arrow right",
-					tint = colorResource(R.color.grey).copy(alpha = 0.7f)
-				)
-			}
-		}
-
-
-		HorizontalDivider(
-			thickness = 1.dp,
-			color = colorResource(R.color.border_color))
-
-
-		Row(Modifier.fillMaxWidth().padding(vertical = 20.dp).clickable(
-			interactionSource = interactionSource,
-			indication = null,
-			onClick = {}
-		),
-			horizontalArrangement = Arrangement.SpaceBetween,
-			verticalAlignment = Alignment.CenterVertically) {
-			Row(verticalAlignment = Alignment.CenterVertically) {
-				Icon(
-					modifier = Modifier.size(25.dp),
-					painter = painterResource(R.drawable.ic_padlock),
-					contentDescription = "Padlock",
-					tint = colorResource(R.color.grey)
-				)
-				Text(text = "Изменить PIN-код",
-					modifier = Modifier.padding(start = 10.dp),
-					fontFamily = font,
-					fontSize = 16.sp,
-					color = colorResource(R.color.grey))
-			}
-
-			Row {
+			Row(modifier = Modifier.size(25.dp),
+				horizontalArrangement = Arrangement.Center,
+				verticalAlignment = Alignment.CenterVertically) {
 				Icon(
 					modifier = Modifier.size(15.dp),
 					painter = painterResource(R.drawable.ic_arrow_right),
