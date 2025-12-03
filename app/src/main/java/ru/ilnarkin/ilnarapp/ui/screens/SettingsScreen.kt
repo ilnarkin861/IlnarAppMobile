@@ -43,6 +43,7 @@ import ru.ilnarkin.ilnarapp.helpers.KEY_TOKEN
 import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
+import ru.ilnarkin.ilnarapp.ui.components.ConfirmComponent
 import ru.ilnarkin.ilnarapp.ui.components.EmailFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.PasswordFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
@@ -59,7 +60,10 @@ fun SettingsScreen() {
 
 	val context = LocalContext.current
 	val intent = Intent(context, WelcomeActivity::class.java)
+
 	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+	var showConfirmAlert by remember { mutableStateOf(false) }
 
 	val scope = rememberCoroutineScope()
 
@@ -233,7 +237,28 @@ fun SettingsScreen() {
 			color = colorResource(R.color.border_color))
 
 
-
+		Row(Modifier.fillMaxWidth().padding(top = 40.dp).clickable(
+			interactionSource = remember { MutableInteractionSource() },
+			indication = ripple(),
+			onClick = { showConfirmAlert = true }
+		)) {
+			Row(Modifier.fillMaxWidth().padding(vertical = 20.dp),
+				verticalAlignment = Alignment.CenterVertically) {
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Icon(
+						modifier = Modifier.size(25.dp),
+						painter = painterResource(R.drawable.ic_logout),
+						contentDescription = "Logout",
+						tint = colorResource(R.color.danger_color)
+					)
+					Text(text = "Выйти из приложения",
+						modifier = Modifier.padding(start = 10.dp),
+						fontFamily = font,
+						fontSize = 16.sp,
+						color = colorResource(R.color.danger_color))
+				}
+			}
+		}
 	}
 
 
@@ -242,6 +267,20 @@ fun SettingsScreen() {
 		message = alertTitle.value,
 		showed = showAlert,
 		action = { showAlert = false }
+	)
+
+	ConfirmComponent(
+		showed = showConfirmAlert,
+		text = "Точно хочешь выйти?",
+		action = {confirmed ->
+
+			if (confirmed){
+				sharedPreferences.edit{ putString(KEY_TOKEN, null) }
+				context.startActivity(intent)
+			}
+
+			showConfirmAlert = false
+		}
 	)
 
 
