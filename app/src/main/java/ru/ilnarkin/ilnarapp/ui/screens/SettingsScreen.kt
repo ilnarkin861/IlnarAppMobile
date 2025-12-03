@@ -15,6 +15,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,8 +63,6 @@ fun SettingsScreen() {
 
 	val scope = rememberCoroutineScope()
 
-	val interactionSource = remember { MutableInteractionSource() }
-
 	var success by remember { mutableStateOf(true) }
 
 	val alertTitle = remember { mutableStateOf("") }
@@ -79,11 +78,10 @@ fun SettingsScreen() {
 
 	Column(Modifier.fillMaxSize().padding(top = 30.dp)) {
 
-		Row(Modifier.fillMaxWidth().padding(vertical = 20.dp).clickable(
-			interactionSource = interactionSource,
-			indication = null,
+		Row(Modifier.fillMaxWidth().clickable(
+			interactionSource = remember { MutableInteractionSource() },
+			indication = ripple(),
 			onClick = {
-
 				scope.launch {
 					infoLoading = true
 
@@ -93,51 +91,52 @@ fun SettingsScreen() {
 
 				}
 			}
-		),
-			horizontalArrangement = Arrangement.SpaceBetween,
-			verticalAlignment = Alignment.CenterVertically) {
-			Row(verticalAlignment = Alignment.CenterVertically) {
-				Icon(
-					modifier = Modifier.size(25.dp),
-					painter = painterResource(R.drawable.ic_user),
-					contentDescription = "Padlock",
-					tint = colorResource(R.color.grey)
-				)
-				Text(text = "Изменить основную информацию",
-					modifier = Modifier.padding(start = 10.dp),
-					fontFamily = font,
-					fontSize = 16.sp,
-					color = colorResource(R.color.grey))
-			}
-
-			Row(modifier = Modifier.size(25.dp),
-				horizontalArrangement = Arrangement.Center,
+		)) {
+			Row(Modifier.fillMaxWidth().padding(vertical = 20.dp),
+				horizontalArrangement = Arrangement.SpaceBetween,
 				verticalAlignment = Alignment.CenterVertically) {
-
-				if (infoLoading){
-					ProgressIndicatorComponent(15, colorResource(R.color.grey).copy(alpha = 0.7f))
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Icon(
+						modifier = Modifier.size(25.dp),
+						painter = painterResource(R.drawable.ic_user),
+						contentDescription = "Padlock",
+						tint = colorResource(R.color.grey)
+					)
+					Text(text = "Изменить личные данные",
+						modifier = Modifier.padding(start = 10.dp),
+						fontFamily = font,
+						fontSize = 16.sp,
+						color = colorResource(R.color.grey))
 				}
 
-				else{
-					Icon(
-						modifier = Modifier.size(15.dp),
-						painter = painterResource(R.drawable.ic_arrow_right),
-						contentDescription = "Arrow right",
-						tint = colorResource(R.color.grey).copy(alpha = 0.7f)
-					)
+				Row(modifier = Modifier.size(25.dp),
+					horizontalArrangement = Arrangement.Center,
+					verticalAlignment = Alignment.CenterVertically) {
+
+					if (infoLoading){
+						ProgressIndicatorComponent(15, colorResource(R.color.grey).copy(alpha = 0.7f))
+					}
+
+					else{
+						Icon(
+							modifier = Modifier.size(15.dp),
+							painter = painterResource(R.drawable.ic_arrow_right),
+							contentDescription = "Arrow right",
+							tint = colorResource(R.color.grey).copy(alpha = 0.7f)
+						)
+					}
 				}
 			}
 		}
-
 
 		HorizontalDivider(
 			thickness = 1.dp,
 			color = colorResource(R.color.border_color))
 
 
-		Row(Modifier.fillMaxWidth().padding(vertical = 20.dp).clickable(
-			interactionSource = interactionSource,
-			indication = null,
+		Row(Modifier.fillMaxWidth().clickable(
+			interactionSource = remember { MutableInteractionSource() },
+			indication = ripple(),
 			onClick = {
 
 				scope.launch {
@@ -150,31 +149,74 @@ fun SettingsScreen() {
 					emailFormDialogState.show()
 				}
 			}
-		),
-			horizontalArrangement = Arrangement.SpaceBetween) {
-			Row(verticalAlignment = Alignment.CenterVertically) {
-				Icon(
-					modifier = Modifier.size(25.dp),
-					painter = painterResource(R.drawable.ic_mail),
-					contentDescription = "Mail",
-					tint = colorResource(R.color.grey)
-				)
-				Text(text = "Изменить Email",
-					modifier = Modifier.padding(start = 10.dp),
-					fontFamily = font,
-					fontSize = 16.sp,
-					color = colorResource(R.color.grey))
-			}
-
-			Row(modifier = Modifier.size(25.dp),
-				horizontalArrangement = Arrangement.Center,
-				verticalAlignment = Alignment.CenterVertically) {
-
-				if (emailLoading){
-					ProgressIndicatorComponent(15, colorResource(R.color.grey).copy(alpha = 0.7f))
+		)) {
+			Row(Modifier.fillMaxWidth().padding(vertical = 20.dp),
+				horizontalArrangement = Arrangement.SpaceBetween) {
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Icon(
+						modifier = Modifier.size(25.dp),
+						painter = painterResource(R.drawable.ic_mail),
+						contentDescription = "Mail",
+						tint = colorResource(R.color.grey)
+					)
+					Text(text = "Изменить Email",
+						modifier = Modifier.padding(start = 10.dp),
+						fontFamily = font,
+						fontSize = 16.sp,
+						color = colorResource(R.color.grey))
 				}
 
-				else{
+				Row(modifier = Modifier.size(25.dp),
+					horizontalArrangement = Arrangement.Center,
+					verticalAlignment = Alignment.CenterVertically) {
+
+					if (emailLoading){
+						ProgressIndicatorComponent(15, colorResource(R.color.grey).copy(alpha = 0.7f))
+					}
+
+					else{
+						Icon(
+							modifier = Modifier.size(15.dp),
+							painter = painterResource(R.drawable.ic_arrow_right),
+							contentDescription = "Arrow right",
+							tint = colorResource(R.color.grey).copy(alpha = 0.7f)
+						)
+					}
+				}
+			}
+		}
+
+
+		HorizontalDivider(
+			thickness = 1.dp,
+			color = colorResource(R.color.border_color))
+
+
+		Row(Modifier.fillMaxWidth().clickable(
+			interactionSource = remember { MutableInteractionSource() },
+			indication = ripple(),
+			onClick = { passwordFormDialogState.show() }
+		)) {
+			Row(Modifier.fillMaxWidth().padding(vertical = 20.dp),
+				horizontalArrangement = Arrangement.SpaceBetween,
+				verticalAlignment = Alignment.CenterVertically) {
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Icon(
+						modifier = Modifier.size(25.dp),
+						painter = painterResource(R.drawable.ic_password),
+						contentDescription = "Password",
+						tint = colorResource(R.color.grey)
+					)
+					Text(text = "Сменить пароль",
+						modifier = Modifier.padding(start = 10.dp),
+						fontFamily = font,
+						fontSize = 16.sp,
+						color = colorResource(R.color.grey))
+				}
+
+				Row(modifier = Modifier.size(25.dp),
+					horizontalArrangement = Arrangement.Center,
+					verticalAlignment = Alignment.CenterVertically) {
 					Icon(
 						modifier = Modifier.size(15.dp),
 						painter = painterResource(R.drawable.ic_arrow_right),
@@ -191,38 +233,7 @@ fun SettingsScreen() {
 			color = colorResource(R.color.border_color))
 
 
-		Row(Modifier.fillMaxWidth().padding(vertical = 20.dp).clickable(
-			interactionSource = interactionSource,
-			indication = null,
-			onClick = { passwordFormDialogState.show() }
-		),
-			horizontalArrangement = Arrangement.SpaceBetween,
-			verticalAlignment = Alignment.CenterVertically) {
-			Row(verticalAlignment = Alignment.CenterVertically) {
-				Icon(
-					modifier = Modifier.size(25.dp),
-					painter = painterResource(R.drawable.ic_password),
-					contentDescription = "Password",
-					tint = colorResource(R.color.grey)
-				)
-				Text(text = "Сменить пароль",
-					modifier = Modifier.padding(start = 10.dp),
-					fontFamily = font,
-					fontSize = 16.sp,
-					color = colorResource(R.color.grey))
-			}
 
-			Row(modifier = Modifier.size(25.dp),
-				horizontalArrangement = Arrangement.Center,
-				verticalAlignment = Alignment.CenterVertically) {
-				Icon(
-					modifier = Modifier.size(15.dp),
-					painter = painterResource(R.drawable.ic_arrow_right),
-					contentDescription = "Arrow right",
-					tint = colorResource(R.color.grey).copy(alpha = 0.7f)
-				)
-			}
-		}
 	}
 
 
