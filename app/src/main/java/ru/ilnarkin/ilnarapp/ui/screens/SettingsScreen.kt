@@ -74,68 +74,11 @@ fun SettingsScreen() {
 
 	var emailLoading by remember { mutableStateOf(false) }
 
-	var infoLoading by remember { mutableStateOf(false) }
-
 	val emailFormDialogState = rememberMaterialDialogState()
 	val passwordFormDialogState = rememberMaterialDialogState()
 
 
 	Column(Modifier.fillMaxSize().padding(top = 30.dp)) {
-
-		Row(Modifier.fillMaxWidth().clickable(
-			interactionSource = remember { MutableInteractionSource() },
-			indication = ripple(),
-			onClick = {
-				scope.launch {
-					infoLoading = true
-
-					delay(1500)
-
-					infoLoading = false
-
-				}
-			}
-		)) {
-			Row(Modifier.fillMaxWidth().padding(vertical = 20.dp),
-				horizontalArrangement = Arrangement.SpaceBetween,
-				verticalAlignment = Alignment.CenterVertically) {
-				Row(verticalAlignment = Alignment.CenterVertically) {
-					Icon(
-						modifier = Modifier.size(25.dp),
-						painter = painterResource(R.drawable.ic_user),
-						contentDescription = "Padlock",
-						tint = colorResource(R.color.grey)
-					)
-					Text(text = "Изменить личные данные",
-						modifier = Modifier.padding(start = 10.dp),
-						fontFamily = font,
-						fontSize = 16.sp,
-						color = colorResource(R.color.grey))
-				}
-
-				Row(modifier = Modifier.size(25.dp),
-					horizontalArrangement = Arrangement.Center,
-					verticalAlignment = Alignment.CenterVertically) {
-
-					if (infoLoading){
-						ProgressIndicatorComponent(15, colorResource(R.color.grey).copy(alpha = 0.7f))
-					}
-
-					else{
-						Icon(
-							modifier = Modifier.size(15.dp),
-							painter = painterResource(R.drawable.ic_arrow_right),
-							contentDescription = "Arrow right",
-							tint = colorResource(R.color.grey).copy(alpha = 0.7f)
-						)
-					}
-				}
-			}
-		}
-
-		HorizontalDivider(
-			thickness = 1.dp,
-			color = colorResource(R.color.border_color))
 
 
 		Row(Modifier.fillMaxWidth().clickable(
@@ -232,12 +175,7 @@ fun SettingsScreen() {
 		}
 
 
-		HorizontalDivider(
-			thickness = 1.dp,
-			color = colorResource(R.color.border_color))
-
-
-		Row(Modifier.fillMaxWidth().padding(top = 40.dp).clickable(
+		Row(Modifier.fillMaxWidth().padding(top = 30.dp).clickable(
 			interactionSource = remember { MutableInteractionSource() },
 			indication = ripple(),
 			onClick = { showConfirmAlert = true }
