@@ -94,7 +94,7 @@ fun TagsScreen() {
 
 				itemsIndexed(tags){index, tag ->
 
-					Row(Modifier.fillMaxWidth().padding(vertical = 5.dp)) {
+					Row(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
 						ListItemComponent(
 							tag.id,
 							tag.title,
