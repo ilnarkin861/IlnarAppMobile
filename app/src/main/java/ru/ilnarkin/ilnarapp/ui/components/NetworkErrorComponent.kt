@@ -32,7 +32,7 @@ import ru.ilnarkin.ilnarapp.helpers.getInterFont
 fun NetworkErrorComponent() {
 
 	val fontFamily = getInterFont()
-	val interactionSource = remember { MutableInteractionSource() }
+
 
 	Box(
 		modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),

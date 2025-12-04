@@ -55,7 +55,6 @@ fun NoteItemComponent(
 	deleteAction: suspend (note: Note) -> Unit
 	) {
 
-	val interactionSource = remember { MutableInteractionSource() }
 	var deleting by remember { mutableStateOf(false) }
 	val scope = rememberCoroutineScope()
 	var showConfirmAlert by remember { mutableStateOf(false) }

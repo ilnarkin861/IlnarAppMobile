@@ -70,7 +70,6 @@ fun SearchFormComponent(
 	val font = getInterFont()
 	var tagsLoading by remember { mutableStateOf(false) }
 	val scope = rememberCoroutineScope()
-	val interactionSource = remember { MutableInteractionSource() }
 
 	var startYear = 2025
 	val unSelectedYearTitle = "Год не выбран"

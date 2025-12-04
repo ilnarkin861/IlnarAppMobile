@@ -35,7 +35,6 @@ fun AlertComponent(
 	showed: Boolean = false,
 	action: () -> Unit
 ) {
-	val interactionSource = remember { MutableInteractionSource() }
 	val dialogState = rememberMaterialDialogState()
 	val font = getInterFont()
 

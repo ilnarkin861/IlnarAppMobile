@@ -34,7 +34,6 @@ fun TagCheckboxComponent(
 	onChecked: (tag: Tag) -> Unit
 ) {
 	var checked by remember { mutableStateOf(false) }
-	val interactionSource = remember { MutableInteractionSource() }
 
 
 	Row(
