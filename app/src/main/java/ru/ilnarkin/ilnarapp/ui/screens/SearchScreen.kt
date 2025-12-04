@@ -94,7 +94,7 @@ fun SearchScreen() {
 		loading = false
 	}
 
-	Box(Modifier.fillMaxSize()) {
+	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 
 		if (loading){
 			Box(

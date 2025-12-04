@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
 import androidx.compose.ui.tooling.preview.Preview
@@ -97,7 +98,7 @@ fun SettingsScreen() {
 				}
 			}
 		)) {
-			Row(Modifier.fillMaxWidth().padding(vertical = 20.dp),
+			Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
 				horizontalArrangement = Arrangement.SpaceBetween) {
 				Row(verticalAlignment = Alignment.CenterVertically) {
 					Icon(
@@ -135,6 +136,7 @@ fun SettingsScreen() {
 
 
 		HorizontalDivider(
+			modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
 			thickness = 1.dp,
 			color = colorResource(R.color.border_color))
 
@@ -144,7 +146,7 @@ fun SettingsScreen() {
 			indication = ripple(),
 			onClick = { passwordFormDialogState.show() }
 		)) {
-			Row(Modifier.fillMaxWidth().padding(vertical = 20.dp),
+			Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
 				horizontalArrangement = Arrangement.SpaceBetween,
 				verticalAlignment = Alignment.CenterVertically) {
 				Row(verticalAlignment = Alignment.CenterVertically) {
@@ -180,7 +182,7 @@ fun SettingsScreen() {
 			indication = ripple(),
 			onClick = { showConfirmAlert = true }
 		)) {
-			Row(Modifier.fillMaxWidth().padding(vertical = 20.dp),
+			Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
 				verticalAlignment = Alignment.CenterVertically) {
 				Row(verticalAlignment = Alignment.CenterVertically) {
 					Icon(
