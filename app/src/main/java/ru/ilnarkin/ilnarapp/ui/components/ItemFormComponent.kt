@@ -51,8 +51,6 @@ fun ItemFormComponent(
 
 	var itemTextIsError by remember { mutableStateOf(false) }
 
-	val interactionSource = remember { MutableInteractionSource() }
-
 	val scope = rememberCoroutineScope()
 
 	var saving by remember { mutableStateOf(false) }
@@ -165,7 +163,7 @@ fun ItemFormComponent(
 				) {
 					Text(
 						modifier = Modifier.clickable(
-							interactionSource = interactionSource,
+							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
 							onClick = {	close()	}
 						),

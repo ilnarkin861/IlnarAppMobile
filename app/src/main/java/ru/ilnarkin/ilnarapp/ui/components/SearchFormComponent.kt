@@ -478,7 +478,7 @@ fun SearchFormComponent(
 				else{
 					Text(
 						modifier = Modifier.clickable(
-							interactionSource = interactionSource,
+							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
 							onClick = {
 								tagsLoading = true

@@ -125,7 +125,7 @@ fun NoteItemComponent(
 
 					Text(
 						modifier = Modifier.clickable(
-							interactionSource = interactionSource,
+							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
 							onClick = { viewAction(note) }
 						),

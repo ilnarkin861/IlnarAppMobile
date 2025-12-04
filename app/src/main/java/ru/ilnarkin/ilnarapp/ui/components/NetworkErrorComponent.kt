@@ -79,7 +79,7 @@ fun NetworkErrorComponent() {
 				Text(
 					"Попробовать снова",
 					modifier = Modifier.clickable(
-						interactionSource = interactionSource,
+						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
 						onClick = {}
 					),

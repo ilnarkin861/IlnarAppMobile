@@ -39,7 +39,7 @@ fun TagCheckboxComponent(
 
 	Row(
 		modifier = Modifier.fillMaxWidth().clickable(
-			interactionSource = interactionSource,
+			interactionSource = remember { MutableInteractionSource() },
 			indication = null,
 			onClick = {
 				checked = !checked

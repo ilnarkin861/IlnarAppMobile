@@ -87,7 +87,7 @@ fun AlertComponent(
 			) {
 				Text(
 					modifier = Modifier.clickable(
-						interactionSource = interactionSource,
+						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
 						onClick = {
 							dialogState.hide()

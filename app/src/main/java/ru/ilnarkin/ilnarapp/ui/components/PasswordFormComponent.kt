@@ -64,8 +64,6 @@ fun PasswordFormComponent(
 	var newPasswordIsError by remember { mutableStateOf(false) }
 	var confirmPasswordIsError by remember { mutableStateOf(false) }
 
-	val interactionSource = remember { MutableInteractionSource() }
-
 	val scope = rememberCoroutineScope()
 
 	var saving by remember { mutableStateOf(false) }
@@ -323,7 +321,7 @@ fun PasswordFormComponent(
 				) {
 					Text(
 						modifier = Modifier.clickable(
-							interactionSource = interactionSource,
+							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
 							onClick = {	close()	}
 						),

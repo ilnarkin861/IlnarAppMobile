@@ -84,7 +84,6 @@ fun NoteFormComponent(
 	var saving by remember { mutableStateOf(false) }
 	var tagsLoading by remember { mutableStateOf(false) }
 	val scope = rememberCoroutineScope()
-	val interactionSource = remember { MutableInteractionSource() }
 
 	var noteTypeMenuExpanded by remember { mutableStateOf(false) }
 	val selectedNoteType = remember { mutableStateOf(note?.noteType ?: noteTypes[0]) }
@@ -443,7 +442,7 @@ fun NoteFormComponent(
 				else{
 					Text(
 						modifier = Modifier.clickable(
-							interactionSource = interactionSource,
+							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
 							onClick = {
 								tagsLoading = true
