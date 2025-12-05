@@ -145,7 +145,7 @@ fun PinLockScreen(navController: NavController) {
 
 		Column(modifier = Modifier.fillMaxWidth().padding(
 			top = if(isLandscape) 100.dp else 0.dp,
-			bottom = 100.dp
+			bottom = 50.dp
 		)) {
 			Row(modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.Center) {
