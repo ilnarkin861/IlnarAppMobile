@@ -91,7 +91,9 @@ fun NotesScreen() {
 		loading = false
 	}
 
-	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
+	Box(Modifier
+		.fillMaxSize()
+		.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 
 		if (loading){
 			Box(
@@ -210,9 +212,8 @@ fun NotesScreen() {
 			containerColor = Color.White,
 			sheetState = noteFormSheetState,
 		) {
-			Column(Modifier
-				.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
-				Row {
+			Column {
+				Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 					Text(
 						color = colorResource(R.color.title_color),
 						text = sheetTitle.value,
