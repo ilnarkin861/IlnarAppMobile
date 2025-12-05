@@ -122,7 +122,7 @@ fun PinLockScreen(navController: NavController) {
 				horizontalArrangement = Arrangement.Center) {
 				Row(Modifier.padding(bottom = 40.dp)) {
 					(0 until 4).forEach {
-						Box(modifier = Modifier.padding(15.dp)
+						Box(modifier = Modifier.padding(10.dp)
 							.alpha(if (inputPin.size > it) 1f else 0.5f)
 							.background(
 								color =  Color.DarkGray,
