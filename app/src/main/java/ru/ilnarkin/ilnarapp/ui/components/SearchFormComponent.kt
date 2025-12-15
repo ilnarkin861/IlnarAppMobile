@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -116,7 +117,9 @@ fun SearchFormComponent(
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(bottom = 20.dp),
+				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
+					end = dimensionResource(R.dimen.container_horizontal_padding),
+					bottom = 20.dp),
 			expanded = noteTypeMenuExpanded,
 			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded }
 		) {
@@ -179,7 +182,9 @@ fun SearchFormComponent(
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(bottom = 20.dp),
+				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
+					end = dimensionResource(R.dimen.container_horizontal_padding),
+					bottom = 20.dp),
 			expanded = yearsMenuExpanded,
 			onExpandedChange = { yearsMenuExpanded = !yearsMenuExpanded }
 		){
@@ -263,7 +268,8 @@ fun SearchFormComponent(
 			ExposedDropdownMenuBox(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(bottom = 20.dp),
+					.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
+						end = dimensionResource(R.dimen.container_horizontal_padding),bottom = 20.dp),
 				expanded = monthMenuExpanded,
 				onExpandedChange = { monthMenuExpanded = !monthMenuExpanded }
 			){
@@ -344,7 +350,8 @@ fun SearchFormComponent(
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(bottom = 20.dp),
+				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
+					end = dimensionResource(R.dimen.container_horizontal_padding),bottom = 20.dp),
 			expanded = archiveMenuExpanded,
 			onExpandedChange = { archiveMenuExpanded = !archiveMenuExpanded }
 		){
@@ -429,7 +436,8 @@ fun SearchFormComponent(
 		) {
 			Row(Modifier
 				.fillMaxWidth()
-				.padding(bottom = 20.dp)) {
+				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
+					end = dimensionResource(R.dimen.container_horizontal_padding),bottom = 20.dp)) {
 				Text(
 					color = Color.Gray,
 					text = "Выбрать теги (${selectedTagsCount.intValue})",
@@ -440,8 +448,7 @@ fun SearchFormComponent(
 			}
 			selectableTags.forEachIndexed { index, tag ->
 				Row(Modifier
-					.fillMaxWidth()
-					.padding(vertical = 15.dp)) {
+					.fillMaxWidth()) {
 					TagCheckboxComponent(tag, onChecked = {tag ->
 						if (selectedTags.count() == 0){
 							selectedTags.add(tag)
@@ -460,7 +467,10 @@ fun SearchFormComponent(
 				}
 
 				if (index != selectableTags.count() -1){
-					HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
+					HorizontalDivider(
+						modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
+						thickness = 1.dp,
+						color = colorResource(R.color.border_color))
 				}
 			}
 		}
@@ -468,7 +478,10 @@ fun SearchFormComponent(
 		if (hasNextTags){
 			Row(Modifier
 				.fillMaxWidth()
-				.padding(top = 20.dp, bottom = 40.dp)) {
+				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
+					end = dimensionResource(R.dimen.container_horizontal_padding),
+					top = 20.dp,
+					bottom = 40.dp)) {
 
 				if (tagsLoading){
 					ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
@@ -507,7 +520,9 @@ fun SearchFormComponent(
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(top = 60.dp, bottom = 80.dp)
+				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
+					end = dimensionResource(R.dimen.container_horizontal_padding),
+					top = 60.dp, bottom = 80.dp)
 		) {
 			Button(
 				modifier = Modifier

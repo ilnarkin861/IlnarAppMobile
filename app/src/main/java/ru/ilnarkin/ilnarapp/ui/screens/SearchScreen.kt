@@ -209,9 +209,8 @@ fun SearchScreen() {
 			containerColor = Color.White,
 			sheetState = noteFormSheetState,
 		) {
-			Column(Modifier
-				.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
-				Row {
+			Column {
+				Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 					Text(
 						color = colorResource(R.color.title_color),
 						text = sheetTitle.value,
@@ -286,9 +285,8 @@ fun SearchScreen() {
 			containerColor = Color.White,
 			sheetState = noteSearchFormSheetState,
 		){
-			Column(Modifier
-				.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
-				Row {
+			Column {
+				Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 					Text(
 						color = colorResource(R.color.title_color),
 						text = "Фильтр",
