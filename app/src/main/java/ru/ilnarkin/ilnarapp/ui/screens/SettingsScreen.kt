@@ -213,7 +213,6 @@ fun SettingsScreen() {
 		action = {confirmed ->
 
 			if (confirmed){
-				sharedPreferences.edit{ putString(KEY_TOKEN, null) }
 				context.startActivity(intent)
 			}
 
