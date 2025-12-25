@@ -48,14 +48,23 @@ import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 fun ArchiveScreen() {
 
 	val archives = getArchives(20)
+
 	var loading by remember { mutableStateOf(false) }
+
 	val listState = rememberLazyListState()
+
 	val itemText = remember { mutableStateOf("") }
+
 	val alertTitle = remember { mutableStateOf("") }
+
 	var showAlert by remember { mutableStateOf(false) }
+
 	var modalFormLabel by remember { mutableStateOf("") }
+
 	var success by remember { mutableStateOf(true) }
+
 	val dialogState = rememberMaterialDialogState()
+
 	var actionType by remember { mutableStateOf(ActionType.CREATE) }
 
 
@@ -90,7 +99,6 @@ fun ArchiveScreen() {
 				}
 
 				itemsIndexed(archives){ index, tag ->
-
 					Row(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
 						ListItemComponent(
 							tag.id,
@@ -157,7 +165,6 @@ fun ArchiveScreen() {
 				painter = painterResource(R.drawable.ic_plus),
 				contentDescription = "Создать") }
 	}// Box
-
 
 
 	AlertComponent(

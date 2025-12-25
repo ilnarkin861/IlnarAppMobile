@@ -45,10 +45,12 @@ fun TagCheckboxComponent(
 			onChecked(tag)
 		}
 	)) {
+
 		Row(
 			modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 15.dp),
 			verticalAlignment = Alignment.CenterVertically
 		) {
+
 			Row(
 				modifier = Modifier.size(20.dp)
 					.border(

@@ -63,16 +63,22 @@ fun LoginScreen(navController: NavController) {
 	val testPassword = "qwerty1234"
 
 	val font = getInterFont()
+
 	val scrollState = rememberScrollState()
+
 	val email = remember { mutableStateOf("") }
-	val password = remember { mutableStateOf("") }
 	var emailIsError by remember { mutableStateOf(false) }
 	var emailNotValid by remember { mutableStateOf(false) }
+
+	val password = remember { mutableStateOf("") }
 	var passwordIsError by remember { mutableStateOf(false) }
+
 	var loading by remember { mutableStateOf(false) }
+
 	val scope = rememberCoroutineScope()
 
 	var showAlert by remember { mutableStateOf(false) }
+
 
 	Column(Modifier.fillMaxSize()
 		.verticalScroll(scrollState)
@@ -87,7 +93,6 @@ fun LoginScreen(navController: NavController) {
 					contentDescription = "Lock",
 					alpha = 0.4f)
 		}
-
 
 		Column(Modifier.fillMaxWidth().padding(top = 50.dp)) {
 			Row(Modifier.fillMaxWidth()) {
@@ -204,7 +209,6 @@ fun LoginScreen(navController: NavController) {
 
 							loading = true
 
-
 							scope.launch {
 								delay(1500)
 							}.invokeOnCompletion {
@@ -246,7 +250,6 @@ fun LoginScreen(navController: NavController) {
 					}
 				}
 			}
-
 		}
 	}
 

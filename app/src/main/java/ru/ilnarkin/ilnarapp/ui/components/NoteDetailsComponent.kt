@@ -31,7 +31,9 @@ import java.time.format.DateTimeFormatter
 fun NoteDetailsComponent(note: Note?) {
 
 	val containerPadding = dimensionResource(R.dimen.container_horizontal_padding)
+
 	val font = getInterFont()
+
 
 	Column(Modifier.fillMaxSize()
 		.padding(start = containerPadding, top = 30.dp, end = containerPadding)

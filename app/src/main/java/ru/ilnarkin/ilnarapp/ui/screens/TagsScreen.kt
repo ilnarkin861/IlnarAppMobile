@@ -51,14 +51,23 @@ import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 fun TagsScreen() {
 
 	val tags = getTags(20)
+
 	var loading by remember { mutableStateOf(false) }
+
 	val listState = rememberLazyListState()
+
 	val itemText = remember { mutableStateOf("") }
+
 	val alertTitle = remember { mutableStateOf("") }
+
 	var showAlert by remember { mutableStateOf(false) }
+
 	var modalFormLabel by remember { mutableStateOf("") }
+
 	var success by remember { mutableStateOf(true) }
+
 	val dialogState = rememberMaterialDialogState()
+
 	var actionType by remember { mutableStateOf(ActionType.CREATE) }
 
 
@@ -160,7 +169,6 @@ fun TagsScreen() {
 				painter = painterResource(R.drawable.ic_plus),
 				contentDescription = "Добавить") }
 	}// Box
-
 
 
 	AlertComponent(

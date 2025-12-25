@@ -25,6 +25,7 @@ import ru.ilnarkin.ilnarapp.routes.NavRoutes
 fun WelcomeScreen(navController: NavController) {
 
 	val context = LocalContext.current
+
 	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
 

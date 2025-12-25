@@ -36,9 +36,13 @@ fun ListItemComponent(
     deleteAction: suspend (id: String) -> Unit) {
 
     var loading by remember { mutableStateOf(false) }
+
     var deleting by remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
+
     var showConfirmAlert by remember { mutableStateOf(false) }
+
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -110,6 +114,7 @@ fun ListItemComponent(
         action = {confirmed ->
 
             if (confirmed){
+
                 deleting = true
 
                 scope.launch {

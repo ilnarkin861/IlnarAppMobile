@@ -69,10 +69,13 @@ fun SearchFormComponent(
 	val selectableTags = tags
 
 	val font = getInterFont()
+
 	var tagsLoading by remember { mutableStateOf(false) }
+
 	val scope = rememberCoroutineScope()
 
 	var startYear = 2025
+
 	val unSelectedYearTitle = "Год не выбран"
 	var yearsMenuExpanded by remember { mutableStateOf(false) }
 	var selectedYearTitle by remember { mutableStateOf(unSelectedYearTitle) }
@@ -111,7 +114,6 @@ fun SearchFormComponent(
 		.fillMaxSize()
 		.padding(top = 30.dp)
 		.verticalScroll(rememberScrollState())) {
-
 
 		//Note type dropdown menu
 		ExposedDropdownMenuBox(
@@ -176,7 +178,6 @@ fun SearchFormComponent(
 				}
 			}
 		}
-
 
 		// Year dropdown
 		ExposedDropdownMenuBox(
@@ -262,7 +263,6 @@ fun SearchFormComponent(
 			}
 		}
 
-
 		// Month dropdown
 		if (yearSelected){
 			ExposedDropdownMenuBox(
@@ -345,7 +345,6 @@ fun SearchFormComponent(
 			}
 		}
 
-
 		// Archive dropdown
 		ExposedDropdownMenuBox(
 			modifier = Modifier
@@ -426,7 +425,6 @@ fun SearchFormComponent(
 				}
 			}
 		}
-
 
 		//Selectable tags
 		Column(
@@ -514,7 +512,6 @@ fun SearchFormComponent(
 				}
 			}
 		}
-
 
 		// Search button
 		Row(

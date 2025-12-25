@@ -31,6 +31,7 @@ import ru.ilnarkin.ilnarapp.routes.NavRoutes
 fun TopBar (navController: NavController) {
 
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
+
 	val route = navBackStackEntry?.destination?.route
 
 	val title = when(route) {
@@ -41,6 +42,7 @@ fun TopBar (navController: NavController) {
 		NavRoutes.SettingsScreen.route -> stringResource(R.string.settings_title)
 		else -> stringResource(R.string.app_name)
 	}
+
 
 	TopAppBar(
 		modifier = Modifier.padding(bottom = 2.dp),
@@ -75,10 +77,12 @@ fun TopBar (navController: NavController) {
 							}
 						}
 					}
-				}) {
+				}
+			) {
 				Icon(
 					painter = painterResource(R.drawable.ic_settings),
-					contentDescription = "")
+					contentDescription = ""
+				)
 			}
 		}
 	)

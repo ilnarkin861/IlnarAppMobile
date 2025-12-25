@@ -99,7 +99,6 @@ fun PasswordFormComponent(
 				)
 			}
 
-
 			// Old password field
 			Row(
 				modifier = Modifier.fillMaxWidth()
@@ -144,7 +143,6 @@ fun PasswordFormComponent(
 				}
 			}
 
-
 			// New password field
 			Row(
 				modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
@@ -177,7 +175,6 @@ fun PasswordFormComponent(
 					shape = RoundedCornerShape(10.dp))
 			}
 
-
 			if (newPasswordIsError){
 				Row(modifier = Modifier.padding(top = 5.dp)) {
 					Text(
@@ -189,7 +186,6 @@ fun PasswordFormComponent(
 				}
 			}
 
-
 			if (!newPassword.value.isEmpty() && passwordLengthError){
 				Text(
 					modifier = Modifier.padding(top = 5.dp),
@@ -199,7 +195,6 @@ fun PasswordFormComponent(
 					fontSize = 13.sp
 				)
 			}
-
 
 			// Confirm password field
 			Row(
@@ -234,7 +229,6 @@ fun PasswordFormComponent(
 					shape = RoundedCornerShape(10.dp))
 			}
 
-
 			if (confirmPasswordIsError){
 				Row(modifier = Modifier.padding(top = 5.dp, bottom = 10.dp)) {
 					Text(
@@ -246,7 +240,6 @@ fun PasswordFormComponent(
 				}
 			}
 
-
 			if (!confirmPassword.value.isEmpty() && !passwordsMatch){
 				Text(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
@@ -256,7 +249,6 @@ fun PasswordFormComponent(
 					fontSize = 13.sp
 				)
 			}
-
 
 			Row(
 				modifier = Modifier.fillMaxWidth().padding(top = 30.dp)

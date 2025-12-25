@@ -36,9 +36,13 @@ fun AlertComponent(
 	action: () -> Unit
 ) {
 	val dialogState = rememberMaterialDialogState()
+
 	val font = getInterFont()
 
-	if (showed) dialogState.show()
+
+	if (showed) {
+		dialogState.show()
+	}
 
 
 	MaterialDialog(

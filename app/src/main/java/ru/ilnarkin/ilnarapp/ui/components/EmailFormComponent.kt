@@ -57,7 +57,6 @@ fun EmailFormComponent(
 	var saving by remember { mutableStateOf(false) }
 
 
-
 	Column(modifier = Modifier.background(Color.White)) {
 		Column(
 			modifier = Modifier.fillMaxWidth()

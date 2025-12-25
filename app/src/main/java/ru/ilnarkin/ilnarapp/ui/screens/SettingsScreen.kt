@@ -74,13 +74,12 @@ fun SettingsScreen() {
 	var showAlert by remember { mutableStateOf(false) }
 
 	var emailLoading by remember { mutableStateOf(false) }
-
 	val emailFormDialogState = rememberMaterialDialogState()
+
 	val passwordFormDialogState = rememberMaterialDialogState()
 
 
 	Column(Modifier.fillMaxSize().padding(top = 30.dp)) {
-
 
 		Row(Modifier.fillMaxWidth().clickable(
 			interactionSource = remember { MutableInteractionSource() },
@@ -98,6 +97,7 @@ fun SettingsScreen() {
 				}
 			}
 		)) {
+
 			Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
 				horizontalArrangement = Arrangement.SpaceBetween) {
 				Row(verticalAlignment = Alignment.CenterVertically) {
@@ -134,12 +134,10 @@ fun SettingsScreen() {
 			}
 		}
 
-
 		HorizontalDivider(
 			modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
 			thickness = 1.dp,
 			color = colorResource(R.color.border_color))
-
 
 		Row(Modifier.fillMaxWidth().clickable(
 			interactionSource = remember { MutableInteractionSource() },
@@ -176,7 +174,6 @@ fun SettingsScreen() {
 			}
 		}
 
-
 		Row(Modifier.fillMaxWidth().padding(top = 30.dp).clickable(
 			interactionSource = remember { MutableInteractionSource() },
 			indication = ripple(),
@@ -208,6 +205,7 @@ fun SettingsScreen() {
 		showed = showAlert,
 		action = { showAlert = false }
 	)
+
 
 	ConfirmComponent(
 		showed = showConfirmAlert,
@@ -242,6 +240,7 @@ fun SettingsScreen() {
 			close = { emailFormDialogState.hide() }
 		)
 	}
+
 
 	// Password change form
 	MaterialDialog(

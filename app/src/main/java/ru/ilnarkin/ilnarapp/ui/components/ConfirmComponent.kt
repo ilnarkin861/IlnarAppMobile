@@ -36,19 +36,29 @@ fun ConfirmComponent(
 	action: (confirmed: Boolean) -> Unit) {
 
 	val interactionSource = remember { MutableInteractionSource() }
+
 	val dialogState = rememberMaterialDialogState()
+
 	val font = getInterFont()
 
-	if (showed) dialogState.show()
+
+	if (showed) {
+		dialogState.show()
+	}
+
 
 	MaterialDialog(
 		dialogState = dialogState,
 		shape = MaterialTheme.shapes.small,
 		onCloseRequest = { MaterialDialogState.Saver() },
 	) {
-		Column(modifier = Modifier.background(Color.White).padding(20.dp)) {
+		Column(modifier = Modifier
+			.background(Color.White)
+			.padding(20.dp)) {
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 10.dp),
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 10.dp, bottom = 10.dp),
 				horizontalArrangement = Arrangement.Center
 			) {
 				Icon(
@@ -59,7 +69,9 @@ fun ConfirmComponent(
 			}
 
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 25.dp),
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(start = 10.dp, end = 10.dp, bottom = 25.dp),
 				horizontalArrangement = Arrangement.Center
 			) {
 				Text(
@@ -72,19 +84,23 @@ fun ConfirmComponent(
 			}
 
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(top = 30.dp, bottom = 15.dp),
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 30.dp, bottom = 15.dp),
 				horizontalArrangement = Arrangement.Center
 			) {
 				Row {
 					Text(
-						modifier = Modifier.padding(horizontal = 15.dp).clickable(
-							interactionSource = interactionSource,
-							indication = null,
-							onClick = {
-								dialogState.hide()
-								action(false)
-							}
-						),
+						modifier = Modifier
+							.padding(horizontal = 15.dp)
+							.clickable(
+								interactionSource = interactionSource,
+								indication = null,
+								onClick = {
+									dialogState.hide()
+									action(false)
+								}
+							),
 						text = "Нет",
 						fontWeight = FontWeight.SemiBold,
 						fontSize = 15.sp,
@@ -93,14 +109,16 @@ fun ConfirmComponent(
 					)
 
 					Text(
-						modifier = Modifier.padding(horizontal = 15.dp).clickable(
-							interactionSource = interactionSource,
-							indication = null,
-							onClick = {
-								dialogState.hide()
-								action(true)
-							}
-						),
+						modifier = Modifier
+							.padding(horizontal = 15.dp)
+							.clickable(
+								interactionSource = interactionSource,
+								indication = null,
+								onClick = {
+									dialogState.hide()
+									action(true)
+								}
+							),
 						text = "Да",
 						fontWeight = FontWeight.SemiBold,
 						fontSize = 15.sp,

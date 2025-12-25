@@ -26,9 +26,13 @@ import ru.ilnarkin.ilnarapp.helpers.getInterFont
 fun LoadButtonComponent(nextButton: Boolean = true, action: suspend () -> Unit) {
 
 	val interactionSource = remember { MutableInteractionSource() }
+
 	val scope = rememberCoroutineScope()
-	var text = if (nextButton) "Следующие" else "Предыдущие"
+
+	val text = if (nextButton) "Следующие" else "Предыдущие"
+
 	var loading by remember { mutableStateOf(false) }
+
 
 	Row(
 		modifier = Modifier.fillMaxWidth().height(25.dp),

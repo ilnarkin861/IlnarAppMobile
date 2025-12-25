@@ -56,9 +56,13 @@ fun NoteItemComponent(
 	) {
 
 	var deleting by remember { mutableStateOf(false) }
+
 	val scope = rememberCoroutineScope()
+
 	var showConfirmAlert by remember { mutableStateOf(false) }
+
 	val font = getInterFont()
+
 
 	Box(
 		Modifier.fillMaxSize()
@@ -174,6 +178,7 @@ fun NoteItemComponent(
 			}
 		}
 	}
+
 
 	ConfirmComponent(
 		showed = showConfirmAlert,

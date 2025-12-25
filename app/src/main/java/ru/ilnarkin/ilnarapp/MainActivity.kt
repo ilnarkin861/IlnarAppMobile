@@ -56,6 +56,7 @@ class MainActivity : ComponentActivity() {
 fun Main(){
 
 	val navController = rememberNavController()
+
 	val borderColor = colorResource(R.color.border_color)
 
 	Column(Modifier.displayCutoutPadding()
@@ -73,7 +74,9 @@ fun Main(){
 					end = Offset(size.width, size.height),
 					strokeWidth = strokeWidthPx
 				)
-			}) { TopBar(navController) }
+			}) {
+			TopBar(navController)
+		}
 
 		NavHost(
 			navController = navController,
@@ -85,6 +88,7 @@ fun Main(){
 			composable(NavRoutes.SearchScreen.route) { SearchScreen() }
 			composable(NavRoutes.SettingsScreen.route) { SettingsScreen() }
 		}
+
 		BottomNavigationBar(navController)
 	}
 }

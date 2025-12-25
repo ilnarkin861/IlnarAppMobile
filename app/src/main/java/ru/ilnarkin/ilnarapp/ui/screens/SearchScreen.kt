@@ -59,24 +59,36 @@ import ru.ilnarkin.ilnarapp.ui.components.SearchFormComponent
 @Composable
 fun SearchScreen() {
 
-
 	var actionType by remember { mutableStateOf(ActionType.CREATE) }
+
 	var currentNote by remember { mutableStateOf<Note?>(null) }
+
 	val notes = getNotesList()
+
 	var showNoteFormSheet by remember { mutableStateOf(false) }
-	var showNoteSearchFormSheet by remember { mutableStateOf(false) }
-	var showNoteDetailsSheet by remember { mutableStateOf(false) }
-	val listState = rememberLazyListState()
 	val noteFormSheetState = rememberModalBottomSheetState()
+
+	var showNoteSearchFormSheet by remember { mutableStateOf(false) }
 	val noteSearchFormSheetState = rememberModalBottomSheetState()
+
+	var showNoteDetailsSheet by remember { mutableStateOf(false) }
 	val noteDetailsSheetState = rememberModalBottomSheetState()
-	val sheetTitle = remember { mutableStateOf("") }
-	val alertTitle = remember { mutableStateOf("") }
-	var loading by remember { mutableStateOf(false) }
 	var noteDetailsLoading by remember { mutableStateOf(false) }
+
+	val listState = rememberLazyListState()
+
+	val sheetTitle = remember { mutableStateOf("") }
+
+	val alertTitle = remember { mutableStateOf("") }
+
+	var loading by remember { mutableStateOf(false) }
+
 	var showAlert by remember { mutableStateOf(false) }
+
 	var success by remember { mutableStateOf(true) }
+
 	val scope = rememberCoroutineScope()
+
 	val noteFullText = """
 		В маленьком городке, расположенном у подножия гор, ежегодно проходит фестиваль дружбы. Это событие собирает людей из разных уголков региона, и каждый год его темы отличаются.
 
@@ -93,6 +105,7 @@ fun SearchScreen() {
 
 		loading = false
 	}
+
 
 	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 
@@ -147,12 +160,14 @@ fun SearchScreen() {
 								noteDetailsLoading = false
 							}
 						},
+
 						deleteAction = {
 							delay(1500)
 							alertTitle.value = "Запись успешно удалена"
 							showAlert = true
 						})
 				}
+
 				item {
 					Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
 						LoadButtonComponent(action = {
@@ -170,6 +185,7 @@ fun SearchScreen() {
 				MessageComponent("Записей нет")
 			}
 		}
+
 
 		FloatingActionButton(
 			containerColor = colorResource(R.color.primary_color),
@@ -322,7 +338,6 @@ fun SearchScreen() {
 			}
 		}
 	}
-
 
 
 	// Details sheet

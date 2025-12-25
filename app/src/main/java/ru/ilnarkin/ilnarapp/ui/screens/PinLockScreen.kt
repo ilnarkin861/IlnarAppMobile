@@ -68,15 +68,21 @@ fun PinLockScreen(navController: NavController) {
 
 	val orientation = LocalConfiguration.current.orientation
 	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
+
 	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
 
 
 	val font = getInterFont()
+
 	val inputPin = remember { mutableStateListOf<Int>() }
 	var incorrectPin by remember { mutableStateOf(false) }
+
 	var showConfirmAlert by remember { mutableStateOf(false) }
+
 	val dialogState = rememberMaterialDialogState()
+
 	val scrollState = rememberScrollState()
+
 
 	if (inputPin.size == 4){
 		LaunchedEffect(true) {
@@ -295,6 +301,7 @@ fun PinLockScreen(navController: NavController) {
 			}
 		}
 	}
+
 
 	ConfirmComponent(
 		showed = showConfirmAlert,

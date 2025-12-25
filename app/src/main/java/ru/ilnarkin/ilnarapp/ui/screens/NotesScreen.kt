@@ -60,20 +60,33 @@ import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 fun NotesScreen() {
 
 	var actionType by remember { mutableStateOf(ActionType.CREATE) }
+
 	var currentNote by remember { mutableStateOf<Note?>(null) }
+
 	val notes = getNotesList()
+
 	var showNoteFormSheet by remember { mutableStateOf(false) }
 	var showNoteDetailsSheet by remember { mutableStateOf(false) }
+
 	val listState = rememberLazyListState()
+
 	val noteFormSheetState = rememberModalBottomSheetState()
 	val noteDetailsSheetState = rememberModalBottomSheetState()
+
 	val sheetTitle = remember { mutableStateOf("") }
+
 	val alertTitle = remember { mutableStateOf("") }
+
 	var loading by remember { mutableStateOf(false) }
+
 	var noteDetailsLoading by remember { mutableStateOf(false) }
+
 	var showAlert by remember { mutableStateOf(false) }
+
 	var success by remember { mutableStateOf(true) }
+
 	val scope = rememberCoroutineScope()
+
 	val noteFullText = """
 		В маленьком городке, расположенном у подножия гор, ежегодно проходит фестиваль дружбы. Это событие собирает людей из разных уголков региона, и каждый год его темы отличаются.
 
@@ -91,6 +104,7 @@ fun NotesScreen() {
 		loading = false
 	}
 
+
 	Box(Modifier
 		.fillMaxSize()
 		.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
@@ -107,11 +121,13 @@ fun NotesScreen() {
 			LazyColumn(
 				state = listState,
 				contentPadding = PaddingValues(top = 30.dp, bottom = 60.dp)) {
+
 				item {
 					Row(Modifier.padding(bottom = 25.dp)) {
 						LoadButtonComponent(nextButton = false, action = { delay(1500) })
 					}
 				}
+
 				items(notes) {value ->
 					NoteItemComponent(
 						value,
@@ -152,6 +168,7 @@ fun NotesScreen() {
 							showAlert = true
 						})
 				}
+
 				item {
 					Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
 						LoadButtonComponent(action = {
@@ -212,6 +229,7 @@ fun NotesScreen() {
 			containerColor = Color.White,
 			sheetState = noteFormSheetState,
 		) {
+
 			Column {
 				Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 					Text(

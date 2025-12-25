@@ -59,6 +59,7 @@ fun PinResetScreen() {
 
 	val orientation = LocalConfiguration.current.orientation
 	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
+
 	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
 
 	val font = getInterFont()
@@ -158,7 +159,6 @@ fun PinResetScreen() {
 				}
 			}
 		}
-
 
 		Column(modifier = Modifier.fillMaxWidth().padding(
 			top = if(isLandscape) 100.dp else 0.dp,

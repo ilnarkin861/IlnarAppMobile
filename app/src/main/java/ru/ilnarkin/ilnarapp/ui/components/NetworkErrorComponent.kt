@@ -19,8 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.ilnarkin.ilnarapp.R
@@ -28,8 +26,7 @@ import ru.ilnarkin.ilnarapp.helpers.getInterFont
 
 
 @Composable
-@Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
-fun NetworkErrorComponent() {
+fun NetworkErrorComponent(action: () -> Unit) {
 
 	val fontFamily = getInterFont()
 
@@ -81,7 +78,7 @@ fun NetworkErrorComponent() {
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
-						onClick = {}
+						onClick = { action() }
 					),
 					color = colorResource(R.color.primary_color),
 					fontFamily = fontFamily,

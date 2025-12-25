@@ -29,6 +29,7 @@ import ru.ilnarkin.ilnarapp.routes.NavRoutes
 fun BottomNavigationBar(navController: NavController) {
 
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
+
 	val currentRoute = navBackStackEntry?.destination?.route
 
 	val borderColor = colorResource(R.color.border_color)
@@ -40,9 +41,10 @@ fun BottomNavigationBar(navController: NavController) {
 		unselectedTextColor = colorResource(R.color.bottom_navigation_color),
 		indicatorColor = Color.Transparent)
 
+
 	NavigationBar(
 		modifier = Modifier.drawBehind {
-			var borderStrokeWidth = 2.dp
+			val borderStrokeWidth = 2.dp
 			val strokeWidthPx = borderStrokeWidth.toPx()
 			drawLine(
 				color = borderColor,
@@ -53,7 +55,6 @@ fun BottomNavigationBar(navController: NavController) {
 		},
 		containerColor = Color.White,
 	) {
-
 		NavigationBarItem(
 			selected = currentRoute == NavRoutes.NotesScreen.route,
 			colors = colors,
@@ -102,7 +103,8 @@ fun BottomNavigationBar(navController: NavController) {
 						}
 					}
 				}
-			})
+			}
+		)
 
 		NavigationBarItem(
 			selected = currentRoute == NavRoutes.ArchiveScreen.route,
@@ -127,7 +129,8 @@ fun BottomNavigationBar(navController: NavController) {
 						}
 					}
 				}
-			})
+			}
+		)
 
 		NavigationBarItem(
 			selected = currentRoute == NavRoutes.SearchScreen.route,
@@ -152,6 +155,7 @@ fun BottomNavigationBar(navController: NavController) {
 						}
 					}
 				}
-			})
+			}
+		)
 	}
 }

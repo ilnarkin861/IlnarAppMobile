@@ -83,7 +83,9 @@ fun NoteFormComponent(
 	val font = getInterFont()
 
 	var saving by remember { mutableStateOf(false) }
+
 	var tagsLoading by remember { mutableStateOf(false) }
+
 	val scope = rememberCoroutineScope()
 
 	var noteTypeMenuExpanded by remember { mutableStateOf(false) }
@@ -184,7 +186,6 @@ fun NoteFormComponent(
 			}
 		}
 
-
 		//Note title field
 		OutlinedTextField(
 			modifier = Modifier
@@ -249,7 +250,6 @@ fun NoteFormComponent(
 			)
 		}
 
-
 		//Date field
 		OutlinedTextField(
 			modifier = Modifier
@@ -305,7 +305,6 @@ fun NoteFormComponent(
 				)
 			) { noteDate = it }
 		}
-
 
 		// Archive dropdown
 		ExposedDropdownMenuBox(
@@ -385,7 +384,6 @@ fun NoteFormComponent(
 				}
 			}
 		}
-
 
 		//Selectable tags
 		Column(
@@ -471,8 +469,8 @@ fun NoteFormComponent(
 			}
 		}
 
+		//Added tags
 		if (!addedTags.isEmpty()){
-			//Added tags
 			Column(
 				Modifier
 					.fillMaxWidth()
@@ -518,7 +516,6 @@ fun NoteFormComponent(
 			}
 
 		}
-
 
 		//Save button
 		Row(
