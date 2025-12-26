@@ -10,6 +10,7 @@ import ru.ilnarkin.ilnarapp.R
 const val PREFS_NAME = "AppSettings"
 const val KEY_PIN = "pin"
 const val KEY_TOKEN = "token"
+const val API_URL = "http://192.168.1.11:8080"
 
 
 fun getInterFont(): FontFamily{
