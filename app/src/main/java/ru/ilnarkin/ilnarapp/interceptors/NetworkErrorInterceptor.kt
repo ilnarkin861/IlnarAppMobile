@@ -1,6 +1,5 @@
 package ru.ilnarkin.ilnarapp.interceptors
 
-import android.content.Context
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -11,7 +10,7 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 
 
-class NetworkErrorInterceptor(private val errorManager: NetworkErrorManager, private val context: Context) : Interceptor {
+class NetworkErrorInterceptor(private val errorManager: NetworkErrorManager) : Interceptor {
 	override fun intercept(chain: Interceptor.Chain): Response {
 		val response = chain.proceed(chain.request())
 
