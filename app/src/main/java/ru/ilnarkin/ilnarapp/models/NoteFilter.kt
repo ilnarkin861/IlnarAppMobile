@@ -8,4 +8,4 @@ data class NoteFilter (
 	var day: Int?,
 	var archiveId: String?,
 	var tagIds: MutableList<String>? = mutableListOf()
-)
+) : FilterModel
