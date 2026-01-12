@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Archive
+import ru.ilnarkin.ilnarapp.models.FilterModel
 import ru.ilnarkin.ilnarapp.models.NoteFilter
 import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.models.Tag
@@ -63,7 +64,7 @@ fun SearchFormComponent(
 	tags: MutableList<Tag>,
 	hasNextTags: Boolean = true,
 	loadTags: suspend (count: Int) -> MutableList<Tag>,
-	action: (filter: NoteFilter) -> Unit
+	action: (filter: FilterModel) -> Unit
 ) {
 
 	val selectableTags = tags
