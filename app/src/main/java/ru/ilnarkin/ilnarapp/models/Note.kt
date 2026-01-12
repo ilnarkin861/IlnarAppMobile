@@ -9,4 +9,4 @@ data  class Note (
 	var date: String,
 	var archive: Archive? = null,
 	var tags: MutableList<Tag> = mutableListOf()
-)
+) : AppModel
