@@ -40,7 +40,6 @@ fun WelcomeScreen(
 ) {
 
 	val snackBarHostState = remember { SnackbarHostState() }
-	val scope = rememberCoroutineScope()
 
 	val state by userViewModel.uiState.collectAsState()
 
