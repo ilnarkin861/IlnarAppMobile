@@ -11,5 +11,5 @@ data class AppUiState<T> (
 	var offset: Int = 0,
 	var list: MutableList<T> = mutableListOf(),
 	var pagination: Pagination? = null,
-	var userToken: String? = null
+	var message: String = ""
 )
