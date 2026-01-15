@@ -1,7 +1,7 @@
 package ru.ilnarkin.ilnarapp.models
 
 
-data class UserAuth (
+data class UserAuthData (
 	var email: String,
 	var password: String,
 )

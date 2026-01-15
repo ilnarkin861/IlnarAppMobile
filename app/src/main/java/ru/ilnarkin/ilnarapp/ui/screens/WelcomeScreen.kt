@@ -14,7 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import kotlinx.coroutines.async
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
@@ -46,7 +46,9 @@ fun WelcomeScreen(
 
 	LaunchedEffect(Unit) {
 
-		userViewModel.checkAuth()
+		async {
+			userViewModel.checkAuth()
+		}.await()
 
 		if (state.isAuth){
 			navController.navigate(NavRoutes.PinLockScreen.route){
