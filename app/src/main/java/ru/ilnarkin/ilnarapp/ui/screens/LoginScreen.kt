@@ -35,6 +35,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,7 +49,6 @@ import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.helpers.validEmail
 import ru.ilnarkin.ilnarapp.models.UserAuthData
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
-import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
@@ -73,7 +73,7 @@ fun LoginScreen(
 
 	val scope = rememberCoroutineScope()
 
-	var showAlert by remember { mutableStateOf(false) }
+	var showMessage by remember { mutableStateOf(false) }
 
 	val state by userViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -90,6 +90,17 @@ fun LoginScreen(
 					painter = painterResource(R.drawable.ic_lock),
 					contentDescription = "Lock",
 					alpha = 0.4f)
+		}
+
+		if (showMessage){
+			Row(modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 2.dp),
+				horizontalArrangement = Arrangement.Center) {
+				Text(state.message,
+					color = colorResource(R.color.danger_color),
+					textAlign = TextAlign.Center,
+					fontFamily = font,
+					fontSize = 16.sp)
+			}
 		}
 
 		Column(Modifier.fillMaxWidth().padding(top = 50.dp)) {
@@ -221,6 +232,8 @@ fun LoginScreen(
 										}
 									}
 								}
+
+								else { showMessage = true }
 							}
 						}
 					}
@@ -245,12 +258,5 @@ fun LoginScreen(
 			}
 		}
 	}
-
-	AlertComponent(
-		success = false,
-		message = "Неверный email или пароль",
-		showed = showAlert,
-		action = { showAlert = false }
-	)
 }
 
