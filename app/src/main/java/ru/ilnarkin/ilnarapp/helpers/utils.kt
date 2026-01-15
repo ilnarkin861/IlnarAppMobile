@@ -27,3 +27,15 @@ fun getInterFont(): FontFamily{
 fun validEmail(email: String): Boolean{
 	return Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
+
+
+fun buildString(stringsList: MutableList<String>) : String{
+
+	val stringBuilder = StringBuilder()
+
+	stringsList.forEach { string ->
+		stringBuilder.appendLine(string)
+	}
+
+	return stringBuilder.toString()
+}
