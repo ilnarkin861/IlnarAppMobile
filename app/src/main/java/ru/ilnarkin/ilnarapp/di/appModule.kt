@@ -14,6 +14,6 @@ val appModule = module {
 		androidContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 	}
 
-	viewModel { UserViewModel(get()) }
+	viewModel { UserViewModel(get(), get() ) }
 
 }
