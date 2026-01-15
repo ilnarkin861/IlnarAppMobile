@@ -65,6 +65,8 @@ dependencies {
     implementation (libs.koin.androidx.navigation)
     implementation (libs.koin.androidx.compose)
     implementation (libs.logging.interceptor)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
