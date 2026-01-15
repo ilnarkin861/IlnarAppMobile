@@ -1,6 +1,5 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +28,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -39,28 +37,26 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.edit
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.KEY_TOKEN
-import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.helpers.validEmail
+import ru.ilnarkin.ilnarapp.models.UserAuthData
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
+import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
 @Composable
-fun LoginScreen(navController: NavController) {
-
-	val context = LocalContext.current
-	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
-	val testEmail = "info@example.com"
-	val testPassword = "qwerty1234"
+fun LoginScreen(
+	navController: NavController,
+	userViewModel: UserViewModel = koinViewModel()
+	) {
 
 	val font = getInterFont()
 
@@ -78,6 +74,8 @@ fun LoginScreen(navController: NavController) {
 	val scope = rememberCoroutineScope()
 
 	var showAlert by remember { mutableStateOf(false) }
+
+	val state by userViewModel.uiState.collectAsStateWithLifecycle()
 
 
 	Column(Modifier.fillMaxSize()
@@ -210,18 +208,13 @@ fun LoginScreen(navController: NavController) {
 							loading = true
 
 							scope.launch {
-								delay(1500)
-							}.invokeOnCompletion {
+								async {
+									userViewModel.login(UserAuthData(email = email.value, password = password.value))
+								}.await()
 
-								if (email.value != testEmail || password.value != testPassword){
-									showAlert = true
-									loading = false
-								}
+								loading = false
 
-								else{
-									loading = false
-									sharedPreferences.edit { putString(KEY_TOKEN, "token_from_api")}
-
+								if (state.success){
 									navController.navigate(NavRoutes.PinResetScreen.route){
 										popUpTo(navController.graph.findStartDestination().id) {
 											inclusive = true
