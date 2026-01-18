@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,27 +41,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.edit
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.KEY_PIN
-import ru.ilnarkin.ilnarapp.helpers.KEY_TOKEN
 import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.ConfirmComponent
 import ru.ilnarkin.ilnarapp.ui.components.PinKeypadItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
 @Composable
-fun PinLockScreen(navController: NavController) {
+fun PinLockScreen(
+	navController: NavController,
+	userViewModel: UserViewModel = koinViewModel()
+
+) {
 
 	val context = LocalContext.current
 	val intent = Intent(context, MainActivity::class.java)
@@ -83,13 +88,13 @@ fun PinLockScreen(navController: NavController) {
 
 	val scrollState = rememberScrollState()
 
+	val scope = rememberCoroutineScope()
+
 
 	if (inputPin.size == 4){
 		LaunchedEffect(true) {
 
 			dialogState.show()
-
-			delay(2000)
 
 			val pin = sharedPreferences.getString(KEY_PIN, null)
 
@@ -309,10 +314,15 @@ fun PinLockScreen(navController: NavController) {
 		action = {confirmed ->
 
 			if (confirmed){
-				sharedPreferences.edit{ putString(KEY_TOKEN, null) }
+
+				scope.launch {
+					async {
+						userViewModel.clearToken()
+					}.await()
+				}
 
 				navController.navigate(NavRoutes.WelcomeScreen.route){
-					popUpTo(navController.graph.findStartDestination().id) {
+					popUpTo(NavRoutes.PinLockScreen.route) {
 						inclusive = true
 					}
 				}
