@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,10 +45,15 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
+import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
+import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.helpers.validEmail
-import ru.ilnarkin.ilnarapp.models.UserAuthData
+import ru.ilnarkin.ilnarapp.models.UserLoginData
+import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
@@ -55,7 +61,8 @@ import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 @Composable
 fun LoginScreen(
 	navController: NavController,
-	userViewModel: UserViewModel = koinViewModel()
+	userViewModel: UserViewModel = koinViewModel(),
+	errorManager: NetworkErrorManager = koinInject()
 	) {
 
 	val font = getInterFont()
@@ -73,9 +80,32 @@ fun LoginScreen(
 
 	val scope = rememberCoroutineScope()
 
+	val message = remember { mutableStateOf("") }
 	var showMessage by remember { mutableStateOf(false) }
 
 	val state by userViewModel.uiState.collectAsStateWithLifecycle()
+
+
+	if (!state.success){
+		LaunchedEffect(Unit) {
+			errorManager.errorEvent.collect { error ->
+
+				when(error){
+					NetworkErrorType.NO_INTERNET -> {
+						showMessage = true
+						message.value = NO_INTERNET_ERROR_MESSAGE
+					}
+
+					NetworkErrorType.SERVER_ERROR -> {
+						showMessage = true
+						message.value = SERVER_ERROR_MESSAGE
+					}
+
+					NetworkErrorType.UNAUTHORIZED -> { }
+				}
+			}
+		}
+	}
 
 
 	Column(Modifier.fillMaxSize()
@@ -95,7 +125,7 @@ fun LoginScreen(
 		if (showMessage){
 			Row(modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 2.dp),
 				horizontalArrangement = Arrangement.Center) {
-				Text(state.message,
+				Text(message.value,
 					color = colorResource(R.color.danger_color),
 					textAlign = TextAlign.Center,
 					fontFamily = font,
@@ -220,7 +250,7 @@ fun LoginScreen(
 
 							scope.launch {
 								async {
-									userViewModel.login(UserAuthData(email = email.value, password = password.value))
+									userViewModel.login(UserLoginData(email = email.value, password = password.value))
 								}.await()
 
 								loading = false
@@ -233,7 +263,12 @@ fun LoginScreen(
 									}
 								}
 
-								else { showMessage = true }
+								else {
+									if (state.message.isNotEmpty()){
+										message.value = state.message
+										showMessage = true
+									}
+								}
 							}
 						}
 					}
