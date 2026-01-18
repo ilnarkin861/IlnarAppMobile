@@ -5,9 +5,10 @@ import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.buildString
-import ru.ilnarkin.ilnarapp.models.Response
-import ru.ilnarkin.ilnarapp.models.UserAuthData
+import ru.ilnarkin.ilnarapp.models.Info
+import ru.ilnarkin.ilnarapp.models.UserLoginData
 import ru.ilnarkin.ilnarapp.models.UserInfo
 import ru.ilnarkin.ilnarapp.network.TokenManager
 import ru.ilnarkin.ilnarapp.network.UserHttpService
@@ -26,21 +27,27 @@ class UserViewModel(
 	suspend fun checkAuth(){
 
 		try {
+
 			val result = userHttpService.checkAuth()
 
 			if (result.isSuccessful){
 				_uiState.value = _uiState.value.copy(isAuth = true)
 			}
 
-		}catch (e: Exception){
-			_uiState.value = _uiState.value.copy(isAuth = false)
+		}catch (_: Exception){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				message = DEFAULT_ERROR_MESSAGE
+			)
 		}
 	}
 
 
-	suspend fun login(userAuthData: UserAuthData){
+	suspend fun login(userAuthData: UserLoginData){
 
 		try {
+			_uiState.value = _uiState.value.copy(message = "")
+
 			val result = userHttpService.login(userAuthData)
 
 			if (result.isSuccessful){
@@ -50,7 +57,7 @@ class UserViewModel(
 
 			else {
 				val errorBody = result.errorBody()?.string()
-				val errorResponse = Gson().fromJson(errorBody, Response::class.java)
+				val errorResponse = Gson().fromJson(errorBody, Info::class.java)
 
 				val message = buildString(errorResponse.messages)
 
@@ -59,11 +66,8 @@ class UserViewModel(
 					message = message
 				)
 			}
-		}catch (e: Exception){
-			_uiState.value = _uiState.value.copy(
-				success = false,
-				message = "Что-то пошло не так. Попробуй еще"
-			)
+		}catch (_: Exception){
+			_uiState.value = _uiState.value.copy(success = false)
 		}
 	}
 }
