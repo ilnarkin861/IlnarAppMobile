@@ -27,6 +27,8 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
+import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
+import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
@@ -58,14 +60,15 @@ fun WelcomeScreen(
 			}
 		}
 
+
 		errorManager.errorEvent.collect { error ->
 			when(error){
 				NetworkErrorType.NO_INTERNET -> {
-					snackBarHostState.showSnackbar("Проверь интернет соединение", duration = SnackbarDuration.Short)
+					snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE, duration = SnackbarDuration.Short)
 				}
 
 				NetworkErrorType.SERVER_ERROR -> {
-					snackBarHostState.showSnackbar("Сервер недоступен", duration = SnackbarDuration.Short)
+					snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE, duration = SnackbarDuration.Short)
 				}
 
 				NetworkErrorType.UNAUTHORIZED -> {
