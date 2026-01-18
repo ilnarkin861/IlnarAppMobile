@@ -70,4 +70,9 @@ class UserViewModel(
 			_uiState.value = _uiState.value.copy(success = false)
 		}
 	}
+
+
+	suspend fun clearToken(){
+		tokenManager.clearAuthToken()
+	}
 }
