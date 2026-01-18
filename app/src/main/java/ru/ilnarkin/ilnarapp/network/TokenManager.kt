@@ -32,7 +32,7 @@ class TokenManager(private val context: Context) {
 	}
 
 
-	suspend fun clearAuthToken(token: String){
+	suspend fun clearAuthToken(){
 		dataStore.edit { preferences ->
 			preferences.clear()
 		}
