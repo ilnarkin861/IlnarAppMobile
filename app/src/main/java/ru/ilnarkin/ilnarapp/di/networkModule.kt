@@ -18,7 +18,7 @@ val networkModule = module {
 
 	single { NetworkErrorManager() }
 
-	single { NetworkErrorInterceptor(get()) }
+	single { NetworkErrorInterceptor(get(), get()) }
 
 	single { AuthInterceptor(get()) }
 
