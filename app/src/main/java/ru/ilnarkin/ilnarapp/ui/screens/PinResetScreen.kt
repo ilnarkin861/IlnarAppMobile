@@ -40,7 +40,6 @@ import androidx.core.content.edit
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.coroutines.delay
 import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.KEY_PIN
@@ -107,9 +106,8 @@ fun PinResetScreen() {
 
 				else{
 					dialogState.show()
-					delay(2000)
-					dialogState.hide()
 					sharedPreferences.edit {putString(KEY_PIN, inputPin.joinToString(""))}
+					dialogState.hide()
 					context.startActivity(intent)
 				}
 			}
