@@ -5,7 +5,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import ru.ilnarkin.ilnarapp.models.Token
-import ru.ilnarkin.ilnarapp.models.UserAuthData
+import ru.ilnarkin.ilnarapp.models.UserLoginData
 
 
 interface UserHttpService {
@@ -15,5 +15,5 @@ interface UserHttpService {
 
 
 	@POST("user/login")
-	suspend fun login(@Body userAuthData : UserAuthData) : Response<Token>
+	suspend fun login(@Body userAuthData : UserLoginData) : Response<Token>
 }
