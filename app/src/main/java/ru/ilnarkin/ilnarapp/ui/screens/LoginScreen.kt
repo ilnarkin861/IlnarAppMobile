@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -257,7 +256,7 @@ fun LoginScreen(
 
 								if (state.success){
 									navController.navigate(NavRoutes.PinResetScreen.route){
-										popUpTo(navController.graph.findStartDestination().id) {
+										popUpTo(NavRoutes.LoginScreen.route) {
 											inclusive = true
 										}
 									}
