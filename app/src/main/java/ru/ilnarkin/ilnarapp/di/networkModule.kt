@@ -10,6 +10,7 @@ import ru.ilnarkin.ilnarapp.helpers.API_URL
 import ru.ilnarkin.ilnarapp.interceptors.AuthInterceptor
 import ru.ilnarkin.ilnarapp.interceptors.NetworkErrorInterceptor
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
+import ru.ilnarkin.ilnarapp.network.TagHttpService
 import ru.ilnarkin.ilnarapp.network.TokenManager
 import ru.ilnarkin.ilnarapp.network.UserHttpService
 
@@ -23,6 +24,9 @@ val networkModule = module {
 	single { AuthInterceptor(get()) }
 
 	single { TokenManager(androidContext()) }
+
+	single { get<Retrofit>().create(UserHttpService::class.java) }
+	single { get<Retrofit>().create(TagHttpService::class.java) }
 
 	single {
 		OkHttpClient.Builder()
@@ -39,6 +43,4 @@ val networkModule = module {
 			.addConverterFactory(GsonConverterFactory.create())
 			.build()
 	}
-
-	single { get<Retrofit>().create(UserHttpService::class.java) }
 }
