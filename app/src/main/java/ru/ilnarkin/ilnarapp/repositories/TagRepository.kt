@@ -13,7 +13,7 @@ class TagRepository(private val httpService: TagHttpService) : Repository<Tag, A
 		limit: Int,
 		filter: FilterModel?
 	): Response<AppPagination<Tag>> {
-		TODO("Not yet implemented")
+		return httpService.getAll(offset, limit)
 	}
 
 	override suspend fun getById(id: String): Response<Tag?> {

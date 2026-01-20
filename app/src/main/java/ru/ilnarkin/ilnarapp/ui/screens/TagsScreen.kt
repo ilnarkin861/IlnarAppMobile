@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,28 +30,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.ActionType
+import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.ItemFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
 
 
 @Composable
-@Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
-fun TagsScreen() {
+fun TagsScreen(
+	tagViewModel: TagViewModel = koinViewModel(),
+	errorManager: NetworkErrorManager = koinInject()
+	) {
 
-	val tags = getTags(20)
+	val limit = 10
 
 	var loading by remember { mutableStateOf(false) }
 
@@ -70,38 +76,35 @@ fun TagsScreen() {
 
 	var actionType by remember { mutableStateOf(ActionType.CREATE) }
 
+	val state by tagViewModel.uiState.collectAsState()
+
 
 	LaunchedEffect(Unit) {
-		loading = true
-
-		delay(1500)
-
-		loading = false
+		async {
+			tagViewModel.getTagsList(state.offset, limit)
+		}.await()
 	}
 
 
 	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 
-		if (loading){
-			Box(
-				modifier = Modifier.fillMaxSize(),
-				contentAlignment = Alignment.Center){
-				ProgressIndicatorComponent(60, colorResource(R.color.primary_color))
-			}
-		}
-
-		if (!loading && !tags.isEmpty()){
+		if (!state.loading && !state.list.isEmpty()){
 			LazyColumn(
 				state = listState,
 				contentPadding = PaddingValues(top = 30.dp, bottom = 80.dp)
 			) {
-				item {
-					Row(Modifier.padding(bottom = 25.dp)) {
-						LoadButtonComponent(nextButton = false, action = { delay(1500) })
+
+				state.pagination?.let {
+					if (it.hasPreviousPage){
+						item {
+							Row(Modifier.padding(bottom = 25.dp)) {
+								LoadButtonComponent(nextButton = false, action = { delay(1500) })
+							}
+						}
 					}
 				}
 
-				itemsIndexed(tags){index, tag ->
+				itemsIndexed(state.list){index, tag ->
 
 					Row(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
 						ListItemComponent(
@@ -126,26 +129,38 @@ fun TagsScreen() {
 						)
 					}
 
-					if (index != tags.count() -1){
+					if (index != state.list.count() -1){
 						HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
 					}
 				}
 
-				item {
-					Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
-						LoadButtonComponent(action = {
-							delay(1500)
-							listState.scrollToItem(0)
-						})
+				state.pagination?.let {
+					if (it.hasNextPage){
+						item {
+							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
+								LoadButtonComponent(action = {
+									delay(1500)
+									listState.scrollToItem(0)
+								})
+							}
+						}
 					}
 				}
 			}
 		}
 
-		if (!loading && tags.isEmpty()){
+		if (!loading && state.list.isEmpty()){
 			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
 				contentAlignment = Alignment.Center){
 				MessageComponent("Тегов нет")
+			}
+		}
+
+		if (state.loading){
+			Box(
+				modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
+				contentAlignment = Alignment.Center){
+				ProgressIndicatorComponent(60, colorResource(R.color.primary_color))
 			}
 		}
 
