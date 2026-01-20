@@ -1,9 +1,12 @@
 package ru.ilnarkin.ilnarapp.viewModels
 
 import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.ilnarkin.ilnarapp.helpers.buildString
+import ru.ilnarkin.ilnarapp.models.Info
 import ru.ilnarkin.ilnarapp.models.Tag
 import ru.ilnarkin.ilnarapp.repositories.TagRepository
 import ru.ilnarkin.ilnarapp.ui.AppUiState
@@ -50,6 +53,31 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 				offset = _uiState.value.offset,
 				pagination = _uiState.value.pagination)
 		}
-
 	}
+
+
+	suspend fun createTag(tag: Tag){
+
+		val result = tagRepository.create(tag)
+
+		if (result.isSuccessful){
+			_uiState.value = _uiState.value.copy(
+				success = true,
+				message = "Тег успешно добавлен",
+				offset = 0
+			)
+		}
+
+		else{
+			val errorBody = result.errorBody()?.string()
+			val errorResponse = Gson().fromJson(errorBody, Info::class.java)
+
+			val message = buildString(errorResponse.messages)
+
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				message = message)
+		}
+	}
+
 }

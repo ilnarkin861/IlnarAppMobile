@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,10 +37,12 @@ import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.ActionType
+import ru.ilnarkin.ilnarapp.models.Tag
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.ItemFormComponent
@@ -70,13 +73,13 @@ fun TagsScreen(
 
 	var modalFormLabel by remember { mutableStateOf("") }
 
-	var success by remember { mutableStateOf(true) }
-
 	val dialogState = rememberMaterialDialogState()
 
 	var actionType by remember { mutableStateOf(ActionType.CREATE) }
 
 	val state by tagViewModel.uiState.collectAsState()
+
+	val scope = rememberCoroutineScope()
 
 
 	LaunchedEffect(Unit) {
@@ -187,13 +190,19 @@ fun TagsScreen(
 
 
 	AlertComponent(
-		success = success,
-		message = alertTitle.value,
+		success = state.success,
+		message = state.message,
 		showed = showAlert,
 		action = {
 			showAlert = false
 
-			// еще что-то делаем, может
+			if (state.success){
+				scope.launch {
+					async {
+						tagViewModel.getTagsList(state.offset, limit)
+					}
+				}
+			}
 		}
 	)
 
@@ -206,18 +215,18 @@ fun TagsScreen(
 		ItemFormComponent(
 			itemText.value,
 			modalFormLabel,
-			action = {
-
-				delay(1000)
+			action = {text->
 
 				if (actionType == ActionType.CREATE){
 
-					// Save to db
-
-					alertTitle.value = "Тег успешно добавлен"
+					scope.launch {
+						async {
+							tagViewModel.createTag(Tag(title = text))
+						}
+					}
 				}
 
-				else{
+				if (actionType == ActionType.UPDATE){
 
 					// Save to db
 
