@@ -1,6 +1,5 @@
 package ru.ilnarkin.ilnarapp.interceptors
 
-import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 import ru.ilnarkin.ilnarapp.network.TokenManager

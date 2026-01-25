@@ -38,7 +38,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -49,7 +48,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.WelcomeActivity
 import ru.ilnarkin.ilnarapp.enums.ActionType
@@ -58,7 +56,6 @@ import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.Tag
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
-import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.ItemFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
