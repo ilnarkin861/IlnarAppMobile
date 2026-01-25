@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -22,7 +21,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import kotlinx.coroutines.async
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
@@ -46,40 +46,37 @@ fun WelcomeScreen(
 	val state by userViewModel.uiState.collectAsState()
 
 
-	LaunchedEffect(Unit) {
-
-		async {
-			userViewModel.checkAuth()
-		}.await()
-
-		if (state.isAuth){
-			navController.navigate(NavRoutes.PinLockScreen.route){
-				popUpTo(navController.graph.findStartDestination().id) {
-					inclusive = true
-				}
+	LaunchedEffect(state.isAuth) {
+		if (state.isAuth) {
+			navController.navigate(NavRoutes.PinLockScreen.route) {
+				popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
 			}
 		}
+	}
 
+	LaunchedEffect(Unit) {
 
-		errorManager.errorEvent.collect { error ->
-			when(error){
-				NetworkErrorType.NO_INTERNET -> {
-					snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE, duration = SnackbarDuration.Short)
-				}
+		lateinit var errorJob: Job
 
-				NetworkErrorType.SERVER_ERROR -> {
-					snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE, duration = SnackbarDuration.Short)
-				}
+		errorJob = launch {
+			errorManager.errorEvent.collect { error ->
+				when(error) {
+					NetworkErrorType.NO_INTERNET -> snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE)
 
-				NetworkErrorType.UNAUTHORIZED -> {
-					navController.navigate(NavRoutes.LoginScreen.route){
-						popUpTo(navController.graph.findStartDestination().id) {
-							inclusive = true
+					NetworkErrorType.SERVER_ERROR -> snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE)
+
+					NetworkErrorType.UNAUTHORIZED -> {
+						navController.navigate(NavRoutes.LoginScreen.route) {
+							popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
 						}
+
+						errorJob.cancel()
 					}
 				}
 			}
 		}
+
+		userViewModel.checkAuth()
 	}
 
 

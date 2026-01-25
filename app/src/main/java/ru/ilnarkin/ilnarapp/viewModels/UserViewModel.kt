@@ -72,7 +72,7 @@ class UserViewModel(
 	}
 
 
-	suspend fun clearToken(){
+	fun clearToken(){
 		tokenManager.clearAuthToken()
 	}
 }
