@@ -20,64 +20,75 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 	suspend fun getTagsList(offset: Int, limit: Int){
 
-		val tagsOffset = if (offset < 0) 0 else offset
 
-		_uiState.value = _uiState.value.copy(loading = true)
+		try {
+			val tagsOffset = if (offset < 0) 0 else offset
 
-		_uiState.value.list.clear()
+			_uiState.value = _uiState.value.copy(loading = true)
 
-		_uiState.value = _uiState.value.copy(list = _uiState.value.list)
+			_uiState.value.list.clear()
 
-		val result = tagRepository.getList(tagsOffset, limit, null)
+			_uiState.value = _uiState.value.copy(list = _uiState.value.list)
 
-		if (result.isSuccessful && result.body() != null){
+			val result = tagRepository.getList(tagsOffset, limit, null)
 
-			val tags = result.body()?.data
+			if (result.isSuccessful && result.body() != null){
 
-			tags?.count()?.let {
+				val tags = result.body()?.data
 
-				if ( it > 0){
-					for (tag in tags){
-						_uiState.value.list.add(Tag(id = tag.id, title = tag.title))
+				tags?.count()?.let {
+
+					if ( it > 0){
+						for (tag in tags){
+							_uiState.value.list.add(Tag(id = tag.id, title = tag.title))
+						}
 					}
 				}
+
+				_uiState.value.pagination = result.body()?.pagination
+
+				_uiState.value.offset = tagsOffset
+
+				_uiState.value = _uiState.value.copy(
+					loading = false,
+					list = _uiState.value.list,
+					offset = _uiState.value.offset,
+					pagination = _uiState.value.pagination)
 			}
-
-			_uiState.value.pagination = result.body()?.pagination
-
-			_uiState.value.offset = tagsOffset
-
-			_uiState.value = _uiState.value.copy(
-				loading = false,
-				list = _uiState.value.list,
-				offset = _uiState.value.offset,
-				pagination = _uiState.value.pagination)
 		}
+		catch (_: Exception){}
 	}
 
 
 	suspend fun createTag(tag: Tag){
 
-		val result = tagRepository.create(tag)
+		try {
+			val result = tagRepository.create(tag)
 
-		if (result.isSuccessful){
-			_uiState.value = _uiState.value.copy(
-				success = true,
-				message = "Тег успешно добавлен",
-				offset = 0
-			)
+			if (result.isSuccessful){
+				_uiState.value = _uiState.value.copy(
+					success = true,
+					message = "Тег успешно добавлен",
+					offset = 0
+				)
+			}
+
+			else{
+				val errorBody = result.errorBody()?.string()
+				val errorResponse = Gson().fromJson(errorBody, Info::class.java)
+
+				val message = buildString(errorResponse.messages)
+
+				_uiState.value = _uiState.value.copy(
+					success = false,
+					message = message)
+			}
 		}
 
-		else{
-			val errorBody = result.errorBody()?.string()
-			val errorResponse = Gson().fromJson(errorBody, Info::class.java)
-
-			val message = buildString(errorResponse.messages)
-
+		catch (_: Exception){
 			_uiState.value = _uiState.value.copy(
 				success = false,
-				message = message)
+				message = "Ошибка при добавлении тега")
 		}
 	}
-
 }
