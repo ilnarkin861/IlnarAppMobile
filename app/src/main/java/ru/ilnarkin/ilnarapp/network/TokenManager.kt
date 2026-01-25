@@ -1,40 +1,23 @@
 package ru.ilnarkin.ilnarapp.network
 
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import android.content.SharedPreferences
+import androidx.core.content.edit
+import ru.ilnarkin.ilnarapp.helpers.KEY_TOKEN
 
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "session_prefs")
+class TokenManager(private val prefs: SharedPreferences) {
 
-
-class TokenManager(private val context: Context) {
-	private val dataStore = context.dataStore
-	private val AUTH_TOKEN_KEY = stringPreferencesKey("auth_token_key")
-
-
-	suspend fun saveAuthToken(token: String?){
-		dataStore.edit { preferences ->
-			preferences[AUTH_TOKEN_KEY] = token ?: ""
-		}
+	fun saveAuthToken(token: String?){
+		prefs.edit(commit = true) { putString(KEY_TOKEN, token) }
 	}
 
 
-	suspend fun getAuthToken() : String? {
-		return dataStore.data.map { preferences ->
-			preferences[AUTH_TOKEN_KEY]
-		}.first()
+	fun getAuthToken() : String? {
+		return prefs.getString(KEY_TOKEN, null)
 	}
 
 
-	suspend fun clearAuthToken(){
-		dataStore.edit { preferences ->
-			preferences.clear()
-		}
+	fun clearAuthToken(){
+		prefs.edit { remove(KEY_TOKEN) }
 	}
 }
