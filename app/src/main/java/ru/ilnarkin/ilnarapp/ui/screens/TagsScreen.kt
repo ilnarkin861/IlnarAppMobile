@@ -1,5 +1,6 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +18,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,22 +33,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.WelcomeActivity
 import ru.ilnarkin.ilnarapp.enums.ActionType
+import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
+import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
+import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.Tag
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
+import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.ItemFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
@@ -61,6 +76,8 @@ fun TagsScreen(
 
 	val limit = 10
 
+	val context = LocalContext.current
+
 	var loading by remember { mutableStateOf(false) }
 
 	val listState = rememberLazyListState()
@@ -68,7 +85,6 @@ fun TagsScreen(
 	val itemText = remember { mutableStateOf("") }
 
 	val alertTitle = remember { mutableStateOf("") }
-
 	var showAlert by remember { mutableStateOf(false) }
 
 	var modalFormLabel by remember { mutableStateOf("") }
@@ -81,11 +97,40 @@ fun TagsScreen(
 
 	val scope = rememberCoroutineScope()
 
+	val snackBarHostState = remember { SnackbarHostState() }
+
 
 	LaunchedEffect(Unit) {
-		async {
-			tagViewModel.getTagsList(state.offset, limit)
-		}.await()
+
+		lateinit var errorJob: Job
+
+		errorJob = launch {
+			errorManager.errorEvent.collect { error ->
+
+				when(error){
+					NetworkErrorType.NO_INTERNET ->
+						snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE, duration = SnackbarDuration.Long)
+
+					NetworkErrorType.SERVER_ERROR ->
+						snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE, duration = SnackbarDuration.Long)
+
+					NetworkErrorType.UNAUTHORIZED -> {
+						val intent = Intent(context, WelcomeActivity::class.java).apply {
+							flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+						}
+
+						context.startActivity(intent)
+
+						this@LaunchedEffect.cancel()
+
+						errorJob.cancel()
+					}
+				}
+			}
+		}
+
+
+		tagViewModel.getTagsList(state.offset, limit)
 	}
 
 
@@ -186,6 +231,18 @@ fun TagsScreen(
 				modifier = Modifier.size(25.dp),
 				painter = painterResource(R.drawable.ic_plus),
 				contentDescription = "Добавить") }
+
+
+		SnackbarHost(
+			hostState = snackBarHostState,
+			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter)
+		){data ->
+			Snackbar(
+				snackbarData = data,
+				containerColor = colorResource(R.color.primary_color),
+				contentColor = Color.White
+			)
+		}
 	}// Box
 
 
