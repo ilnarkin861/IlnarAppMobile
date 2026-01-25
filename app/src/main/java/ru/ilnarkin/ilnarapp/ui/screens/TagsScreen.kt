@@ -43,7 +43,6 @@ import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -117,8 +116,6 @@ fun TagsScreen(
 						}
 
 						context.startActivity(intent)
-
-						this@LaunchedEffect.cancel()
 
 						errorJob.cancel()
 					}
