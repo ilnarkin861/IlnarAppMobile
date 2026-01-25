@@ -11,13 +11,10 @@ class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
 
 		val requestBuilder = chain.request().newBuilder()
 
-		runBlocking {
+		val token = tokenManager.getAuthToken()
 
-			val token = tokenManager.getAuthToken()
-
-			if (!token.isNullOrEmpty()){
-				requestBuilder.addHeader("Authorization", "Bearer $token")
-			}
+		if (!token.isNullOrEmpty()){
+			requestBuilder.addHeader("Authorization", "Bearer $token")
 		}
 
 		return chain.proceed(requestBuilder.build())
