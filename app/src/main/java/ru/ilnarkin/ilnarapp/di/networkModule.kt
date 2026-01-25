@@ -23,16 +23,17 @@ val networkModule = module {
 
 	single { AuthInterceptor(get()) }
 
-	single { TokenManager(androidContext()) }
+	single { TokenManager(get()) }
 
 	single { get<Retrofit>().create(UserHttpService::class.java) }
+
 	single { get<Retrofit>().create(TagHttpService::class.java) }
 
 	single {
 		OkHttpClient.Builder()
-			.addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
-			.addInterceptor(get<AuthInterceptor>())
 			.addInterceptor(get<NetworkErrorInterceptor>())
+			.addInterceptor(get<AuthInterceptor>())
+			.addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
 			.build()
 	}
 
