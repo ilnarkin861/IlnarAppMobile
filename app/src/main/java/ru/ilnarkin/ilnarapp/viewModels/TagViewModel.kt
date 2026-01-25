@@ -63,6 +63,9 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 	suspend fun createTag(tag: Tag){
 
 		try {
+
+			_uiState.value = _uiState.value.copy(message = "")
+
 			val result = tagRepository.create(tag)
 
 			if (result.isSuccessful){
