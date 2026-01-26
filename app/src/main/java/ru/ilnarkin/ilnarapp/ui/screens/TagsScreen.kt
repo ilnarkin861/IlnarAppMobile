@@ -140,7 +140,9 @@ fun TagsScreen(
 					if (it.hasPreviousPage){
 						item {
 							Row(Modifier.padding(bottom = 25.dp)) {
-								LoadButtonComponent(nextButton = false, action = { delay(1500) })
+								LoadButtonComponent(nextButton = false, action = {
+									tagViewModel.getTagsList(state.offset - limit, limit, false)
+								})
 							}
 						}
 					}
@@ -187,8 +189,8 @@ fun TagsScreen(
 						item {
 							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
 								LoadButtonComponent(action = {
-									delay(1500)
-									listState.scrollToItem(0)
+									tagViewModel.getTagsList(state.offset + limit, limit, false)
+									//listState.scrollToItem(0)
 								})
 							}
 						}

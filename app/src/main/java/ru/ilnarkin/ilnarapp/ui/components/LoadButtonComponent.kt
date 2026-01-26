@@ -48,11 +48,14 @@ fun LoadButtonComponent(nextButton: Boolean = true, action: suspend () -> Unit) 
 					interactionSource = interactionSource,
 					indication = null,
 					onClick = {
-						loading = true
-
 						scope.launch {
-							action()
-						}.invokeOnCompletion { loading = false }
+							loading = true
+							try {
+								action()
+							} finally {
+								loading = false
+							}
+						}
 					}
 				),
 				text = text,

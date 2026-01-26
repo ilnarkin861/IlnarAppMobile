@@ -18,18 +18,20 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 	val uiState: StateFlow<AppUiState<Tag>> = _uiState.asStateFlow()
 
 
-	suspend fun getTagsList(offset: Int, limit: Int){
+	suspend fun getTagsList(offset: Int, limit: Int, showLoading: Boolean = true){
 
 		try {
 			val tagsOffset = if (offset < 0) 0 else offset
 
-			_uiState.value = _uiState.value.copy(loading = true)
-
-			_uiState.value.list.clear()
+			if (showLoading){
+				_uiState.value = _uiState.value.copy(loading = true)
+			}
 
 			_uiState.value = _uiState.value.copy(list = _uiState.value.list)
 
 			val result = tagRepository.getList(tagsOffset, limit, null)
+
+			_uiState.value.list.clear()
 
 			if (result.isSuccessful && result.body() != null){
 
@@ -46,12 +48,11 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 				_uiState.value.pagination = result.body()?.pagination
 
-				_uiState.value.offset = tagsOffset
 
 				_uiState.value = _uiState.value.copy(
 					loading = false,
 					list = _uiState.value.list,
-					offset = _uiState.value.offset,
+					offset = tagsOffset,
 					pagination = _uiState.value.pagination)
 			}
 		}
