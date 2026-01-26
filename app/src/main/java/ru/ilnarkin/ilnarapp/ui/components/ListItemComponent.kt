@@ -70,14 +70,15 @@ fun ListItemComponent(
 
                 else{
                     IconButton(onClick = {
-                        loading = true
 
                         scope.launch {
-                            scope.async {
-                                // в идеале передаем айдишники, достаем по ним из бд и передаем в форму
+                            loading = true
+                            try {
                                 editAction(title)
-                            }.await()
-                        }.invokeOnCompletion{ loading = false }
+                            } finally {
+                                loading = false
+                            }
+                        }
 
                     }) {
                         Icon(modifier = Modifier.size(22.dp),
