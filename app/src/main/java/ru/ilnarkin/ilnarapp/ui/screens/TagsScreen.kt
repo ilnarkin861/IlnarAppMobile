@@ -275,11 +275,7 @@ fun TagsScreen(
 
 				if (actionType == ActionType.CREATE){
 
-					scope.launch {
-						async {
-							tagViewModel.createTag(Tag(title = text))
-						}.await()
-					}
+					tagViewModel.createTag(Tag(title = text))
 				}
 
 				if (actionType == ActionType.UPDATE){

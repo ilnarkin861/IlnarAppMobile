@@ -125,12 +125,14 @@ fun ItemFormComponent(
 						itemTextIsError = mutableItemText.value.isEmpty()
 
 						if(!itemTextIsError){
-							saving = true
-
 							scope.launch {
-								scope.async {
-									action(mutableItemText.value) }.await()
-							}.invokeOnCompletion { saving = false }
+								saving = true
+								try {
+									action(mutableItemText.value)
+								} finally {
+									saving = false
+								}
+							}
 						}
 					}
 				) {

@@ -116,13 +116,14 @@ fun ListItemComponent(
 
             if (confirmed){
 
-                deleting = true
-
                 scope.launch {
-                    scope.async {
+                    deleting = true
+                    try {
                         deleteAction(id)
-                    }.await()
-                }.invokeOnCompletion{ deleting = false }
+                    } finally {
+                        deleting = false
+                    }
+                }
             }
 
             showConfirmAlert = false
