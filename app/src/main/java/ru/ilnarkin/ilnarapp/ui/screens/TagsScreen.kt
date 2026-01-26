@@ -190,7 +190,6 @@ fun TagsScreen(
 							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
 								LoadButtonComponent(action = {
 									tagViewModel.getTagsList(state.offset + limit, limit, false)
-									//listState.scrollToItem(0)
 								})
 							}
 						}
