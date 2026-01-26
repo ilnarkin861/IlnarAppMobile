@@ -17,7 +17,7 @@ class TagRepository(private val httpService: TagHttpService) : Repository<Tag, A
 	}
 
 	override suspend fun getById(id: String): Response<Tag?> {
-		TODO("Not yet implemented")
+		return httpService.getById(id)
 	}
 
 	override suspend fun create(model: Tag): Response<Tag> {
