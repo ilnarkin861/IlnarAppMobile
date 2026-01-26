@@ -20,7 +20,6 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 	suspend fun getTagsList(offset: Int, limit: Int){
 
-
 		try {
 			val tagsOffset = if (offset < 0) 0 else offset
 
@@ -57,6 +56,42 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 			}
 		}
 		catch (_: Exception){}
+	}
+
+
+	suspend fun getTagById(id: String){
+
+		try {
+
+			_uiState.value = _uiState.value.copy(success = false, data = null)
+
+			val result = tagRepository.getById(id)
+
+			if (result.isSuccessful && result.body() != null){
+				_uiState.value = _uiState.value.copy(
+					success = true,
+					data =  result.body())
+			}
+
+			else{
+				if (result.code() == 404){
+					val errorBody = result.errorBody()?.string()
+					val errorResponse = Gson().fromJson(errorBody, Info::class.java)
+
+					val message = buildString(errorResponse.messages)
+
+					_uiState.value = _uiState.value.copy(
+						success = false,
+						message = message)
+				}
+			}
+		}
+
+		catch (_: Exception){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				message = "Ошибка при получении тега")
+		}
 	}
 
 

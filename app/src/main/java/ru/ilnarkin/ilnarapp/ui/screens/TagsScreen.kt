@@ -78,8 +78,6 @@ fun TagsScreen(
 
 	val listState = rememberLazyListState()
 
-	val itemText = remember { mutableStateOf("") }
-
 	val alertTitle = remember { mutableStateOf("") }
 	var showAlert by remember { mutableStateOf(false) }
 
@@ -90,6 +88,8 @@ fun TagsScreen(
 	var actionType by remember { mutableStateOf(ActionType.CREATE) }
 
 	val state by tagViewModel.uiState.collectAsState()
+
+	val itemText = remember { mutableStateOf("") }
 
 	val scope = rememberCoroutineScope()
 
@@ -153,14 +153,20 @@ fun TagsScreen(
 							tag.id,
 							tag.title,
 
-							editAction = { tag ->
+							editAction = { text ->
 
-								delay(1500)
+								tagViewModel.getTagById(tag.id)
 
-								actionType = ActionType.UPDATE
-								modalFormLabel = "Изменить тег"
-								itemText.value = tag
-								dialogState.show()
+								if (tagViewModel.uiState.value.success){
+									actionType = ActionType.UPDATE
+									modalFormLabel = "Изменить тег"
+									tagViewModel.uiState.value.data?.let { itemText.value = it.title }
+									dialogState.show()
+								}
+
+								else{
+									showAlert = true
+								}
 							},
 
 							deleteAction = {
@@ -249,9 +255,7 @@ fun TagsScreen(
 
 			if (state.success){
 				scope.launch {
-					async {
-						tagViewModel.getTagsList(state.offset, limit)
-					}
+					tagViewModel.getTagsList(state.offset, limit)
 				}
 			}
 		}
@@ -273,7 +277,7 @@ fun TagsScreen(
 					scope.launch {
 						async {
 							tagViewModel.createTag(Tag(title = text))
-						}
+						}.await()
 					}
 				}
 
