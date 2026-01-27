@@ -100,7 +100,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 		try {
 
-			_uiState.value = _uiState.value.copy(message = "")
+			_uiState.value = _uiState.value.copy(message = "", success = false, data = null)
 
 			val result = tagRepository.create(tag)
 
@@ -128,6 +128,40 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 			_uiState.value = _uiState.value.copy(
 				success = false,
 				message = "Ошибка при добавлении тега")
+		}
+	}
+
+
+	suspend fun updateTag(tag: Tag){
+
+		try {
+			_uiState.value = _uiState.value.copy(success = false, data = null)
+
+			val result = tagRepository.update(tag)
+
+			if (result.isSuccessful){
+				_uiState.value = _uiState.value.copy(
+					success = true,
+					message = "Тег успешно обновлен"
+				)
+			}
+
+			else{
+				val errorBody = result.errorBody()?.string()
+				val errorResponse = Gson().fromJson(errorBody, Info::class.java)
+
+				val message = buildString(errorResponse.messages)
+
+				_uiState.value = _uiState.value.copy(
+					success = false,
+					message = message)
+			}
+		}
+
+		catch (_: Exception){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				message = "Ошибка при обновлении тега")
 		}
 	}
 }

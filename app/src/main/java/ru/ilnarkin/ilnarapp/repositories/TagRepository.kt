@@ -25,7 +25,7 @@ class TagRepository(private val httpService: TagHttpService) : Repository<Tag, A
 	}
 
 	override suspend fun update(model: Tag): Response<Tag> {
-		TODO("Not yet implemented")
+		return httpService.update(model.id, model)
 	}
 
 	override suspend fun delete(id: String): Response<Any> {

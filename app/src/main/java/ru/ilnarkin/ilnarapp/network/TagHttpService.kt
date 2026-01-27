@@ -4,6 +4,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.ilnarkin.ilnarapp.models.AppPagination
@@ -25,4 +26,8 @@ interface TagHttpService {
 
 	@GET("tags/{id}")
 	suspend fun getById(@Path("id") id: String): Response<Tag?>
+
+
+	@PUT("tags/edit/{id}")
+	suspend fun update(@Path("id") id: String,@Body tag: Tag): Response<Tag>
 }

@@ -88,6 +88,8 @@ fun TagsScreen(
 
 	val state by tagViewModel.uiState.collectAsState()
 
+	val itemId = remember { mutableStateOf("") }
+
 	val itemText = remember { mutableStateOf("") }
 
 	val scope = rememberCoroutineScope()
@@ -161,6 +163,7 @@ fun TagsScreen(
 								if (tagViewModel.uiState.value.success){
 									actionType = ActionType.UPDATE
 									modalFormLabel = "Изменить тег"
+									tagViewModel.uiState.value.data?.let { itemId.value = it.id }
 									tagViewModel.uiState.value.data?.let { itemText.value = it.title }
 									dialogState.show()
 								}
@@ -279,9 +282,7 @@ fun TagsScreen(
 
 				if (actionType == ActionType.UPDATE){
 
-					// Save to db
-
-					alertTitle.value = "Тег успешно изменен"
+					tagViewModel.updateTag(Tag(id = itemId.value, title = text))
 				}
 
 				showAlert = true
