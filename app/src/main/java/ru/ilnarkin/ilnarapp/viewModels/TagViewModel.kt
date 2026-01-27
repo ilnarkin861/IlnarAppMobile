@@ -63,7 +63,6 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 	suspend fun getTagById(id: String){
 
 		try {
-
 			_uiState.value = _uiState.value.copy(success = false, data = null)
 
 			val result = tagRepository.getById(id)
@@ -99,7 +98,6 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 	suspend fun createTag(tag: Tag){
 
 		try {
-
 			_uiState.value = _uiState.value.copy(message = "", success = false, data = null)
 
 			val result = tagRepository.create(tag)
@@ -162,6 +160,41 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 			_uiState.value = _uiState.value.copy(
 				success = false,
 				message = "Ошибка при обновлении тега")
+		}
+	}
+
+
+	suspend fun deleteTag(id: String){
+
+		try {
+			_uiState.value = _uiState.value.copy(success = false)
+
+			val result = tagRepository.delete(id)
+
+			if (result.isSuccessful){
+				_uiState.value = _uiState.value.copy(
+					success = true,
+					message = "Тег успешно удален"
+				)
+			}
+
+			else{
+				val errorBody = result.errorBody()?.string()
+				val errorResponse = Gson().fromJson(errorBody, Info::class.java)
+
+				val message = buildString(errorResponse.messages)
+
+				_uiState.value = _uiState.value.copy(
+					success = false,
+					message = message)
+			}
+
+		}
+
+		catch (_: Exception){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				message = "Ошибка при удалении тега")
 		}
 	}
 }

@@ -173,9 +173,14 @@ fun TagsScreen(
 								}
 							},
 
-							deleteAction = {
-								delay(1500)
-								alertTitle.value = "Тег успешно удален"
+							deleteAction = {id ->
+
+								tagViewModel.deleteTag(id)
+
+								//val offset = if (state.list.size == 1) state.offset - limit else state.offset
+
+								//tagViewModel.getTagsList(offset, limit)
+
 								showAlert = true
 							}
 						)
@@ -258,7 +263,10 @@ fun TagsScreen(
 
 			if (state.success){
 				scope.launch {
-					tagViewModel.getTagsList(state.offset, limit)
+
+					val offset = if (state.list.size == 1) state.offset - limit else state.offset
+
+					tagViewModel.getTagsList(offset, limit)
 				}
 			}
 		}

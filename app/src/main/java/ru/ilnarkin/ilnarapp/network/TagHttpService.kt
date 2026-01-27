@@ -2,6 +2,7 @@ package ru.ilnarkin.ilnarapp.network
 
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -30,4 +31,8 @@ interface TagHttpService {
 
 	@PUT("tags/edit/{id}")
 	suspend fun update(@Path("id") id: String,@Body tag: Tag): Response<Tag>
+
+
+	@DELETE("tags/delete/{id}")
+	suspend fun delete(@Path("id") id: String): Response<Any>
 }

@@ -29,6 +29,6 @@ class TagRepository(private val httpService: TagHttpService) : Repository<Tag, A
 	}
 
 	override suspend fun delete(id: String): Response<Any> {
-		TODO("Not yet implemented")
+		return httpService.delete(id)
 	}
 }
