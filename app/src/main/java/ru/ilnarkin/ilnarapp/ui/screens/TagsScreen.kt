@@ -42,7 +42,6 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -77,7 +76,6 @@ fun TagsScreen(
 
 	val listState = rememberLazyListState()
 
-	val alertTitle = remember { mutableStateOf("") }
 	var showAlert by remember { mutableStateOf(false) }
 
 	var modalFormLabel by remember { mutableStateOf("") }
