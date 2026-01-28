@@ -68,11 +68,9 @@ fun TagsScreen(
 	errorManager: NetworkErrorManager = koinInject()
 	) {
 
-	val limit = 10
+	val limit = 15
 
 	val context = LocalContext.current
-
-	var loading by remember { mutableStateOf(false) }
 
 	val listState = rememberLazyListState()
 
@@ -121,7 +119,6 @@ fun TagsScreen(
 				}
 			}
 		}
-
 
 		tagViewModel.getTagsList(state.offset, limit)
 	}
@@ -175,10 +172,6 @@ fun TagsScreen(
 
 								tagViewModel.deleteTag(id)
 
-								//val offset = if (state.list.size == 1) state.offset - limit else state.offset
-
-								//tagViewModel.getTagsList(offset, limit)
-
 								showAlert = true
 							}
 						)
@@ -203,7 +196,7 @@ fun TagsScreen(
 			}
 		}
 
-		if (!loading && state.list.isEmpty()){
+		if (!state.loading && state.list.isEmpty()){
 			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
 				contentAlignment = Alignment.Center){
 				MessageComponent("Тегов нет")
