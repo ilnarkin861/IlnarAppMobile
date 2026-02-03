@@ -28,7 +28,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,7 +79,7 @@ fun ArchiveScreen(
 
 	val dialogState = rememberMaterialDialogState()
 
-	var actionType by remember { mutableStateOf(ActionType.CREATE) }
+	var actionType by remember { mutableStateOf(ActionType.READ) }
 
 	val state by archiveViewModel.uiState.collectAsState()
 
@@ -88,9 +87,23 @@ fun ArchiveScreen(
 
 	val itemText = remember { mutableStateOf("") }
 
-	val scope = rememberCoroutineScope()
-
 	val snackBarHostState = remember { SnackbarHostState() }
+
+
+	LaunchedEffect(state.success) {
+		if (state.success){
+			when(actionType){
+				ActionType.CREATE -> archiveViewModel.getArchivesList(0, limit)
+				ActionType.UPDATE -> archiveViewModel.getArchivesList(state.offset, limit)
+				ActionType.DELETE -> {
+					val offset = if (state.list.size == 1) state.offset - limit else state.offset
+
+					archiveViewModel.getArchivesList(offset, limit)
+				}
+				else -> {}
+			}
+		}
+	}
 
 
 	LaunchedEffect(Unit) {
@@ -137,6 +150,8 @@ fun ArchiveScreen(
 						item {
 							Row(Modifier.padding(bottom = 25.dp)) {
 								LoadButtonComponent(nextButton = false, action = {
+									actionType = ActionType.READ
+
 									archiveViewModel.getArchivesList(state.offset - limit, limit, false)
 								})
 							}
@@ -152,6 +167,7 @@ fun ArchiveScreen(
 							tag.title,
 
 							editAction = { text ->
+								actionType = ActionType.READ
 
 								archiveViewModel.getArchiveById(tag.id)
 
@@ -169,10 +185,13 @@ fun ArchiveScreen(
 							},
 
 							deleteAction = {id ->
+								actionType = ActionType.DELETE
 
 								archiveViewModel.deleteArchive(id)
 
-								showAlert = true
+								if (!archiveViewModel.uiState.value.success){
+									showAlert = true
+								}
 							}
 						)
 					}
@@ -187,6 +206,8 @@ fun ArchiveScreen(
 						item {
 							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
 								LoadButtonComponent(action = {
+									actionType = ActionType.READ
+
 									archiveViewModel.getArchivesList(state.offset + limit, limit, false)
 								})
 							}
@@ -251,15 +272,6 @@ fun ArchiveScreen(
 		showed = showAlert,
 		action = {
 			showAlert = false
-
-			if (state.success){
-				scope.launch {
-
-					val offset = if (state.list.size == 1) state.offset - limit else state.offset
-
-					archiveViewModel.getArchivesList(offset, limit)
-				}
-			}
 		}
 	)
 
@@ -284,7 +296,9 @@ fun ArchiveScreen(
 					archiveViewModel.updateArchive(Archive(id = itemId.value, title = text))
 				}
 
-				showAlert = true
+				if (!archiveViewModel.uiState.value.success){
+					showAlert = true
+				}
 
 				dialogState.hide()
 
