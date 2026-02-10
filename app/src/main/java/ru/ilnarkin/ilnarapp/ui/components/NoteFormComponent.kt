@@ -75,12 +75,12 @@ fun NoteFormComponent(
 	archives: List<Archive>,
 	tags: MutableList<Tag>,
 	hasNextTags: Boolean = true,
-	loadTags: suspend (count: Int) -> MutableList<Tag>,
+	loadTags: suspend () -> MutableList<Tag>,
 	action: suspend (note: Note) -> Unit) {
 
-	val selectableTags = tags
-
 	val font = getInterFont()
+
+	val selectableTags = remember { mutableStateListOf<Tag>().apply { addAll(tags) } }
 
 	var saving by remember { mutableStateOf(false) }
 
@@ -447,15 +447,16 @@ fun NoteFormComponent(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
 							onClick = {
-								tagsLoading = true
-
 								scope.launch {
-									scope.async {
-										val tags = loadTags(selectableTags.count() + 10)
-										selectableTags.clear()
+									tagsLoading = true
+									try {
+										val tags = loadTags()
+
 										selectableTags.addAll(tags)
-									}.await()
-								}.invokeOnCompletion { tagsLoading = false }
+									} finally {
+										tagsLoading = false
+									}
+								}
 							}
 
 						),

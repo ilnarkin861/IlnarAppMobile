@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
@@ -52,18 +54,27 @@ import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
+import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
+import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NotesScreen() {
+fun NotesScreen(
+	noteTypeViewModel: NoteTypeViewModel = koinViewModel(),
+	tagViewModel: TagViewModel = koinViewModel(),
+	archiveViewModel: ArchiveViewModel = koinViewModel(),
+) {
+
+	val tagsLimit = 10
 
 	var actionType by remember { mutableStateOf(ActionType.CREATE) }
 
 	var currentNote by remember { mutableStateOf<Note?>(null) }
 
-	val notes = getNotesList()
+	val notes = mutableListOf<Note>()
 
 	var showNoteFormSheet by remember { mutableStateOf(false) }
 	var showNoteDetailsSheet by remember { mutableStateOf(false) }
@@ -87,6 +98,10 @@ fun NotesScreen() {
 
 	val scope = rememberCoroutineScope()
 
+	val noteTypeViewModelState by noteTypeViewModel.uiState.collectAsState()
+	val tagViewModelState by tagViewModel.uiState.collectAsState()
+	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
+
 	val noteFullText = """
 		В маленьком городке, расположенном у подножия гор, ежегодно проходит фестиваль дружбы. Это событие собирает людей из разных уголков региона, и каждый год его темы отличаются.
 
@@ -97,11 +112,10 @@ fun NotesScreen() {
 
 
 	LaunchedEffect(Unit) {
-		loading = true
 
-		delay(1500)
-
-		loading = false
+		noteTypeViewModel.getNoteTypesList(0, 10)
+		tagViewModel.getTagsList(0, tagsLimit)
+		archiveViewModel.getArchivesList(0, 100)
 	}
 
 
@@ -255,14 +269,14 @@ fun NotesScreen() {
 				else{
 					NoteFormComponent(
 						currentNote,
-						noteTypes = getNoteTypes(),
-						archives = getArchives(5),
-						tags = getTags(10),
+						noteTypes = noteTypeViewModelState.list,
+						archives = archiveViewModelState.list,
+						tags = tagViewModelState.list,
+						hasNextTags = tagViewModelState.pagination?.hasNextPage ?: false,
 
-						loadTags = {count ->
-							delay(2000)
-
-							getTags(count)
+						loadTags = {
+							tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
+							tagViewModelState.list
 						},
 
 						action = {note ->
