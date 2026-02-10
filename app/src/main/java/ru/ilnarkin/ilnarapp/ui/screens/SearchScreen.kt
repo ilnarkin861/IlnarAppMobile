@@ -254,10 +254,9 @@ fun SearchScreen() {
 						archives = getArchives(5),
 						tags = getTags(10),
 
-						loadTags = {count ->
-							delay(2000)
+						loadTags = {
 
-							getTags(count)
+							getTags(10)
 						},
 
 						action = {note ->
