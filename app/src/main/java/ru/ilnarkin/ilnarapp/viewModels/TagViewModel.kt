@@ -21,7 +21,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 	suspend fun getTagsList(offset: Int, limit: Int, showLoading: Boolean = true){
 
 		try {
-			val tagsOffset = if (offset < 0) 0 else offset
+			val tagsOffset = if (offset <= 0) 0 else offset
 
 			if (showLoading){
 				_uiState.value = _uiState.value.copy(loading = true)
@@ -53,6 +53,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 					loading = false,
 					list = _uiState.value.list,
 					offset = tagsOffset,
+					success = true,
 					pagination = _uiState.value.pagination)
 			}
 		}
