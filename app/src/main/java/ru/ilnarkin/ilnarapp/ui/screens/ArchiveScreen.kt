@@ -67,7 +67,7 @@ fun ArchiveScreen(
 	errorManager: NetworkErrorManager = koinInject()
 ) {
 
-	val limit = 10
+	val limit = 100
 
 	val context = LocalContext.current
 
