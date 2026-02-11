@@ -56,6 +56,7 @@ import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
+import ru.ilnarkin.ilnarapp.viewModels.NoteViewModel
 import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
 
 
@@ -63,18 +64,18 @@ import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NotesScreen(
+	noteViewModel: NoteViewModel = koinViewModel(),
 	noteTypeViewModel: NoteTypeViewModel = koinViewModel(),
 	tagViewModel: TagViewModel = koinViewModel(),
 	archiveViewModel: ArchiveViewModel = koinViewModel(),
 ) {
 
+	val notesLimit = 10
 	val tagsLimit = 10
 
-	var actionType by remember { mutableStateOf(ActionType.CREATE) }
+	var actionType by remember { mutableStateOf(ActionType.READ) }
 
 	var currentNote by remember { mutableStateOf<Note?>(null) }
-
-	val notes = mutableListOf<Note>()
 
 	var showNoteFormSheet by remember { mutableStateOf(false) }
 	var showNoteDetailsSheet by remember { mutableStateOf(false) }
@@ -88,16 +89,13 @@ fun NotesScreen(
 
 	val alertTitle = remember { mutableStateOf("") }
 
-	var loading by remember { mutableStateOf(false) }
-
 	var noteDetailsLoading by remember { mutableStateOf(false) }
 
 	var showAlert by remember { mutableStateOf(false) }
 
-	var success by remember { mutableStateOf(true) }
-
 	val scope = rememberCoroutineScope()
 
+	val noteViewModelState by noteViewModel.uiState.collectAsState()
 	val noteTypeViewModelState by noteTypeViewModel.uiState.collectAsState()
 	val tagViewModelState by tagViewModel.uiState.collectAsState()
 	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
@@ -111,8 +109,25 @@ fun NotesScreen(
 		""".trimIndent()
 
 
+	LaunchedEffect(noteViewModelState.success) {
+		if (noteViewModelState.success){
+			when(actionType){
+				ActionType.CREATE -> noteViewModel.getNotesList(0, notesLimit)
+				ActionType.UPDATE -> {}
+				ActionType.DELETE -> {
+					//val offset = if (state.list.size == 1) state.offset - limit else state.offset
+
+					//tagViewModel.getTagsList(offset, limit)
+				}
+				else -> {}
+			}
+		}
+	}
+
+
 	LaunchedEffect(Unit) {
 
+		noteViewModel.getNotesList(0, notesLimit)
 		noteTypeViewModel.getNoteTypesList(0, 10)
 		tagViewModel.getTagsList(0, tagsLimit)
 		archiveViewModel.getArchivesList(0, 100)
@@ -123,7 +138,7 @@ fun NotesScreen(
 		.fillMaxSize()
 		.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 
-		if (loading){
+		if (noteViewModelState.loading){
 			Box(
 				modifier = Modifier.fillMaxSize(),
 				contentAlignment = Alignment.Center){
@@ -131,18 +146,26 @@ fun NotesScreen(
 			}
 		}
 
-		if (!loading && !notes.isEmpty()){
+		if (!noteViewModelState.loading && !noteViewModelState.list.isEmpty()){
 			LazyColumn(
 				state = listState,
 				contentPadding = PaddingValues(top = 30.dp, bottom = 60.dp)) {
 
-				item {
-					Row(Modifier.padding(bottom = 25.dp)) {
-						LoadButtonComponent(nextButton = false, action = { delay(1500) })
+				noteViewModelState.pagination?.let {
+					if (it.hasPreviousPage){
+						item {
+							Row(Modifier.padding(bottom = 25.dp)) {
+								LoadButtonComponent(nextButton = false, action = {
+									actionType = ActionType.READ
+
+									noteViewModel.getNotesList(noteViewModelState.offset - notesLimit, notesLimit, false)
+								})
+							}
+						}
 					}
 				}
 
-				items(notes) {value ->
+				items(noteViewModelState.list) {value ->
 					NoteItemComponent(
 						value,
 						viewAction = {note ->
@@ -183,18 +206,23 @@ fun NotesScreen(
 						})
 				}
 
-				item {
-					Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
-						LoadButtonComponent(action = {
-							delay(1500)
-							listState.scrollToItem(0)
-						})
+				noteViewModelState.pagination?.let {
+					if (it.hasNextPage){
+						item {
+							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
+								LoadButtonComponent(action = {
+									actionType = ActionType.READ
+
+									tagViewModel.getTagsList(noteViewModelState.offset + notesLimit, notesLimit, false)
+								})
+							}
+						}
 					}
 				}
 			}
 		}
 
-		if (!loading && notes.isEmpty()){
+		if (!noteViewModelState.loading && noteViewModelState.list.isEmpty()){
 			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
 				contentAlignment = Alignment.Center){
 				MessageComponent("Записей нет")
@@ -222,13 +250,11 @@ fun NotesScreen(
 
 
 	AlertComponent(
-		success = success,
-		message = alertTitle.value,
+		success = noteViewModelState.success,
+		message = noteViewModelState.message,
 		showed = showAlert,
 		action = {
 			showAlert = false
-
-			// еще что-то делаем
 		}
 	)
 
@@ -281,23 +307,21 @@ fun NotesScreen(
 
 						action = {note ->
 
-							delay(3000)
-
 							if (actionType == ActionType.CREATE){
 
-								// Save to db
-
-								alertTitle.value = "Запись успешно добавлена"
+								noteViewModel.createNote(note)
 							}
 
-							else{
+							/*if (actionType == ActionType.UPDATE){
 
-								// Save to db
 
-								alertTitle.value = "Запись успешно изменена"
 							}
 
-							showAlert = true
+							 */
+
+							if (!noteViewModel.uiState.value.success){
+								showAlert = true
+							}
 
 							noteFormSheetState.hide()
 
