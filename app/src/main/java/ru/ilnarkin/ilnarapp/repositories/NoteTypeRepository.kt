@@ -2,16 +2,15 @@ package ru.ilnarkin.ilnarapp.repositories
 
 import retrofit2.Response
 import ru.ilnarkin.ilnarapp.models.AppPagination
-import ru.ilnarkin.ilnarapp.models.FilterModel
 import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.network.NoteTypeHttpService
 
 
-class NoteTypeRepository(private val httpService: NoteTypeHttpService) : Repository<NoteType, AppPagination<NoteType>> {
+class NoteTypeRepository(private val httpService: NoteTypeHttpService) : Repository<NoteType, AppPagination<NoteType>, Nothing> {
 	override suspend fun getList(
 		offset: Int,
 		limit: Int,
-		filter: FilterModel?
+		filter: Nothing?
 	): Response<AppPagination<NoteType>> {
 		return httpService.getAll(offset, limit)
 	}

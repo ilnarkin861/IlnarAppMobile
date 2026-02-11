@@ -3,16 +3,15 @@ package ru.ilnarkin.ilnarapp.repositories
 import retrofit2.Response
 import ru.ilnarkin.ilnarapp.models.AppPagination
 import ru.ilnarkin.ilnarapp.models.Archive
-import ru.ilnarkin.ilnarapp.models.FilterModel
 import ru.ilnarkin.ilnarapp.network.ArchiveHttpService
 
 
-class ArchiveRepository(private val httpService: ArchiveHttpService) : Repository<Archive, AppPagination<Archive>> {
+class ArchiveRepository(private val httpService: ArchiveHttpService) : Repository<Archive, AppPagination<Archive>, Nothing> {
 
 	override suspend fun getList(
 		offset: Int,
 		limit: Int,
-		filter: FilterModel?
+		filter: Nothing?
 	): Response<AppPagination<Archive>> {
 		return httpService.getAll(offset, limit)
 	}
