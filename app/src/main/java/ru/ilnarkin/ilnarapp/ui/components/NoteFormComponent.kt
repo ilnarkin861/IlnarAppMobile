@@ -54,7 +54,6 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
@@ -554,9 +553,13 @@ fun NoteFormComponent(
 						)
 
 						scope.launch {
-							scope.async {
-								action(note) }.await()
-						}.invokeOnCompletion { saving = false }
+							saving = true
+							try {
+								action(note)
+							} finally {
+								saving = false
+							}
+						}
 					}
 				}
 			) {
