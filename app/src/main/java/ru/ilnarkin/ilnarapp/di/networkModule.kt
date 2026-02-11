@@ -10,6 +10,7 @@ import ru.ilnarkin.ilnarapp.interceptors.AuthInterceptor
 import ru.ilnarkin.ilnarapp.interceptors.NetworkErrorInterceptor
 import ru.ilnarkin.ilnarapp.network.ArchiveHttpService
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
+import ru.ilnarkin.ilnarapp.network.NoteHttpService
 import ru.ilnarkin.ilnarapp.network.NoteTypeHttpService
 import ru.ilnarkin.ilnarapp.network.TagHttpService
 import ru.ilnarkin.ilnarapp.network.TokenManager
@@ -28,6 +29,7 @@ val networkModule = module {
 	single { get<Retrofit>().create(TagHttpService::class.java) }
 	single { get<Retrofit>().create(ArchiveHttpService::class.java) }
 	single { get<Retrofit>().create(NoteTypeHttpService::class.java) }
+	single { get<Retrofit>().create(NoteHttpService::class.java) }
 
 	single {
 		OkHttpClient.Builder()
