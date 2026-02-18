@@ -14,6 +14,11 @@ const val PREFS_NAME = "AppSettings"
 const val KEY_PIN = "pin"
 const val KEY_TOKEN = "token"
 const val API_URL = "http://192.168.1.11:8080"
+const val NOTE_TYPES_ENDPOINT = "notetypes"
+const val NOTES_ENDPOINT = "notes"
+const val TAGS_ENDPOINT = "tags"
+const val ARCHIVES_ENDPOINT = "archives"
+const val USER_ENDPOINT = "user"
 
 
 fun getInterFont(): FontFamily{
@@ -29,16 +34,4 @@ fun getInterFont(): FontFamily{
 
 fun validEmail(email: String): Boolean{
 	return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-}
-
-
-fun buildString(stringsList: MutableList<String>) : String{
-
-	val stringBuilder = StringBuilder()
-
-	stringsList.forEach { string ->
-		stringBuilder.appendLine(string)
-	}
-
-	return stringBuilder.toString()
 }
