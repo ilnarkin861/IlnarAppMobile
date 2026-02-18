@@ -1,23 +1,21 @@
 package ru.ilnarkin.ilnarapp.viewModels
 
 import androidx.lifecycle.ViewModel
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
-import ru.ilnarkin.ilnarapp.helpers.buildString
-import ru.ilnarkin.ilnarapp.models.Info
-import ru.ilnarkin.ilnarapp.models.UserLoginData
 import ru.ilnarkin.ilnarapp.models.UserInfo
+import ru.ilnarkin.ilnarapp.models.UserLoginData
 import ru.ilnarkin.ilnarapp.network.TokenManager
-import ru.ilnarkin.ilnarapp.network.UserHttpService
+import ru.ilnarkin.ilnarapp.repositories.UserRepository
 import ru.ilnarkin.ilnarapp.ui.AppUiState
 
 
 class UserViewModel(
 	private val tokenManager: TokenManager,
-	private val userHttpService: UserHttpService
+	private val userRepository: UserRepository
 ) : ViewModel() {
 
 	private val _uiState = MutableStateFlow(AppUiState<UserInfo>())
@@ -28,13 +26,20 @@ class UserViewModel(
 
 		try {
 
-			val result = userHttpService.checkAuth()
+			val result = userRepository.checkAuth()
 
-			if (result.isSuccessful){
+			if (result){
 				_uiState.value = _uiState.value.copy(isAuth = true)
 			}
 
-		}catch (_: Exception){
+		}catch (e: ApiException){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)
+		}
+
+		catch (e: Exception){
 			_uiState.value = _uiState.value.copy(
 				success = false,
 				message = DEFAULT_ERROR_MESSAGE
@@ -48,25 +53,13 @@ class UserViewModel(
 		try {
 			_uiState.value = _uiState.value.copy(message = "")
 
-			val result = userHttpService.login(userAuthData)
+			val result = userRepository.login(userAuthData)
 
-			if (result.isSuccessful){
-				tokenManager.saveAuthToken(result.body()?.token)
-				_uiState.value = _uiState.value.copy(success = true)
-			}
+			tokenManager.saveAuthToken(result.token)
+			_uiState.value = _uiState.value.copy(success = true)
 
-			else {
-				val errorBody = result.errorBody()?.string()
-				val errorResponse = Gson().fromJson(errorBody, Info::class.java)
 
-				val message = buildString(errorResponse.messages)
-
-				_uiState.value = _uiState.value.copy(
-					success = false,
-					message = message
-				)
-			}
-		}catch (_: Exception){
+		}catch (_: ApiException){
 			_uiState.value = _uiState.value.copy(success = false)
 		}
 	}

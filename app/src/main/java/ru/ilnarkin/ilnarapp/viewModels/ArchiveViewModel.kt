@@ -1,13 +1,14 @@
 package ru.ilnarkin.ilnarapp.viewModels
 
 import androidx.lifecycle.ViewModel
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import ru.ilnarkin.ilnarapp.helpers.buildString
+import kotlinx.coroutines.flow.update
+import ru.ilnarkin.ilnarapp.exceptions.ApiException
+import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
+import ru.ilnarkin.ilnarapp.models.AppPagination
 import ru.ilnarkin.ilnarapp.models.Archive
-import ru.ilnarkin.ilnarapp.models.Info
 import ru.ilnarkin.ilnarapp.repositories.ArchiveRepository
 import ru.ilnarkin.ilnarapp.ui.AppUiState
 
@@ -21,182 +22,159 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 	suspend fun getArchivesList(offset: Int, limit: Int, showLoading: Boolean = true){
 
 		try {
-			val tagsOffset = if (offset < 0) 0 else offset
+			_uiState.value = _uiState.value.copy(success = false)
+
+			val tagsOffset = if (offset <= 0) 0 else offset
 
 			if (showLoading){
 				_uiState.value = _uiState.value.copy(loading = true)
 			}
 
-			_uiState.value = _uiState.value.copy(list = _uiState.value.list)
+			val result = archiveRepository.getList<AppPagination<Archive>>(tagsOffset, limit, null)
 
-			val result = archiveRepository.getList(tagsOffset, limit, null)
+			_uiState.value = _uiState.value.copy(
+				loading = false,
+				list = result.data,
+				offset = tagsOffset,
+				pagination = result.pagination)
 
-			_uiState.value.list.clear()
+			_uiState.update { it.copy(success = false) }
 
-			if (result.isSuccessful && result.body() != null){
-
-				val archives = result.body()?.data
-
-				archives?.count()?.let {
-
-					if ( it > 0){
-						for (archive in archives){
-							_uiState.value.list.add(Archive(id = archive.id, title = archive.title))
-						}
-					}
-				}
-
-				_uiState.value.pagination = result.body()?.pagination
-
-
-				_uiState.value = _uiState.value.copy(
-					loading = false,
-					list = _uiState.value.list,
-					offset = tagsOffset,
-					pagination = _uiState.value.pagination)
-			}
 		}
-		catch (_: Exception){}
+		catch (_: Exception){
+			_uiState.value = _uiState.value.copy(
+				loading = false,
+				success = false,
+				message = DEFAULT_ERROR_MESSAGE
+			)
+		}
 	}
 
 
-	suspend fun getArchiveById(id: String){
+	suspend fun getArchiveById(id: String): Archive?{
 
-		try {
-			_uiState.value = _uiState.value.copy(success = false, data = null)
+		return try {
+			_uiState.value = _uiState.value.copy(showAlert = false, data = null)
 
-			val result = archiveRepository.getById(id)
+			archiveRepository.getById<Archive>(id) as Archive
+		}
 
-			if (result.isSuccessful && result.body() != null){
-				_uiState.value = _uiState.value.copy(
-					success = true,
-					data =  result.body())
-			}
+		catch (e: ApiException){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				data = null,
+				showAlert = true,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)
 
-			else{
-				if (result.code() == 404){
-					val errorBody = result.errorBody()?.string()
-					val errorResponse = Gson().fromJson(errorBody, Info::class.java)
-
-					val message = buildString(errorResponse.messages)
-
-					_uiState.value = _uiState.value.copy(
-						success = false,
-						message = message)
-				}
-			}
+			null
 		}
 
 		catch (_: Exception){
 			_uiState.value = _uiState.value.copy(
 				success = false,
-				message = "Ошибка при получении архива")
+				data = null,
+				showAlert = true,
+				message = DEFAULT_ERROR_MESSAGE)
+
+			null
 		}
 	}
 
 
-	suspend fun createArchive(archive: Archive){
-
-		try {
-			_uiState.value = _uiState.value.copy(message = "", success = false, data = null)
-
-			val result = archiveRepository.create(archive)
-
-			if (result.isSuccessful){
-				_uiState.value = _uiState.value.copy(
-					success = true,
-					message = "Архив успешно добавлен",
-					offset = 0
-				)
-			}
-
-			else{
-				val errorBody = result.errorBody()?.string()
-				val errorResponse = Gson().fromJson(errorBody, Info::class.java)
-
-				val message = buildString(errorResponse.messages)
-
-				_uiState.value = _uiState.value.copy(
-					success = false,
-					message = message)
-			}
-		}
-
-		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
-				success = false,
-				message = "Ошибка при добавлении архива")
-		}
-	}
-
-
-	suspend fun updateArchive(archive: Archive){
-
-		try {
-			_uiState.value = _uiState.value.copy(success = false, data = null)
-
-			val result = archiveRepository.update(archive)
-
-			if (result.isSuccessful){
-				_uiState.value = _uiState.value.copy(
-					success = true,
-					message = "Архив успешно обновлен"
-				)
-			}
-
-			else{
-				val errorBody = result.errorBody()?.string()
-				val errorResponse = Gson().fromJson(errorBody, Info::class.java)
-
-				val message = buildString(errorResponse.messages)
-
-				_uiState.value = _uiState.value.copy(
-					success = false,
-					message = message)
-			}
-		}
-
-		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
-				success = false,
-				message = "Ошибка при обновлении архива")
-		}
-	}
-
-
-	suspend fun deleteArchive(id: String){
+	suspend fun createArchive(archive: Archive): Archive?{
 
 		try {
 			_uiState.value = _uiState.value.copy(success = false)
 
-			val result = archiveRepository.delete(id)
+			return archiveRepository.create<Archive>(archive)
+		}
 
-			if (result.isSuccessful){
-				_uiState.value = _uiState.value.copy(
-					success = true,
-					message = "Архив успешно удален"
-				)
-			}
+		catch (e: ApiException){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				showAlert = true,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)
 
-			else{
-				val errorBody = result.errorBody()?.string()
-				val errorResponse = Gson().fromJson(errorBody, Info::class.java)
-
-				val message = buildString(errorResponse.messages)
-
-				_uiState.value = _uiState.value.copy(
-					success = false,
-					message = message)
-			}
-
+			return null
 		}
 
 		catch (_: Exception){
 			_uiState.value = _uiState.value.copy(
 				success = false,
-				message = "Ошибка при удалении архива")
+				showAlert = true,
+				message = "Ошибка при добавлении архива")
+
+			return null
 		}
 	}
 
 
+	suspend fun updateArchive(archive: Archive): Archive?{
+
+		try {
+			_uiState.value = _uiState.value.copy(success = false)
+
+			return archiveRepository.update<Archive>(archive.id, archive)
+		}
+
+		catch (e: ApiException){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				showAlert = true,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)
+
+			return null
+		}
+
+		catch (_: Exception){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				showAlert = true,
+				message = "Ошибка при обновлении архива")
+			return null
+		}
+	}
+
+
+	suspend fun deleteArchive(id: String): Boolean{
+
+		return try {
+			_uiState.value = _uiState.value.copy(success = false)
+
+			archiveRepository.delete(id)
+
+			_uiState.value = _uiState.value.copy(
+				success = true,
+				message = "Архив успешно удален"
+			)
+
+			true
+		}
+
+		catch (e: ApiException){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				showAlert = true,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)
+
+			false
+		}
+
+		catch (_: Exception){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				showAlert = true,
+				message = "Ошибка при удалении архива")
+
+			false
+		}
+	}
+
+	fun dismissAlert() {
+		_uiState.update { it.copy(showAlert = false) }
+	}
 }

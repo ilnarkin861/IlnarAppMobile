@@ -72,7 +72,7 @@ fun NoteFormComponent(
 	note: Note? = null,
 	noteTypes: List<NoteType>,
 	archives: List<Archive>,
-	tags: MutableList<Tag>,
+	tags: List<Tag>,
 	hasNextTags: Boolean = true,
 	loadTags: suspend () -> MutableList<Tag>,
 	action: suspend (note: Note) -> Unit) {

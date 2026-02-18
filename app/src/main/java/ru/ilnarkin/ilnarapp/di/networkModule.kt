@@ -1,20 +1,30 @@
 package ru.ilnarkin.ilnarapp.di
 
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.header
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import ru.ilnarkin.ilnarapp.helpers.API_URL
+import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
+import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.interceptors.AuthInterceptor
 import ru.ilnarkin.ilnarapp.interceptors.NetworkErrorInterceptor
-import ru.ilnarkin.ilnarapp.network.ArchiveHttpService
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
-import ru.ilnarkin.ilnarapp.network.NoteHttpService
-import ru.ilnarkin.ilnarapp.network.NoteTypeHttpService
-import ru.ilnarkin.ilnarapp.network.TagHttpService
 import ru.ilnarkin.ilnarapp.network.TokenManager
-import ru.ilnarkin.ilnarapp.network.UserHttpService
+import java.net.ConnectException
 
 
 val networkModule = module {
@@ -25,25 +35,72 @@ val networkModule = module {
 	single { NetworkErrorInterceptor(get(), get()) }
 	single { AuthInterceptor(get()) }
 
-	single { get<Retrofit>().create(UserHttpService::class.java) }
-	single { get<Retrofit>().create(TagHttpService::class.java) }
-	single { get<Retrofit>().create(ArchiveHttpService::class.java) }
-	single { get<Retrofit>().create(NoteTypeHttpService::class.java) }
-	single { get<Retrofit>().create(NoteHttpService::class.java) }
 
 	single {
-		OkHttpClient.Builder()
-			.addInterceptor(get<NetworkErrorInterceptor>())
-			.addInterceptor(get<AuthInterceptor>())
-			.addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
-			.build()
-	}
+		val errorManager: NetworkErrorManager = get()
+		val tokenManager: TokenManager = get()
+		val context = androidContext()
 
-	single {
-		Retrofit.Builder()
-			.baseUrl(API_URL)
-			.client(get())
-			.addConverterFactory(GsonConverterFactory.create())
-			.build()
+		HttpClient(CIO) {
+
+			install(ContentNegotiation) { json(
+				Json {
+					ignoreUnknownKeys = true
+					prettyPrint = true
+					isLenient = true
+				})
+			}
+
+			expectSuccess = true
+
+			defaultRequest {
+
+				header(HttpHeaders.ContentType, ContentType.Application.Json)
+
+				val token = tokenManager.getAuthToken()
+
+				if (!token.isNullOrBlank()) {
+					header("Authorization", "Bearer $token")
+				}
+			}
+
+			HttpResponseValidator {
+
+
+				handleResponseExceptionWithRequest { cause, _ ->
+					val networkAvailable = isNetworkAvailable(context)
+
+					if (cause is ApiException) {
+						errorManager.notifyError(NetworkErrorType.SERVER_ERROR)
+					}
+
+					if (cause is ClientRequestException){
+						val status = cause.response.status
+
+						if (networkAvailable && status == HttpStatusCode.Unauthorized) {
+							errorManager.notifyError(NetworkErrorType.UNAUTHORIZED)
+						}
+
+						if (status == HttpStatusCode.NotFound){
+							throw ApiException("Ресурс не найден")
+						}
+					}
+
+					if(cause is HttpRequestTimeoutException || cause is ConnectException) {
+						if (networkAvailable) errorManager.notifyError(NetworkErrorType.SERVER_ERROR)
+						else errorManager.notifyError(NetworkErrorType.NO_INTERNET)
+					}
+				}
+			}
+		}
 	}
+}
+
+private fun isNetworkAvailable(context: Context): Boolean {
+	val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+	val network = connectivityManager.activeNetwork ?: return false
+	val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+	return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+			capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+			capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
 }

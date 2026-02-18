@@ -1,5 +1,6 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -21,6 +22,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -29,24 +33,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.WelcomeActivity
 import ru.ilnarkin.ilnarapp.enums.ActionType
+import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
+import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
+import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
+import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
@@ -68,10 +76,13 @@ fun NotesScreen(
 	noteTypeViewModel: NoteTypeViewModel = koinViewModel(),
 	tagViewModel: TagViewModel = koinViewModel(),
 	archiveViewModel: ArchiveViewModel = koinViewModel(),
+	errorManager: NetworkErrorManager = koinInject()
 ) {
 
 	val notesLimit = 10
 	val tagsLimit = 10
+
+	val context = LocalContext.current
 
 	var actionType by remember { mutableStateOf(ActionType.READ) }
 
@@ -87,46 +98,41 @@ fun NotesScreen(
 
 	val sheetTitle = remember { mutableStateOf("") }
 
-	val alertTitle = remember { mutableStateOf("") }
-
 	var noteDetailsLoading by remember { mutableStateOf(false) }
 
-	var showAlert by remember { mutableStateOf(false) }
-
-	val scope = rememberCoroutineScope()
+	val snackBarHostState = remember { SnackbarHostState() }
 
 	val noteViewModelState by noteViewModel.uiState.collectAsState()
+
 	val noteTypeViewModelState by noteTypeViewModel.uiState.collectAsState()
+
 	val tagViewModelState by tagViewModel.uiState.collectAsState()
+
 	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
 
-	val noteFullText = """
-		В маленьком городке, расположенном у подножия гор, ежегодно проходит фестиваль дружбы. Это событие собирает людей из разных уголков региона, и каждый год его темы отличаются.
 
-		В этом году открыл его известный местный музыкант, который исполнил песни о дружбе и единстве. На главной площади горько улыбалась выступление детей из местной школы. Их танец, который они подготовили специально для этого дня, зацепил сердца всех зрителей.
-			
-		Фестиваль дружбы становится не только местом встречи старых друзей, но и возможностью завести новые знакомства. Люди разных возрастов и национальностей объединяются под общим девизом: "Вместе мы сильнее!" По завершении праздника жители обещали встречаться чаще и продолжать развивать дружеские связи, возникающие в течение этого неповторимого дня.
-		""".trimIndent()
+	LaunchedEffect(Unit) {
+		errorManager.errorEvent.collect { error ->
+			when(error) {
+				NetworkErrorType.NO_INTERNET ->
+					snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE)
 
+				NetworkErrorType.SERVER_ERROR ->
+					snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE)
 
-	LaunchedEffect(noteViewModelState.success) {
-		if (noteViewModelState.success){
-			when(actionType){
-				ActionType.CREATE -> noteViewModel.getNotesList(0, notesLimit)
-				ActionType.UPDATE -> {}
-				ActionType.DELETE -> {
-					//val offset = if (state.list.size == 1) state.offset - limit else state.offset
-
-					//tagViewModel.getTagsList(offset, limit)
+				NetworkErrorType.UNAUTHORIZED -> {
+					context.startActivity(Intent(context, WelcomeActivity::class.java).apply {
+						flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+					})
+					return@collect
 				}
-				else -> {}
 			}
 		}
 	}
 
 
-	LaunchedEffect(Unit) {
 
+	LaunchedEffect(Unit) {
 		noteViewModel.getNotesList(0, notesLimit)
 		noteTypeViewModel.getNoteTypesList(0, 10)
 		tagViewModel.getTagsList(0, tagsLimit)
@@ -168,41 +174,14 @@ fun NotesScreen(
 				items(noteViewModelState.list) {value ->
 					NoteItemComponent(
 						value,
-						viewAction = {note ->
-							currentNote = null
+						viewAction = {
 
-							showNoteDetailsSheet = true
-
-							noteDetailsLoading = true
-
-							scope.launch {
-								delay(2500)
-							}.invokeOnCompletion {
-								note.text = noteFullText
-								currentNote = note
-								noteDetailsLoading = false
-							}
 						},
 
-						editAction = {note ->
-							actionType = ActionType.UPDATE
-							sheetTitle.value = "Изменить запись"
-
-							noteDetailsLoading = true
-							showNoteFormSheet = true
-
-							scope.launch {
-								delay(2500)
-							}.invokeOnCompletion {
-								note.text = noteFullText
-								currentNote = note
-								noteDetailsLoading = false
-							}
+						editAction = {
 						},
 						deleteAction = {
-							delay(1500)
-							alertTitle.value = "Запись успешно удалена"
-							showAlert = true
+
 						})
 				}
 
@@ -246,16 +225,25 @@ fun NotesScreen(
 				painter = painterResource(R.drawable.ic_plus),
 				contentDescription = "Добавить")
 		}
+
+		SnackbarHost(
+			hostState = snackBarHostState,
+			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter)
+		){data ->
+			Snackbar(
+				snackbarData = data,
+				containerColor = colorResource(R.color.primary_color),
+				contentColor = Color.White
+			)
+		}
 	}
 
 
 	AlertComponent(
 		success = noteViewModelState.success,
 		message = noteViewModelState.message,
-		showed = showAlert,
-		action = {
-			showAlert = false
-		}
+		showed = noteViewModelState.showAlert,
+		action = { noteViewModel.dismissAlert()	}
 	)
 
 
@@ -302,26 +290,20 @@ fun NotesScreen(
 
 						loadTags = {
 							tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
-							tagViewModelState.list
+							tagViewModelState.list.toMutableList()
 						},
 
 						action = {note ->
 
 							if (actionType == ActionType.CREATE){
 
-								noteViewModel.createNote(note)
+								val createdNote = noteViewModel.createNote(note)
+
+								if (createdNote != null){
+									noteViewModel.getNotesList(noteViewModelState.offset, notesLimit)
+								}
 							}
 
-							/*if (actionType == ActionType.UPDATE){
-
-
-							}
-
-							 */
-
-							if (!noteViewModel.uiState.value.success){
-								showAlert = true
-							}
 
 							noteFormSheetState.hide()
 

@@ -29,18 +29,17 @@ import ru.ilnarkin.ilnarapp.helpers.getInterFont
 
 @Composable
 fun ListItemComponent(
-    id: String,
-    title: String,
-    editAction: suspend (id: String) -> Unit,
-    deleteAction: suspend (id: String) -> Unit) {
-
-    var loading by remember { mutableStateOf(false) }
-
-    var deleting by remember { mutableStateOf(false) }
-
-    val scope = rememberCoroutineScope()
+    text: String,
+    editAction: suspend () -> Unit,
+    deleteAction: suspend () -> Unit) {
 
     var showConfirmAlert by remember { mutableStateOf(false) }
+
+    var isLoading by remember { mutableStateOf(false) }
+
+    var isDeleting by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
 
     Row(
@@ -50,7 +49,7 @@ fun ListItemComponent(
 
         Row {
             Text(
-                text = title,
+                text = text,
                 fontFamily = getInterFont(),
                 fontWeight = FontWeight.SemiBold,
                 color = colorResource(R.color.title_color),
@@ -63,7 +62,7 @@ fun ListItemComponent(
             Row(Modifier.size(35.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
-                if (loading){
+                if (isLoading){
                     ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
                 }
 
@@ -71,11 +70,11 @@ fun ListItemComponent(
                     IconButton(onClick = {
 
                         scope.launch {
-                            loading = true
+                            isLoading = true
                             try {
-                                editAction(title)
+                                editAction()
                             } finally {
-                                loading = false
+                                isLoading = false
                             }
                         }
 
@@ -91,7 +90,7 @@ fun ListItemComponent(
             Row(Modifier.size(35.dp).padding(start = 10.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
-                if (deleting){
+                if (isDeleting){
                     ProgressIndicatorComponent(25, colorResource(R.color.danger_color))
                 }
 
@@ -116,11 +115,11 @@ fun ListItemComponent(
             if (confirmed){
 
                 scope.launch {
-                    deleting = true
+                    isDeleting = true
                     try {
-                        deleteAction(id)
+                        deleteAction()
                     } finally {
-                        deleting = false
+                        isDeleting = false
                     }
                 }
             }

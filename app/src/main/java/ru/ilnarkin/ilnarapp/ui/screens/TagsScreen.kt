@@ -19,7 +19,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -40,8 +39,6 @@ import androidx.compose.ui.unit.dp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
@@ -73,8 +70,6 @@ fun TagsScreen(
 
 	val listState = rememberLazyListState()
 
-	var showAlert by remember { mutableStateOf(false) }
-
 	var modalFormLabel by remember { mutableStateOf("") }
 
 	val dialogState = rememberMaterialDialogState()
@@ -90,51 +85,31 @@ fun TagsScreen(
 	val snackBarHostState = remember { SnackbarHostState() }
 
 
-	LaunchedEffect(state.success) {
-		if (state.success){
-			when(actionType){
-				ActionType.CREATE -> tagViewModel.getTagsList(0, limit)
-				ActionType.UPDATE -> tagViewModel.getTagsList(state.offset, limit)
-				ActionType.DELETE -> {
-					val offset = if (state.list.size == 1) state.offset - limit else state.offset
 
-					tagViewModel.getTagsList(offset, limit)
+	LaunchedEffect(Unit) {
+		errorManager.errorEvent.collect { error ->
+			when(error) {
+				NetworkErrorType.NO_INTERNET ->
+					snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE)
+
+				NetworkErrorType.SERVER_ERROR ->
+					snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE)
+
+				NetworkErrorType.UNAUTHORIZED -> {
+					context.startActivity(Intent(context, WelcomeActivity::class.java).apply {
+						flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+					})
+					return@collect
 				}
-				else -> {}
 			}
 		}
 	}
 
 
 	LaunchedEffect(Unit) {
-
-		lateinit var errorJob: Job
-
-		errorJob = launch {
-			errorManager.errorEvent.collect { error ->
-
-				when(error){
-					NetworkErrorType.NO_INTERNET ->
-						snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE, duration = SnackbarDuration.Long)
-
-					NetworkErrorType.SERVER_ERROR ->
-						snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE, duration = SnackbarDuration.Long)
-
-					NetworkErrorType.UNAUTHORIZED -> {
-						val intent = Intent(context, WelcomeActivity::class.java).apply {
-							flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-						}
-
-						context.startActivity(intent)
-
-						errorJob.cancel()
-					}
-				}
-			}
-		}
-
 		tagViewModel.getTagsList(state.offset, limit)
 	}
+
 
 
 	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
@@ -159,38 +134,33 @@ fun TagsScreen(
 					}
 				}
 
-				itemsIndexed(state.list){index, tag ->
+
+				itemsIndexed(items = tagViewModel.uiState.value.list){index, item ->
 
 					Row(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
 						ListItemComponent(
-							tag.id,
-							tag.title,
+							item.title,
 
-							editAction = { text ->
-								actionType = ActionType.READ
+							editAction = {
+								val tag = tagViewModel.getTagById(item.id)
 
-								tagViewModel.getTagById(tag.id)
-
-								if (tagViewModel.uiState.value.success){
+								if (tag != null) {
 									actionType = ActionType.UPDATE
+									itemText.value = tag.title
+									itemId.value = tag.id
 									modalFormLabel = "Изменить тег"
-									tagViewModel.uiState.value.data?.let { itemId.value = it.id }
-									tagViewModel.uiState.value.data?.let { itemText.value = it.title }
 									dialogState.show()
-								}
-
-								else{
-									showAlert = true
 								}
 							},
 
-							deleteAction = {id ->
-								actionType = ActionType.DELETE
+							deleteAction = {
 
-								tagViewModel.deleteTag(id)
+								val isDeleted = tagViewModel.deleteTag(item.id)
 
-								if (!tagViewModel.uiState.value.success){
-									showAlert = true
+								if (isDeleted){
+									val offset = if (state.list.size == 1) state.offset - limit else state.offset
+
+									tagViewModel.getTagsList(offset, limit, false)
 								}
 							}
 						)
@@ -269,10 +239,8 @@ fun TagsScreen(
 	AlertComponent(
 		success = state.success,
 		message = state.message,
-		showed = showAlert,
-		action = {
-			showAlert = false
-		}
+		showed = state.showAlert,
+		action = { tagViewModel.dismissAlert()	}
 	)
 
 
@@ -284,20 +252,25 @@ fun TagsScreen(
 		ItemFormComponent(
 			itemText.value,
 			modalFormLabel,
+
 			action = {text->
 
 				if (actionType == ActionType.CREATE){
 
-					tagViewModel.createTag(Tag(title = text))
+					val createdTag = tagViewModel.createTag(Tag(title = text))
+
+					if (createdTag != null){
+						tagViewModel.getTagsList(0, limit)
+					}
 				}
 
 				if (actionType == ActionType.UPDATE){
 
-					tagViewModel.updateTag(Tag(id = itemId.value, title = text))
-				}
+					val updatedTag = tagViewModel.updateTag(Tag(id = itemId.value, title = text))
 
-				if (!tagViewModel.uiState.value.success){
-					showAlert = true
+					if (updatedTag != null){
+						tagViewModel.getTagsList(state.offset, limit)
+					}
 				}
 
 				dialogState.hide()

@@ -19,7 +19,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -40,8 +39,6 @@ import androidx.compose.ui.unit.dp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
@@ -72,8 +69,6 @@ fun ArchiveScreen(
 	val context = LocalContext.current
 
 	val listState = rememberLazyListState()
-
-	var showAlert by remember { mutableStateOf(false) }
 
 	var modalFormLabel by remember { mutableStateOf("") }
 
@@ -107,32 +102,26 @@ fun ArchiveScreen(
 
 
 	LaunchedEffect(Unit) {
+		errorManager.errorEvent.collect { error ->
+			when(error) {
+				NetworkErrorType.NO_INTERNET ->
+					snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE)
 
-		lateinit var errorJob: Job
+				NetworkErrorType.SERVER_ERROR ->
+					snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE)
 
-		errorJob = launch {
-			errorManager.errorEvent.collect { error ->
-
-				when(error){
-					NetworkErrorType.NO_INTERNET ->
-						snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE, duration = SnackbarDuration.Long)
-
-					NetworkErrorType.SERVER_ERROR ->
-						snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE, duration = SnackbarDuration.Long)
-
-					NetworkErrorType.UNAUTHORIZED -> {
-						val intent = Intent(context, WelcomeActivity::class.java).apply {
-							flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-						}
-
-						context.startActivity(intent)
-
-						errorJob.cancel()
-					}
+				NetworkErrorType.UNAUTHORIZED -> {
+					context.startActivity(Intent(context, WelcomeActivity::class.java).apply {
+						flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+					})
+					return@collect
 				}
 			}
 		}
+	}
 
+
+	LaunchedEffect(Unit) {
 		archiveViewModel.getArchivesList(state.offset, limit)
 	}
 
@@ -159,38 +148,31 @@ fun ArchiveScreen(
 					}
 				}
 
-				itemsIndexed(state.list){index, tag ->
+				itemsIndexed(state.list){index, item ->
 
 					Row(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
 						ListItemComponent(
-							tag.id,
-							tag.title,
+							item.title,
 
-							editAction = { text ->
-								actionType = ActionType.READ
+							editAction = {
+								val archive = archiveViewModel.getArchiveById(item.id)
 
-								archiveViewModel.getArchiveById(tag.id)
-
-								if (archiveViewModel.uiState.value.success){
+								if (archive != null) {
 									actionType = ActionType.UPDATE
+									itemText.value = archive.title
+									itemId.value = archive.id
 									modalFormLabel = "Изменить архив"
-									archiveViewModel.uiState.value.data?.let { itemId.value = it.id }
-									archiveViewModel.uiState.value.data?.let { itemText.value = it.title }
 									dialogState.show()
-								}
-
-								else{
-									showAlert = true
 								}
 							},
 
-							deleteAction = {id ->
-								actionType = ActionType.DELETE
+							deleteAction = {
+								val isDeleted = archiveViewModel.deleteArchive(item.id)
 
-								archiveViewModel.deleteArchive(id)
+								if (isDeleted){
+									val offset = if (state.list.size == 1) state.offset - limit else state.offset
 
-								if (!archiveViewModel.uiState.value.success){
-									showAlert = true
+									archiveViewModel.getArchivesList(offset, limit, false)
 								}
 							}
 						)
@@ -269,10 +251,8 @@ fun ArchiveScreen(
 	AlertComponent(
 		success = state.success,
 		message = state.message,
-		showed = showAlert,
-		action = {
-			showAlert = false
-		}
+		showed = state.showAlert,
+		action = { archiveViewModel.dismissAlert()	}
 	)
 
 
@@ -288,16 +268,20 @@ fun ArchiveScreen(
 
 				if (actionType == ActionType.CREATE){
 
-					archiveViewModel.createArchive(Archive(title = text))
+					val createdArchive = archiveViewModel.createArchive(Archive(title = text))
+
+					if (createdArchive != null){
+						archiveViewModel.getArchivesList(0, limit)
+					}
 				}
 
 				if (actionType == ActionType.UPDATE){
 
-					archiveViewModel.updateArchive(Archive(id = itemId.value, title = text))
-				}
+					val updatedArchive = archiveViewModel.updateArchive(Archive(id = itemId.value, title = text))
 
-				if (!archiveViewModel.uiState.value.success){
-					showAlert = true
+					if (updatedArchive != null){
+						archiveViewModel.getArchivesList(state.offset, limit)
+					}
 				}
 
 				dialogState.hide()
