@@ -9,7 +9,8 @@ data class AppUiState<T> (
 	var loading: Boolean = false,
 	var data: T? = null,
 	var offset: Int = 0,
-	var list: MutableList<T> = mutableListOf(),
+	var list: List<T> = listOf(),
+	var showAlert: Boolean = false,
 	var pagination: Pagination? = null,
 	var message: String = ""
 )
