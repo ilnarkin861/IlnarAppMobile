@@ -1,5 +1,6 @@
 package ru.ilnarkin.ilnarapp.viewModels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,6 +10,7 @@ import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.AppPagination
 import ru.ilnarkin.ilnarapp.models.Note
+import ru.ilnarkin.ilnarapp.models.NoteFilter
 import ru.ilnarkin.ilnarapp.repositories.NoteRepository
 import ru.ilnarkin.ilnarapp.ui.AppUiState
 
@@ -19,34 +21,39 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 	val uiState: StateFlow<AppUiState<Note>> = _uiState.asStateFlow()
 
 
-	suspend fun getNotesList(offset: Int, limit: Int, showLoading: Boolean = true){
+	suspend fun getNotesList(offset: Int, limit: Int, filter: NoteFilter? = null, showLoading: Boolean = true): List<Note>{
 
 		try {
-			_uiState.value = _uiState.value.copy(success = false)
 
-			val tagsOffset = if (offset <= 0) 0 else offset
+
+			val notesOffset = if (offset <= 0) 0 else offset
 
 			if (showLoading){
 				_uiState.value = _uiState.value.copy(loading = true)
 			}
 
-			val result = noteRepository.getList<AppPagination<Note>>(tagsOffset, limit, null)
+			val result = noteRepository.getList<AppPagination<Note>>(notesOffset, limit, filter)
+
+			Log.d("NOTES", result.data.joinToString(""))
 
 			_uiState.value = _uiState.value.copy(
 				loading = false,
 				list = result.data,
-				offset = tagsOffset,
+				offset = notesOffset,
 				pagination = result.pagination)
 
-			_uiState.update { it.copy(success = false) }
+			return result.data
 
 		}
 		catch (_: Exception){
 			_uiState.value = _uiState.value.copy(
 				loading = false,
 				success = false,
+				showAlert = true,
 				message = DEFAULT_ERROR_MESSAGE
 			)
+
+			return emptyList()
 		}
 	}
 

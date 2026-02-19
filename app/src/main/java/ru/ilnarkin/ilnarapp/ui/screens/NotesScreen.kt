@@ -164,7 +164,7 @@ fun NotesScreen(
 								LoadButtonComponent(nextButton = false, action = {
 									actionType = ActionType.READ
 
-									noteViewModel.getNotesList(noteViewModelState.offset - notesLimit, notesLimit, false)
+									noteViewModel.getNotesList(noteViewModelState.offset - notesLimit, notesLimit, showLoading = false)
 								})
 							}
 						}
@@ -192,7 +192,7 @@ fun NotesScreen(
 								LoadButtonComponent(action = {
 									actionType = ActionType.READ
 
-									tagViewModel.getTagsList(noteViewModelState.offset + notesLimit, notesLimit, false)
+									noteViewModel.getNotesList(noteViewModelState.offset + notesLimit, notesLimit, showLoading = false)
 								})
 							}
 						}
