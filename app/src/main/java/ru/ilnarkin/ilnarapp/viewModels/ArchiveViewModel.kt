@@ -45,6 +45,7 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 			_uiState.value = _uiState.value.copy(
 				loading = false,
 				success = false,
+				showAlert = true,
 				message = DEFAULT_ERROR_MESSAGE
 			)
 		}

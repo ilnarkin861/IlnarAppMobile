@@ -45,6 +45,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 			_uiState.value = _uiState.value.copy(
 				loading = false,
 				success = false,
+				showAlert = true,
 				message = DEFAULT_ERROR_MESSAGE
 			)
 
