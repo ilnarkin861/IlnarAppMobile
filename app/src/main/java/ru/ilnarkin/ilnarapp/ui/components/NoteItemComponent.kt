@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.helpers.DEFAULT_NOTE_TITLE
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
 import java.time.LocalDate
@@ -81,7 +82,7 @@ fun NoteItemComponent(
 		)){
 			Row {
 				Text(
-					text = note.title,
+					text = note.title ?: DEFAULT_NOTE_TITLE,
 					fontFamily = font,
 					fontWeight = FontWeight.SemiBold,
 					color = colorResource(R.color.title_color),
