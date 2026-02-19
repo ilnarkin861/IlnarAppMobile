@@ -202,6 +202,17 @@ fun NotesScreen(
 
 						editAction = {
 
+							val result = noteViewModel.getNoteById(value.id)
+
+							if (result != null){
+
+								tagViewModel.getTagsList(0, tagsLimit)
+
+								currentNote = result
+								actionType = ActionType.UPDATE
+								sheetTitle.value = "Изменить запись"
+								showNoteFormSheet = true
+							}
 						},
 						deleteAction = {
 
@@ -247,7 +258,6 @@ fun NotesScreen(
 
 					if (!tags.isEmpty()){
 						currentNote = null
-
 						actionType = ActionType.CREATE
 						sheetTitle.value = "Добавить запись"
 						showNoteFormSheet = true
@@ -335,10 +345,18 @@ fun NotesScreen(
 								val createdNote = noteViewModel.createNote(note)
 
 								if (createdNote != null){
-									noteViewModel.getNotesList(noteViewModelState.offset, notesLimit)
+									noteViewModel.getNotesList(0, notesLimit)
 								}
 							}
 
+							if (actionType == ActionType.UPDATE){
+
+								val updatedNote = noteViewModel.updateNote(note)
+
+								if (updatedNote != null){
+									noteViewModel.getNotesList(noteViewModelState.offset, notesLimit)
+								}
+							}
 
 							noteFormSheetState.hide()
 

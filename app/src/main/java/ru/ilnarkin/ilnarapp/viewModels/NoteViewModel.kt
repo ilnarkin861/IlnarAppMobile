@@ -90,8 +90,6 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 	suspend fun createNote(note: Note): Note?{
 
 		return try {
-			_uiState.value = _uiState.value.copy(success = false)
-
 			noteRepository.create<Note>(note)
 		}
 
@@ -110,6 +108,33 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				success = false,
 				showAlert = true,
 				message = "Ошибка при добавлении записи")
+
+			null
+		}
+	}
+
+
+	suspend fun updateNote(note: Note): Note?{
+
+		return try {
+			noteRepository.update<Note>(note.id, note)
+		}
+
+		catch (e: ApiException){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				showAlert = true,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)
+
+			null
+		}
+
+		catch (_: Exception){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				showAlert = true,
+				message = "Ошибка при изменении записи")
 
 			null
 		}
