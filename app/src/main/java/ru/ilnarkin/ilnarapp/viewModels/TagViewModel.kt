@@ -21,7 +21,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 	suspend fun getTagsList(offset: Int, limit: Int, showLoading: Boolean = true): List<Tag>{
 
-		try {
+		return try {
 			_uiState.value = _uiState.value.copy(success = false)
 
 			val tagsOffset = if (offset <= 0) 0 else offset
@@ -38,7 +38,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 				offset = tagsOffset,
 				pagination = result.pagination)
 
-			return result.data
+			result.data
 
 		}
 		catch (_: Exception){
@@ -57,8 +57,6 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 	suspend fun getTagById(id: String): Tag?{
 
 		return try {
-			_uiState.value = _uiState.value.copy(showAlert = false, data = null)
-
 			tagRepository.getById<Tag>(id) as Tag
 		}
 
@@ -78,7 +76,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 				success = false,
 				data = null,
 				showAlert = true,
-				message = DEFAULT_ERROR_MESSAGE)
+				message = "Ошибка при получении тега")
 
 			null
 		}
@@ -87,10 +85,8 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 	suspend fun createTag(tag: Tag): Tag?{
 
-		try {
-			_uiState.value = _uiState.value.copy(success = false)
-
-			return tagRepository.create<Tag>(tag)
+		return try {
+			tagRepository.create<Tag>(tag)
 		}
 
 		catch (e: ApiException){
@@ -100,7 +96,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
 			)
 
-			return null
+			null
 		}
 
 		catch (_: Exception){
@@ -109,17 +105,15 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 				showAlert = true,
 				message = "Ошибка при добавлении тега")
 
-			return null
+			null
 		}
 	}
 
 
 	suspend fun updateTag(tag: Tag): Tag?{
 
-		try {
-			_uiState.value = _uiState.value.copy(success = false)
-
-			return tagRepository.update<Tag>(tag.id, tag)
+		return try {
+			tagRepository.update<Tag>(tag.id, tag)
 		}
 
 		catch (e: ApiException){
@@ -129,7 +123,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
 			)
 
-			return null
+			null
 		}
 
 		catch (_: Exception){
@@ -137,7 +131,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 				success = false,
 				showAlert = true,
 				message = "Ошибка при обновлении тега")
-			return null
+			null
 		}
 	}
 
@@ -145,16 +139,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 	suspend fun deleteTag(id: String): Boolean{
 
 		return try {
-			_uiState.value = _uiState.value.copy(success = false)
-
 			tagRepository.delete(id)
-			
-			_uiState.value = _uiState.value.copy(
-				success = true,
-				message = "Тег успешно удален"
-			)
-
-			true
 		}
 
 		catch (e: ApiException){

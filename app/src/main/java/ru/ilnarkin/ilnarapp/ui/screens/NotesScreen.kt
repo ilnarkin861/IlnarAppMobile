@@ -33,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
@@ -91,6 +93,8 @@ fun NotesScreen(
 	var showNoteFormSheet by remember { mutableStateOf(false) }
 	var showNoteDetailsSheet by remember { mutableStateOf(false) }
 
+	val scope = rememberCoroutineScope()
+
 	val listState = rememberLazyListState()
 
 	val noteFormSheetState = rememberModalBottomSheetState()
@@ -114,11 +118,19 @@ fun NotesScreen(
 	LaunchedEffect(Unit) {
 		errorManager.errorEvent.collect { error ->
 			when(error) {
-				NetworkErrorType.NO_INTERNET ->
+				NetworkErrorType.NO_INTERNET ->{
+					showNoteDetailsSheet = false
+					noteDetailsLoading = false
+					currentNote = null
 					snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE)
+				}
 
-				NetworkErrorType.SERVER_ERROR ->
+				NetworkErrorType.SERVER_ERROR -> {
+					showNoteDetailsSheet = false
+					noteDetailsLoading = false
+					currentNote = null
 					snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE)
+				}
 
 				NetworkErrorType.UNAUTHORIZED -> {
 					context.startActivity(Intent(context, WelcomeActivity::class.java).apply {
@@ -129,7 +141,6 @@ fun NotesScreen(
 			}
 		}
 	}
-
 
 
 	LaunchedEffect(Unit) {
@@ -176,9 +187,21 @@ fun NotesScreen(
 						value,
 						viewAction = {
 
+							showNoteDetailsSheet = true
+
+							noteDetailsLoading = true
+
+							val result = noteViewModel.getNoteById(value.id)
+
+							if (result != null ){
+								currentNote = result
+							}
+
+							noteDetailsLoading = false
 						},
 
 						editAction = {
+
 						},
 						deleteAction = {
 
@@ -202,7 +225,9 @@ fun NotesScreen(
 		}
 
 		if (!noteViewModelState.loading && noteViewModelState.list.isEmpty()){
-			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
+			Box(modifier = Modifier
+				.background(colorResource(R.color.app_bg_color))
+				.fillMaxSize(),
 				contentAlignment = Alignment.Center){
 				MessageComponent("Записей нет")
 			}
@@ -217,9 +242,15 @@ fun NotesScreen(
 				.absolutePadding(bottom = 30.dp, right = 30.dp)
 				.background(Color.Transparent),
 			onClick = {
-				actionType = ActionType.CREATE
-				sheetTitle.value = "Добавить запись"
-				showNoteFormSheet = true
+				scope.launch {
+					tagViewModel.getTagsList(0, tagsLimit)
+
+					currentNote = null
+
+					actionType = ActionType.CREATE
+					sheetTitle.value = "Добавить запись"
+					showNoteFormSheet = true
+				}
 			}) {
 			Icon(modifier = Modifier.size(25.dp),
 				painter = painterResource(R.drawable.ic_plus),
@@ -228,7 +259,9 @@ fun NotesScreen(
 
 		SnackbarHost(
 			hostState = snackBarHostState,
-			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter)
+			modifier = Modifier
+				.padding(16.dp)
+				.align(Alignment.BottomCenter)
 		){data ->
 			Snackbar(
 				snackbarData = data,
@@ -321,7 +354,10 @@ fun NotesScreen(
 	// Details sheet
 	if (showNoteDetailsSheet){
 		ModalBottomSheet(
-			onDismissRequest = { showNoteDetailsSheet = false },
+			onDismissRequest = {
+				showNoteDetailsSheet = false
+				currentNote = null
+			},
 			containerColor = Color.White,
 			sheetState = noteDetailsSheetState,
 		) {
@@ -336,7 +372,9 @@ fun NotesScreen(
 				}
 			}
 
-			else { NoteDetailsComponent(currentNote) }
+			if(!noteDetailsLoading && currentNote != null){
+				NoteDetailsComponent(currentNote)
+			}
 		}
 	}
 }

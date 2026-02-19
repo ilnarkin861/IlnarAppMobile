@@ -51,7 +51,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun NoteItemComponent(
 	note: Note,
-	viewAction: (note: Note) -> Unit,
+	viewAction: suspend (note: Note) -> Unit,
 	editAction: (note: Note) -> Unit,
 	deleteAction: suspend (note: Note) -> Unit
 	) {
@@ -131,7 +131,11 @@ fun NoteItemComponent(
 						modifier = Modifier.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
-							onClick = { viewAction(note) }
+							onClick = {
+
+								scope.launch { viewAction(note) }
+
+							}
 						),
 						color = colorResource(R.color.primary_color),
 						text = "Читаем полностью",
