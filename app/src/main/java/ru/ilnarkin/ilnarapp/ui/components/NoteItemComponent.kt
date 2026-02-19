@@ -51,10 +51,12 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun NoteItemComponent(
 	note: Note,
-	viewAction: suspend (note: Note) -> Unit,
-	editAction: (note: Note) -> Unit,
-	deleteAction: suspend (note: Note) -> Unit
+	viewAction: suspend () -> Unit,
+	editAction: suspend () -> Unit,
+	deleteAction: suspend () -> Unit
 	) {
+
+	var saving by remember { mutableStateOf(false) }
 
 	var deleting by remember { mutableStateOf(false) }
 
@@ -133,7 +135,7 @@ fun NoteItemComponent(
 							indication = null,
 							onClick = {
 
-								scope.launch { viewAction(note) }
+								scope.launch { viewAction() }
 
 							}
 						),
@@ -150,8 +152,24 @@ fun NoteItemComponent(
 					Row(Modifier.size(35.dp),
 						horizontalArrangement = Arrangement.Center,
 						verticalAlignment = Alignment.CenterVertically) {
+
+						if (saving){
+							Row(modifier = Modifier.fillMaxSize(),
+								horizontalArrangement = Arrangement.Center,
+								verticalAlignment = Alignment.CenterVertically) {
+								ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
+							}
+						}
+
 						IconButton(onClick = {
-							editAction(note)
+							scope.launch {
+								saving = true
+								try {
+									editAction()
+								} finally {
+									saving = false
+								}
+							}
 						}) {
 							Icon(modifier = Modifier.size(22.dp),
 								painter = painterResource(R.drawable.ic_edit), contentDescription = "",
@@ -193,11 +211,13 @@ fun NoteItemComponent(
 				deleting = true
 
 				scope.launch {
-					scope.async {
-						deleteAction(note)
-					}.await()
-				}.invokeOnCompletion{ deleting = false }
-
+					deleting = true
+					try {
+						deleteAction()
+					} finally {
+						deleting = false
+					}
+				}
 			}
 
 			showConfirmAlert = false

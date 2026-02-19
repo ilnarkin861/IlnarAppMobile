@@ -543,7 +543,7 @@ fun NoteFormComponent(
 						uploadableTags.addAll(selectedTags)
 						uploadableTags.addAll(addedTags)
 
-						val note = Note(
+						val updatableNote = Note(
 							title = noteTitle.value,
 							text = noteText.value,
 							noteType = selectedNoteType.value,
@@ -552,10 +552,14 @@ fun NoteFormComponent(
 							tags =  uploadableTags
 						)
 
+						if(note != null){
+							updatableNote.id = note.id
+						}
+
 						scope.launch {
 							saving = true
 							try {
-								action(note)
+								action(updatableNote)
 							} finally {
 								saving = false
 							}

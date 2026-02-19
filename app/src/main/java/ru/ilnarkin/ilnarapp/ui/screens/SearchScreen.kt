@@ -129,36 +129,10 @@ fun SearchScreen() {
 				items(notes) {value ->
 					NoteItemComponent(
 						value,
-						viewAction = {note ->
-							currentNote = null
-
-							showNoteDetailsSheet = true
-
-							noteDetailsLoading = true
-
-							scope.launch {
-								delay(2500)
-							}.invokeOnCompletion {
-								note.text = noteFullText
-								currentNote = note
-								noteDetailsLoading = false
-							}
+						viewAction = {
 						},
 
-						editAction = {note ->
-							actionType = ActionType.UPDATE
-							sheetTitle.value = "Изменить запись"
-
-							noteDetailsLoading = true
-							showNoteFormSheet = true
-
-							scope.launch {
-								delay(2500)
-							}.invokeOnCompletion {
-								note.text = noteFullText
-								currentNote = note
-								noteDetailsLoading = false
-							}
+						editAction = {
 						},
 
 						deleteAction = {
