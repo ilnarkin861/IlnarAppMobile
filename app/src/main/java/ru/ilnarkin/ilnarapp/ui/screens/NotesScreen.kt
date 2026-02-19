@@ -289,8 +289,8 @@ fun NotesScreen(
 						hasNextTags = tagViewModelState.pagination?.hasNextPage ?: false,
 
 						loadTags = {
-							tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
-							tagViewModelState.list.toMutableList()
+							val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
+							tags.toMutableList()
 						},
 
 						action = {note ->
