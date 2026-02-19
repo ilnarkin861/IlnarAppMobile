@@ -243,13 +243,15 @@ fun NotesScreen(
 				.background(Color.Transparent),
 			onClick = {
 				scope.launch {
-					tagViewModel.getTagsList(0, tagsLimit)
+					val tags = tagViewModel.getTagsList(0, tagsLimit)
 
-					currentNote = null
+					if (!tags.isEmpty()){
+						currentNote = null
 
-					actionType = ActionType.CREATE
-					sheetTitle.value = "Добавить запись"
-					showNoteFormSheet = true
+						actionType = ActionType.CREATE
+						sheetTitle.value = "Добавить запись"
+						showNoteFormSheet = true
+					}
 				}
 			}) {
 			Icon(modifier = Modifier.size(25.dp),
