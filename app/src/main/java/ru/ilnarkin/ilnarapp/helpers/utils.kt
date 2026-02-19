@@ -7,6 +7,7 @@ import androidx.compose.ui.text.googlefonts.GoogleFont
 import ru.ilnarkin.ilnarapp.R
 
 
+const val DEFAULT_NOTE_TITLE = "Без названия"
 const val DEFAULT_ERROR_MESSAGE = "Что-то пошло не так. Попробуй еще"
 const val NO_INTERNET_ERROR_MESSAGE = "Проверь интернет соединение"
 const val SERVER_ERROR_MESSAGE = "Сервер недоступен"
