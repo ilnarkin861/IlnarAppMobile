@@ -1,6 +1,5 @@
 package ru.ilnarkin.ilnarapp.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
