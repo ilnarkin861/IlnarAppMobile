@@ -19,7 +19,7 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 	val uiState: StateFlow<AppUiState<Archive>> = _uiState.asStateFlow()
 
 
-	suspend fun getArchivesList(offset: Int, limit: Int, showLoading: Boolean = true){
+	suspend fun getArchivesList(offset: Int, limit: Int, showLoading: Boolean = true): List<Archive>{
 
 		try {
 			_uiState.value = _uiState.value.copy(success = false)
@@ -38,7 +38,7 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 				offset = tagsOffset,
 				pagination = result.pagination)
 
-			_uiState.update { it.copy(success = false) }
+			return result.data
 
 		}
 		catch (_: Exception){
@@ -48,6 +48,8 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 				showAlert = true,
 				message = DEFAULT_ERROR_MESSAGE
 			)
+
+			return emptyList()
 		}
 	}
 

@@ -18,7 +18,7 @@ class NoteTypeViewModel(private val noteTypeRepository: NoteTypeRepository) : Vi
 	val uiState: StateFlow<AppUiState<NoteType>> = _uiState.asStateFlow()
 
 
-	suspend fun getNoteTypesList(offset: Int, limit: Int, showLoading: Boolean = true){
+	suspend fun getNoteTypesList(offset: Int, limit: Int, showLoading: Boolean = true): List<NoteType>{
 
 		try {
 			_uiState.value = _uiState.value.copy(success = false)
@@ -37,7 +37,7 @@ class NoteTypeViewModel(private val noteTypeRepository: NoteTypeRepository) : Vi
 				offset = tagsOffset,
 				pagination = result.pagination)
 
-			_uiState.update { it.copy(success = false) }
+			return result.data
 
 		}
 		catch (_: Exception){
@@ -46,6 +46,8 @@ class NoteTypeViewModel(private val noteTypeRepository: NoteTypeRepository) : Vi
 				success = false,
 				message = DEFAULT_ERROR_MESSAGE
 			)
+
+			return emptyList()
 		}
 	}
 }
