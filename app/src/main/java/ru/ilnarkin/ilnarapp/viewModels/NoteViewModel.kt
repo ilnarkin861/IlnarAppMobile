@@ -23,8 +23,7 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 
 	suspend fun getNotesList(offset: Int, limit: Int, filter: NoteFilter? = null, showLoading: Boolean = true): List<Note>{
 
-		try {
-
+		return try {
 
 			val notesOffset = if (offset <= 0) 0 else offset
 
@@ -34,34 +33,35 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 
 			val result = noteRepository.getList<AppPagination<Note>>(notesOffset, limit, filter)
 
-			Log.d("NOTES", result.data.joinToString(""))
-
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				loading = false,
-				list = result.data,
 				offset = notesOffset,
-				pagination = result.pagination)
+				pagination = result.pagination,
+				list = result.data)
+			}
 
-			return result.data
+			result.data
 
 		}
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				loading = false,
 				success = false,
+				list = emptyList(),
 				showAlert = true,
 				message = DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
-			return emptyList()
+			emptyList()
 		}
 	}
 
 
 	suspend fun getNoteById(id: String): Note?{
-		return try {
+		try {
 
-			noteRepository.getById<Note>(id)
+			return noteRepository.getById<Note>(id)
+
 		}
 
 		catch (e: ApiException){
@@ -72,7 +72,7 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
 			)
 
-			null
+			return null
 		}
 
 		catch (_: Exception){
@@ -82,15 +82,15 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				showAlert = true,
 				message = "Ошибка при получении записи")
 
-			null
+			return null
 		}
 	}
 
 
 	suspend fun createNote(note: Note): Note?{
 
-		return try {
-			noteRepository.create<Note>(note)
+		try {
+			return noteRepository.create<Note>(note)
 		}
 
 		catch (e: ApiException){
@@ -100,7 +100,7 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
 			)
 
-			null
+			return null
 		}
 
 		catch (_: Exception){
@@ -109,15 +109,15 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				showAlert = true,
 				message = "Ошибка при добавлении записи")
 
-			null
+			return null
 		}
 	}
 
 
 	suspend fun updateNote(note: Note): Note?{
 
-		return try {
-			noteRepository.update<Note>(note.id, note)
+		try {
+			return noteRepository.update<Note>(note.id, note)
 		}
 
 		catch (e: ApiException){
@@ -127,7 +127,7 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
 			)
 
-			null
+			return null
 		}
 
 		catch (_: Exception){
@@ -136,7 +136,34 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				showAlert = true,
 				message = "Ошибка при изменении записи")
 
-			null
+			return null
+		}
+	}
+
+
+	suspend fun deleteNote(id: String): Boolean{
+
+		try {
+			return noteRepository.delete(id)
+		}
+
+		catch (e: ApiException){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				showAlert = true,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)
+
+			return false
+		}
+
+		catch (_: Exception){
+			_uiState.value = _uiState.value.copy(
+				success = false,
+				showAlert = true,
+				message = "Ошибка при изменении записи")
+
+			return false
 		}
 	}
 

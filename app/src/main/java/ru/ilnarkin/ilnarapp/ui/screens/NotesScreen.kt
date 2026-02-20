@@ -187,13 +187,15 @@ fun NotesScreen(
 						value,
 						viewAction = {
 
+							currentNote = null
+
 							showNoteDetailsSheet = true
 
 							noteDetailsLoading = true
 
 							val result = noteViewModel.getNoteById(value.id)
 
-							if (result != null ){
+							if (result != null){
 								currentNote = result
 							}
 
@@ -214,7 +216,16 @@ fun NotesScreen(
 								showNoteFormSheet = true
 							}
 						},
+
 						deleteAction = {
+
+							val isDeleted = noteViewModel.deleteNote(value.id)
+
+							if (isDeleted){
+								val offset = if (noteViewModelState.list.size == 1) noteViewModelState.offset - notesLimit else noteViewModelState.offset
+
+								noteViewModel.getNotesList(offset, notesLimit, showLoading = false)
+							}
 
 						})
 				}
