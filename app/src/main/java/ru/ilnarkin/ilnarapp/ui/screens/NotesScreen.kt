@@ -98,7 +98,7 @@ fun NotesScreen(
 
 	val listState = rememberLazyListState()
 
-	val noteFormSheetState = rememberModalBottomSheetState()
+	val noteFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	val noteDetailsSheetState = rememberModalBottomSheetState()
 
 	val sheetTitle = remember { mutableStateOf("") }
