@@ -282,14 +282,12 @@ fun NotesScreen(
 				onClick = {
 
 					scope.launch {
-						val tags = tagViewModel.getTagsList(0, tagsLimit)
+						tagViewModel.getTagsList(0, tagsLimit)
 
-						if (!tags.isEmpty()){
-							currentNote = null
-							actionType = ActionType.CREATE
-							sheetTitle.value = "Добавить запись"
-							showNoteFormSheet = true
-						}
+						currentNote = null
+						actionType = ActionType.CREATE
+						sheetTitle.value = "Добавить запись"
+						showNoteFormSheet = true
 					}
 				}) {
 				Icon(modifier = Modifier.size(25.dp),
