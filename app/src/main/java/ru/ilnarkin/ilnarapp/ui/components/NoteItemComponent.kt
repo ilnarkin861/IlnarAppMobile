@@ -66,6 +66,8 @@ fun NoteItemComponent(
 
 	val font = getInterFont()
 
+	val titleColor = if (note.title != null) colorResource(R.color.title_color) else colorResource(R.color.title_color).copy(alpha = 0.3f)
+
 
 	Box(
 		Modifier.fillMaxSize()
@@ -93,12 +95,12 @@ fun NoteItemComponent(
 					text = note.title ?: DEFAULT_NOTE_TITLE,
 					fontFamily = font,
 					fontWeight = FontWeight.SemiBold,
-					color = colorResource(R.color.title_color),
+					color = titleColor,
 					fontSize = dimensionResource(R.dimen.note_item_title_font_size).value.sp
 				)
 			}
 
-			Row(Modifier.padding(top = 5.dp)) {
+			Row(Modifier.padding(top = 5.dp, bottom = 20.dp)) {
 				Text(
 					text = DateTimeFormatter
 						.ofPattern("dd.MM.yyyy")
