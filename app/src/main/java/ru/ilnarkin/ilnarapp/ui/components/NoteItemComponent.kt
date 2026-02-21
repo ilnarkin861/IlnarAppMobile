@@ -128,7 +128,7 @@ fun NoteItemComponent(
 			Row { HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))	}
 
 			Row(
-				Modifier.padding(top = 30.dp).fillMaxWidth(),
+				Modifier.padding(top = 20.dp).fillMaxWidth(),
 				verticalAlignment = Alignment.CenterVertically,
 				) {
 
