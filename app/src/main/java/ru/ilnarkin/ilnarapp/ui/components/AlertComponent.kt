@@ -57,13 +57,13 @@ fun AlertComponent(
 			) {
 				if (!success)
 					Icon(
-						modifier = Modifier.size(60.dp),
+						modifier = Modifier.size(70.dp),
 						painter = painterResource(R.drawable.ic_error),
 						contentDescription = "",
 						tint = colorResource(R.color.danger_color))
 				else{
 					Icon(
-						modifier = Modifier.size(60.dp),
+						modifier = Modifier.size(70.dp),
 						painter = painterResource(R.drawable.ic_success),
 						contentDescription = "",
 						tint = colorResource(R.color.primary_color))
