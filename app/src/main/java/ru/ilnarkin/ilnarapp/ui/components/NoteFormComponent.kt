@@ -267,6 +267,7 @@ fun NoteFormComponent(
 			trailingIcon = {
 				IconButton(onClick = { dateDialogState.show() }) {
 					Icon(
+						modifier = Modifier.size(30.dp),
 						painter = painterResource(R.drawable.ic_calendar),
 						contentDescription = "Выбрать дату",
 						tint = colorResource(R.color.primary_color)
