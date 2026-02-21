@@ -133,18 +133,18 @@ fun BottomNavigationBar(navController: NavController) {
 		)
 
 		NavigationBarItem(
-			selected = currentRoute == NavRoutes.SearchScreen.route,
+			selected = currentRoute == NavRoutes.SettingsScreen.route,
 			colors = colors,
-			icon = { Icon(painter = painterResource(R.drawable.ic_search), contentDescription = "") },
+			icon = { Icon(painter = painterResource(R.drawable.ic_user_settings), contentDescription = "") },
 			label = { Text(
-				text = stringResource(R.string.search_title),
+				text = stringResource(R.string.settings_title),
 				fontFamily = getInterFont(),
 				fontSize = dimensionResource(R.dimen.bottom_bar_label_font_size).value.sp,
 				fontWeight = FontWeight.Bold)
 			},
 			onClick = {
-				if (currentRoute != NavRoutes.SearchScreen.route){
-					navController.navigate(NavRoutes.SearchScreen.route) {
+				if (currentRoute != NavRoutes.SettingsScreen.route){
+					navController.navigate(NavRoutes.SettingsScreen.route) {
 						launchSingleTop = true
 						restoreState = false
 
