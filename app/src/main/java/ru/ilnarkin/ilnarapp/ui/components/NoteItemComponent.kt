@@ -156,7 +156,7 @@ fun NoteItemComponent(
 								}
 							}
 						}) {
-							Icon(modifier = Modifier.size(22.dp),
+							Icon(modifier = Modifier.size(25.dp),
 								painter = painterResource(R.drawable.ic_edit), contentDescription = "",
 								tint = colorResource(R.color.primary_color))
 						}
@@ -176,7 +176,7 @@ fun NoteItemComponent(
 								showConfirmAlert = true
 							}) {
 								Icon(
-									modifier = Modifier.size(22.dp),
+									modifier = Modifier.size(25.dp),
 									painter = painterResource(R.drawable.ic_trash), contentDescription = "",
 									tint = colorResource(R.color.danger_color))
 							}
