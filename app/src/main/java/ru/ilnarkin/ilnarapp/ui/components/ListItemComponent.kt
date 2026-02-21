@@ -79,7 +79,7 @@ fun ListItemComponent(
                         }
 
                     }) {
-                        Icon(modifier = Modifier.size(22.dp),
+                        Icon(modifier = Modifier.size(25.dp),
                             painter = painterResource(R.drawable.ic_edit), contentDescription = "",
                             tint = colorResource(R.color.primary_color))
                     }
@@ -87,7 +87,7 @@ fun ListItemComponent(
             }
 
 
-            Row(Modifier.size(35.dp).padding(start = 10.dp),
+            Row(Modifier.size(35.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
                 if (isDeleting){
@@ -99,7 +99,7 @@ fun ListItemComponent(
                         showConfirmAlert = true
                     }) {
                         Icon(
-                            modifier = Modifier.size(22.dp),
+                            modifier = Modifier.size(25.dp),
                             painter = painterResource(R.drawable.ic_trash), contentDescription = "",
                             tint = colorResource(R.color.danger_color))
                     }
