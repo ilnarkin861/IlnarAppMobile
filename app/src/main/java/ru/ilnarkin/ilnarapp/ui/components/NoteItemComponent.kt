@@ -19,6 +19,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +38,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_NOTE_TITLE
@@ -73,7 +73,13 @@ fun NoteItemComponent(
 			.padding(bottom = 15.dp)
 			.clip(RoundedCornerShape(10.dp))
 			.background(color = Color.White)
-
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = ripple(),
+				onClick = {
+					scope.launch { viewAction() }
+				}
+			)
 	) {
 
 		Column (Modifier.padding(
@@ -122,30 +128,7 @@ fun NoteItemComponent(
 			Row(
 				Modifier.padding(top = 30.dp).fillMaxWidth(),
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.SpaceBetween
 				) {
-				Row (
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.Center
-					) {
-
-					Text(
-						modifier = Modifier.clickable(
-							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
-							onClick = {
-
-								scope.launch { viewAction() }
-
-							}
-						),
-						color = colorResource(R.color.primary_color),
-						text = "Читаем полностью",
-						fontFamily = font,
-						fontSize = 15.sp,
-						fontWeight = FontWeight.Bold
-					)
-				}
 
 				Row(verticalAlignment = Alignment.CenterVertically){
 
