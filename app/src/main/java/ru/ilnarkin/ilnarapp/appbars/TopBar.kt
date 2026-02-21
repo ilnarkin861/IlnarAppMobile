@@ -1,6 +1,7 @@
 package ru.ilnarkin.ilnarapp.appbars
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,24 +64,16 @@ fun TopBar (navController: NavController) {
 
 		actions = {
 			IconButton(
+				modifier = Modifier.padding(end = 10.dp).size(30.dp),
 				colors = IconButtonDefaults.iconButtonColors(
 					contentColor = colorResource(R.color.primary_color)
 				),
 				onClick = {
-					if (route != NavRoutes.SettingsScreen.route){
-						navController.navigate(NavRoutes.SettingsScreen.route) {
-							launchSingleTop = true
-							restoreState = false
 
-							popUpTo(NavRoutes.SettingsScreen.route){
-								saveState = true
-							}
-						}
-					}
 				}
 			) {
 				Icon(
-					painter = painterResource(R.drawable.ic_settings),
+					painter = painterResource(R.drawable.ic_logout),
 					contentDescription = ""
 				)
 			}
