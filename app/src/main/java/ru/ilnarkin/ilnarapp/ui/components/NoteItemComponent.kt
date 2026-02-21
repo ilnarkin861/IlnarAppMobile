@@ -109,11 +109,9 @@ fun NoteItemComponent(
 				)
 			}
 
-			Row(Modifier.padding(vertical = 15.dp)) {
-				HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
-			}
+			Row { HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))	}
 
-			Row {
+			Row(Modifier.padding(vertical = 15.dp)) {
 				Text(
 					text = note.text,
 					maxLines = 3,
@@ -124,6 +122,8 @@ fun NoteItemComponent(
 					fontSize = dimensionResource(R.dimen.note_item_text_font_size).value.sp
 				)
 			}
+
+			Row { HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))	}
 
 			Row(
 				Modifier.padding(top = 30.dp).fillMaxWidth(),
