@@ -221,7 +221,7 @@ fun ArchiveScreen(
 			shape = CircleShape,
 			modifier = Modifier
 				.align(Alignment.BottomEnd)
-				.absolutePadding(bottom = 30.dp, right = 30.dp)
+				.absolutePadding(bottom = 20.dp, right = 20.dp)
 				.background(Color.Transparent),
 			onClick = {
 				actionType = ActionType.CREATE
