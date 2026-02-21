@@ -173,29 +173,6 @@ fun SettingsScreen() {
 				}
 			}
 		}
-
-		Row(Modifier.fillMaxWidth().padding(top = 30.dp).clickable(
-			interactionSource = remember { MutableInteractionSource() },
-			indication = ripple(),
-			onClick = { showConfirmAlert = true }
-		)) {
-			Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
-				verticalAlignment = Alignment.CenterVertically) {
-				Row(verticalAlignment = Alignment.CenterVertically) {
-					Icon(
-						modifier = Modifier.size(25.dp),
-						painter = painterResource(R.drawable.ic_logout),
-						contentDescription = "Logout",
-						tint = colorResource(R.color.danger_color)
-					)
-					Text(text = "Выйти из приложения",
-						modifier = Modifier.padding(start = 10.dp),
-						fontFamily = font,
-						fontSize = 16.sp,
-						color = colorResource(R.color.danger_color))
-				}
-			}
-		}
 	}
 
 
@@ -204,20 +181,6 @@ fun SettingsScreen() {
 		message = alertTitle.value,
 		showed = showAlert,
 		action = { showAlert = false }
-	)
-
-
-	ConfirmComponent(
-		showed = showConfirmAlert,
-		text = "Точно хочешь выйти?",
-		action = {confirmed ->
-
-			if (confirmed){
-				context.startActivity(intent)
-			}
-
-			showConfirmAlert = false
-		}
 	)
 
 
