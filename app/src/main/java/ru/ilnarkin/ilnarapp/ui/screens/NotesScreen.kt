@@ -4,11 +4,11 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -166,7 +167,7 @@ fun NotesScreen(
 		if (!noteViewModelState.loading && !noteViewModelState.list.isEmpty()){
 			LazyColumn(
 				state = listState,
-				contentPadding = PaddingValues(top = 30.dp, bottom = 60.dp)) {
+				contentPadding = PaddingValues(top = 30.dp)) {
 
 				noteViewModelState.pagination?.let {
 					if (it.hasPreviousPage){
@@ -255,30 +256,49 @@ fun NotesScreen(
 			}
 		}
 
-		FloatingActionButton(
-			containerColor = colorResource(R.color.primary_color),
-			contentColor = Color.White,
-			shape = CircleShape,
-			modifier = Modifier
-				.align(Alignment.BottomEnd)
-				.absolutePadding(bottom = 30.dp, right = 30.dp)
-				.background(Color.Transparent),
-			onClick = {
-				scope.launch {
-					val tags = tagViewModel.getTagsList(0, tagsLimit)
 
-					if (!tags.isEmpty()){
-						currentNote = null
-						actionType = ActionType.CREATE
-						sheetTitle.value = "Добавить запись"
-						showNoteFormSheet = true
+		Column(
+			modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
+			horizontalAlignment = Alignment.End,
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+
+			SmallFloatingActionButton(
+				modifier = Modifier.align(Alignment.CenterHorizontally),
+				shape = CircleShape,
+				containerColor = Color.White,
+				contentColor = colorResource(R.color.primary_color),
+				onClick = { }) {
+
+				Icon(painter = painterResource(R.drawable.ic_filter), contentDescription = "Filter")
+			}
+
+			FloatingActionButton(
+				containerColor = colorResource(R.color.primary_color),
+				contentColor = Color.White,
+				shape = CircleShape,
+				modifier = Modifier
+					.background(Color.Transparent),
+				onClick = {
+
+					scope.launch {
+						val tags = tagViewModel.getTagsList(0, tagsLimit)
+
+						if (!tags.isEmpty()){
+							currentNote = null
+							actionType = ActionType.CREATE
+							sheetTitle.value = "Добавить запись"
+							showNoteFormSheet = true
+						}
 					}
-				}
-			}) {
-			Icon(modifier = Modifier.size(25.dp),
-				painter = painterResource(R.drawable.ic_plus),
-				contentDescription = "Добавить")
+				}) {
+				Icon(modifier = Modifier.size(25.dp),
+					painter = painterResource(R.drawable.ic_plus),
+					contentDescription = "Добавить")
+			}
 		}
+
+
 
 		SnackbarHost(
 			hostState = snackBarHostState,
