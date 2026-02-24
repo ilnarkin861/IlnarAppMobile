@@ -47,6 +47,7 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 				loading = false,
 				success = false,
 				showAlert = true,
+				list = emptyList(),
 				message = DEFAULT_ERROR_MESSAGE
 			)
 

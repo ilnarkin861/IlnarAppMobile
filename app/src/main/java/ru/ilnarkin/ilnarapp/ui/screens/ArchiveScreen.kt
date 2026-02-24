@@ -85,22 +85,6 @@ fun ArchiveScreen(
 	val snackBarHostState = remember { SnackbarHostState() }
 
 
-	LaunchedEffect(state.success) {
-		if (state.success){
-			when(actionType){
-				ActionType.CREATE -> archiveViewModel.getArchivesList(0, limit)
-				ActionType.UPDATE -> archiveViewModel.getArchivesList(state.offset, limit)
-				ActionType.DELETE -> {
-					val offset = if (state.list.size == 1) state.offset - limit else state.offset
-
-					archiveViewModel.getArchivesList(offset, limit)
-				}
-				else -> {}
-			}
-		}
-	}
-
-
 	LaunchedEffect(Unit) {
 		errorManager.errorEvent.collect { error ->
 			when(error) {
