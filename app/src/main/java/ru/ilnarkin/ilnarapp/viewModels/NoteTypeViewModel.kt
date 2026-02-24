@@ -20,7 +20,7 @@ class NoteTypeViewModel(private val noteTypeRepository: NoteTypeRepository) : Vi
 	suspend fun getNoteTypesList(offset: Int, limit: Int, showLoading: Boolean = true): List<NoteType>{
 
 		try {
-			_uiState.value = _uiState.value.copy(success = false)
+			_uiState.value = _uiState.value.copy(success = false, showAlert = false)
 
 			val tagsOffset = if (offset <= 0) 0 else offset
 
@@ -32,6 +32,7 @@ class NoteTypeViewModel(private val noteTypeRepository: NoteTypeRepository) : Vi
 
 			_uiState.value = _uiState.value.copy(
 				loading = false,
+				success = true,
 				list = result.data,
 				offset = tagsOffset,
 				pagination = result.pagination)
@@ -43,7 +44,8 @@ class NoteTypeViewModel(private val noteTypeRepository: NoteTypeRepository) : Vi
 			_uiState.value = _uiState.value.copy(
 				loading = false,
 				success = false,
-				message = DEFAULT_ERROR_MESSAGE
+				showAlert = true,
+				message = "Ошибка при получении типов записи"
 			)
 
 			return emptyList()

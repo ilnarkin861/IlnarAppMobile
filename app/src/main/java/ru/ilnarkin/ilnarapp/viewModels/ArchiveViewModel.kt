@@ -34,6 +34,7 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 
 			_uiState.value = _uiState.value.copy(
 				loading = false,
+				success = true,
 				list = result.data,
 				offset = tagsOffset,
 				pagination = result.pagination)

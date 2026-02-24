@@ -115,6 +115,8 @@ fun NotesScreen(
 
 	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
 
+	var floatingButtonsVisible by remember { mutableStateOf(false) }
+
 
 	LaunchedEffect(Unit) {
 		errorManager.errorEvent.collect { error ->
@@ -146,9 +148,8 @@ fun NotesScreen(
 
 	LaunchedEffect(Unit) {
 		noteViewModel.getNotesList(0, notesLimit)
-		noteTypeViewModel.getNoteTypesList(0, 10)
-		tagViewModel.getTagsList(0, tagsLimit)
-		archiveViewModel.getArchivesList(0, 100)
+
+		floatingButtonsVisible = true
 	}
 
 
@@ -188,6 +189,8 @@ fun NotesScreen(
 						value,
 						viewAction = {
 
+							floatingButtonsVisible = false
+
 							currentNote = null
 
 							showNoteDetailsSheet = true
@@ -201,24 +204,37 @@ fun NotesScreen(
 							}
 
 							noteDetailsLoading = false
+
+							floatingButtonsVisible = true
 						},
 
 						editAction = {
+
+							floatingButtonsVisible = false
 
 							val result = noteViewModel.getNoteById(value.id)
 
 							if (result != null){
 
-								tagViewModel.getTagsList(0, tagsLimit)
+								val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
 
-								currentNote = result
-								actionType = ActionType.UPDATE
-								sheetTitle.value = "Изменить запись"
-								showNoteFormSheet = true
+								if (!noteTypes.isEmpty()){
+									tagViewModel.getTagsList(0, tagsLimit)
+									archiveViewModel.getArchivesList(0, 100)
+
+									currentNote = result
+									actionType = ActionType.UPDATE
+									sheetTitle.value = "Изменить запись"
+									showNoteFormSheet = true
+								}
+
+								floatingButtonsVisible = true
 							}
 						},
 
 						deleteAction = {
+
+							floatingButtonsVisible = false
 
 							val isDeleted = noteViewModel.deleteNote(value.id)
 
@@ -228,6 +244,7 @@ fun NotesScreen(
 								noteViewModel.getNotesList(offset, notesLimit, showLoading = false)
 							}
 
+							floatingButtonsVisible = true
 						})
 				}
 
@@ -281,13 +298,25 @@ fun NotesScreen(
 					.background(Color.Transparent),
 				onClick = {
 
-					scope.launch {
-						tagViewModel.getTagsList(0, tagsLimit)
+					if(floatingButtonsVisible){
+						scope.launch {
 
-						currentNote = null
-						actionType = ActionType.CREATE
-						sheetTitle.value = "Добавить запись"
-						showNoteFormSheet = true
+							floatingButtonsVisible = false
+
+							val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
+
+							if (!noteTypes.isEmpty()){
+								tagViewModel.getTagsList(0, tagsLimit)
+								archiveViewModel.getArchivesList(0, 100)
+
+								currentNote = null
+								actionType = ActionType.CREATE
+								sheetTitle.value = "Добавить запись"
+								showNoteFormSheet = true
+							}
+
+							floatingButtonsVisible = true
+						}
 					}
 				}) {
 				Icon(modifier = Modifier.size(25.dp),
@@ -295,7 +324,6 @@ fun NotesScreen(
 					contentDescription = "Добавить")
 			}
 		}
-
 
 
 		SnackbarHost(
@@ -315,8 +343,8 @@ fun NotesScreen(
 
 	AlertComponent(
 		success = noteViewModelState.success,
-		message = noteViewModelState.message,
-		showed = noteViewModelState.showAlert,
+		message = if (noteViewModelState.showAlert) noteViewModelState.message else noteTypeViewModelState.message,
+		showed = noteViewModelState.showAlert || noteTypeViewModelState.showAlert,
 		action = { noteViewModel.dismissAlert()	}
 	)
 
@@ -399,13 +427,13 @@ fun NotesScreen(
 		}
 	}
 
-
 	// Details sheet
 	if (showNoteDetailsSheet){
 		ModalBottomSheet(
 			onDismissRequest = {
 				showNoteDetailsSheet = false
 				currentNote = null
+				floatingButtonsVisible = true
 			},
 			containerColor = Color.White,
 			sheetState = noteDetailsSheetState,

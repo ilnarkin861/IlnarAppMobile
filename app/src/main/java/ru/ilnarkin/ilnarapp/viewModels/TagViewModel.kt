@@ -34,6 +34,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 			_uiState.value = _uiState.value.copy(
 				loading = false,
+				success = true,
 				list = result.data,
 				offset = tagsOffset,
 				pagination = result.pagination)
