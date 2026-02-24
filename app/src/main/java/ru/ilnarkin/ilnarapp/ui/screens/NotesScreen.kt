@@ -65,6 +65,7 @@ import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.ui.components.SearchFormComponent
 import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteViewModel
@@ -91,19 +92,21 @@ fun NotesScreen(
 
 	var currentNote by remember { mutableStateOf<Note?>(null) }
 
-	var showNoteFormSheet by remember { mutableStateOf(false) }
-	var showNoteDetailsSheet by remember { mutableStateOf(false) }
+	var showNoteSearchFormSheet by remember { mutableStateOf(false) }
+	val noteSearchFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
 	val scope = rememberCoroutineScope()
 
 	val listState = rememberLazyListState()
 
+	var showNoteFormSheet by remember { mutableStateOf(false) }
 	val noteFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+	var showNoteDetailsSheet by remember { mutableStateOf(false) }
 	val noteDetailsSheetState = rememberModalBottomSheetState()
+	var noteDetailsLoading by remember { mutableStateOf(false) }
 
 	val sheetTitle = remember { mutableStateOf("") }
-
-	var noteDetailsLoading by remember { mutableStateOf(false) }
 
 	val snackBarHostState = remember { SnackbarHostState() }
 
@@ -285,7 +288,27 @@ fun NotesScreen(
 				shape = CircleShape,
 				containerColor = Color.White,
 				contentColor = colorResource(R.color.primary_color),
-				onClick = { }) {
+				onClick = {
+
+					if(floatingButtonsVisible){
+						scope.launch {
+
+							floatingButtonsVisible = false
+
+							val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
+
+							if (!noteTypes.isEmpty()){
+								tagViewModel.getTagsList(0, tagsLimit)
+								archiveViewModel.getArchivesList(0, 100)
+
+								showNoteSearchFormSheet = true
+							}
+
+							floatingButtonsVisible = true
+						}
+					}
+
+				}) {
 
 				Icon(painter = painterResource(R.drawable.ic_filter), contentDescription = "Filter")
 			}
@@ -318,6 +341,7 @@ fun NotesScreen(
 							floatingButtonsVisible = true
 						}
 					}
+
 				}) {
 				Icon(modifier = Modifier.size(25.dp),
 					painter = painterResource(R.drawable.ic_plus),
@@ -426,6 +450,46 @@ fun NotesScreen(
 			}
 		}
 	}
+
+
+	// Search form sheet
+	if (showNoteSearchFormSheet){
+
+		ModalBottomSheet(
+			onDismissRequest = { showNoteSearchFormSheet = false },
+			containerColor = Color.White,
+			sheetState = noteSearchFormSheetState,
+		){
+			Column {
+				Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
+					Text(
+						color = colorResource(R.color.title_color),
+						text = "Фильтр",
+						fontFamily = getInterFont(),
+						fontSize = 18.sp,
+						fontWeight = FontWeight.Bold
+					)
+				}
+
+				SearchFormComponent(
+					noteTypes = noteTypeViewModelState.list,
+					archives = archiveViewModelState.list,
+					tags = tagViewModelState.list.toMutableList(),
+					hasNextTags = tagViewModelState.pagination?.hasNextPage ?: false,
+
+					loadTags = {
+						val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
+						tags.toMutableList()
+					},
+
+					action = {
+						
+					}
+				)
+			}
+		}
+	}
+
 
 	// Details sheet
 	if (showNoteDetailsSheet){

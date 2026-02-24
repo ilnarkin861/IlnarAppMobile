@@ -43,7 +43,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
@@ -63,8 +62,8 @@ fun SearchFormComponent(
 	archives: List<Archive>,
 	tags: MutableList<Tag>,
 	hasNextTags: Boolean = true,
-	loadTags: suspend (count: Int) -> MutableList<Tag>,
-	action: (filter: FilterModel) -> Unit
+	loadTags: suspend () -> MutableList<Tag>,
+	action: suspend (filter: FilterModel) -> Unit
 ) {
 
 	val selectableTags = tags
@@ -75,7 +74,7 @@ fun SearchFormComponent(
 
 	val scope = rememberCoroutineScope()
 
-	var startYear = 2025
+	var startYear = 2026
 
 	val unSelectedYearTitle = "Год не выбран"
 	var yearsMenuExpanded by remember { mutableStateOf(false) }
@@ -492,15 +491,16 @@ fun SearchFormComponent(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
 							onClick = {
-								tagsLoading = true
-
 								scope.launch {
-									scope.async {
-										val tags = loadTags(selectableTags.count() + 10)
-										selectableTags.clear()
+									tagsLoading = true
+									try {
+										val tags = loadTags()
+
 										selectableTags.addAll(tags)
-									}.await()
-								}.invokeOnCompletion { tagsLoading = false }
+									} finally {
+										tagsLoading = false
+									}
+								}
 							}
 
 						),
@@ -547,7 +547,9 @@ fun SearchFormComponent(
 						tagIds = tagIds
 					)
 
-					action(filter)
+					scope.launch {
+						action(filter)
+					}
 				}
 			) {
 				Text(
