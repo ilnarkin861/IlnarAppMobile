@@ -39,7 +39,6 @@ fun TopBar (navController: NavController) {
 		NavRoutes.NotesScreen.route -> stringResource(R.string.notes_title)
 		NavRoutes.TagsScreen.route -> stringResource(R.string.tags_title)
 		NavRoutes.ArchiveScreen.route -> stringResource(R.string.archives_title)
-		NavRoutes.SearchScreen.route -> stringResource(R.string.search_title)
 		NavRoutes.SettingsScreen.route -> stringResource(R.string.settings_title)
 		else -> stringResource(R.string.app_name)
 	}

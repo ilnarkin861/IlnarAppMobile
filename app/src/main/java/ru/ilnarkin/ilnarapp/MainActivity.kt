@@ -31,7 +31,6 @@ import ru.ilnarkin.ilnarapp.appbars.TopBar
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.screens.ArchiveScreen
 import ru.ilnarkin.ilnarapp.ui.screens.NotesScreen
-import ru.ilnarkin.ilnarapp.ui.screens.SearchScreen
 import ru.ilnarkin.ilnarapp.ui.screens.SettingsScreen
 import ru.ilnarkin.ilnarapp.ui.screens.TagsScreen
 
@@ -85,7 +84,6 @@ fun Main(){
 			composable(NavRoutes.NotesScreen.route) { NotesScreen() }
 			composable(NavRoutes.TagsScreen.route) { TagsScreen() }
 			composable(NavRoutes.ArchiveScreen.route) { ArchiveScreen() }
-			composable(NavRoutes.SearchScreen.route) { SearchScreen() }
 			composable(NavRoutes.SettingsScreen.route) { SettingsScreen() }
 		}
 
