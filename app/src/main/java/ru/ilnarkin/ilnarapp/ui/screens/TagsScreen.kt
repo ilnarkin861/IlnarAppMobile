@@ -14,6 +14,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -21,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,9 +40,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.MaterialDialogState
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import androidx.compose.ui.window.DialogProperties
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
@@ -58,6 +60,7 @@ import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TagsScreen(
 	tagViewModel: TagViewModel = koinViewModel(),
@@ -72,7 +75,7 @@ fun TagsScreen(
 
 	var modalFormLabel by remember { mutableStateOf("") }
 
-	val dialogState = rememberMaterialDialogState()
+	var formDialogShowed by remember { mutableStateOf(false) }
 
 	var actionType by remember { mutableStateOf(ActionType.READ) }
 
@@ -149,7 +152,7 @@ fun TagsScreen(
 									itemText.value = tag.title
 									itemId.value = tag.id
 									modalFormLabel = "Изменить тег"
-									dialogState.show()
+									formDialogShowed = true
 								}
 							},
 
@@ -215,7 +218,7 @@ fun TagsScreen(
 				actionType = ActionType.CREATE
 				modalFormLabel = "Добавить тег"
 				itemText.value = ""
-				dialogState.show()
+				formDialogShowed = true
 			}) {
 			Icon(
 				modifier = Modifier.size(25.dp),
@@ -244,40 +247,49 @@ fun TagsScreen(
 	)
 
 
-	MaterialDialog(
-		dialogState = dialogState,
-		shape = MaterialTheme.shapes.small,
-		onCloseRequest = { MaterialDialogState.Saver() },
-	){
-		ItemFormComponent(
-			itemText.value,
-			modalFormLabel,
+	if (formDialogShowed){
+		BasicAlertDialog(
+			onDismissRequest = {},
+			properties = DialogProperties(
+				dismissOnBackPress = false,
+				dismissOnClickOutside = false
+			)) {
+			Surface(
+				shape = MaterialTheme.shapes.small,
+				tonalElevation = AlertDialogDefaults.TonalElevation
+			) {
+				ItemFormComponent(
+					itemText.value,
+					modalFormLabel,
 
-			action = {text->
+					action = {text->
 
-				if (actionType == ActionType.CREATE){
+						if (actionType == ActionType.CREATE){
 
-					val createdTag = tagViewModel.createTag(Tag(title = text))
+							val createdTag = tagViewModel.createTag(Tag(title = text))
 
-					if (createdTag != null){
-						tagViewModel.getTagsList(0, limit)
-					}
-				}
+							if (createdTag != null){
+								tagViewModel.getTagsList(0, limit)
+							}
+						}
 
-				if (actionType == ActionType.UPDATE){
+						if (actionType == ActionType.UPDATE){
 
-					val updatedTag = tagViewModel.updateTag(Tag(id = itemId.value, title = text))
+							val updatedTag = tagViewModel.updateTag(Tag(id = itemId.value, title = text))
 
-					if (updatedTag != null){
-						tagViewModel.getTagsList(state.offset, limit)
-					}
-				}
+							if (updatedTag != null){
+								tagViewModel.getTagsList(state.offset, limit)
+							}
+						}
 
-				dialogState.hide()
+						formDialogShowed = false
 
-			},
-			close = { dialogState.hide() }
-		)
+					},
+					close = { formDialogShowed = false }
+				)
+
+			}
+		}
 	}
 }
 

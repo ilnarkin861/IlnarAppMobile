@@ -9,8 +9,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -22,13 +26,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.MaterialDialogState
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import androidx.compose.ui.window.DialogProperties
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmComponent(
 	showed: Boolean = false,
@@ -37,94 +40,95 @@ fun ConfirmComponent(
 
 	val interactionSource = remember { MutableInteractionSource() }
 
-	val dialogState = rememberMaterialDialogState()
-
 	val font = getInterFont()
 
 
-	if (showed) {
-		dialogState.show()
-	}
-
-
-	MaterialDialog(
-		dialogState = dialogState,
-		shape = MaterialTheme.shapes.small,
-		onCloseRequest = { MaterialDialogState.Saver() },
-	) {
-		Column(modifier = Modifier
-			.background(Color.White)
-			.padding(20.dp)) {
-			Row(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(top = 10.dp, bottom = 10.dp),
-				horizontalArrangement = Arrangement.Center
+	if (showed){
+		BasicAlertDialog(
+			onDismissRequest = {},
+			properties = DialogProperties(
+				dismissOnBackPress = false,
+				dismissOnClickOutside = false
+			)
+		) {
+			Surface(
+				shape = MaterialTheme.shapes.small,
+				tonalElevation = AlertDialogDefaults.TonalElevation
 			) {
-				Icon(
-					modifier = Modifier.size(60.dp),
-					painter = painterResource(R.drawable.ic_warning),
-					contentDescription = "",
-					tint = colorResource(R.color.warning_color))
-			}
 
-			Row(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(start = 10.dp, end = 10.dp, bottom = 25.dp),
-				horizontalArrangement = Arrangement.Center
-			) {
-				Text(
-					text = text,
-					textAlign = TextAlign.Center,
-					fontSize = 16.sp,
-					fontFamily = font,
-					color = colorResource(R.color.warning_color)
-				)
-			}
-
-			Row(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(top = 30.dp, bottom = 15.dp),
-				horizontalArrangement = Arrangement.Center
-			) {
-				Row {
-					Text(
+				Column(modifier = Modifier
+					.background(Color.White)
+					.padding(20.dp)) {
+					Row(
 						modifier = Modifier
-							.padding(horizontal = 15.dp)
-							.clickable(
-								interactionSource = interactionSource,
-								indication = null,
-								onClick = {
-									dialogState.hide()
-									action(false)
-								}
-							),
-						text = "Нет",
-						fontWeight = FontWeight.SemiBold,
-						fontSize = 15.sp,
-						color = Color.Gray,
-						fontFamily = font,
-					)
+							.fillMaxWidth()
+							.padding(top = 10.dp, bottom = 10.dp),
+						horizontalArrangement = Arrangement.Center
+					) {
+						Icon(
+							modifier = Modifier.size(60.dp),
+							painter = painterResource(R.drawable.ic_warning),
+							contentDescription = "",
+							tint = colorResource(R.color.warning_color))
+					}
 
-					Text(
+					Row(
 						modifier = Modifier
-							.padding(horizontal = 15.dp)
-							.clickable(
-								interactionSource = interactionSource,
-								indication = null,
-								onClick = {
-									dialogState.hide()
-									action(true)
-								}
-							),
-						text = "Да",
-						fontWeight = FontWeight.SemiBold,
-						fontSize = 15.sp,
-						color = colorResource(R.color.danger_color),
-						fontFamily = font,
-					)
+							.fillMaxWidth()
+							.padding(start = 10.dp, end = 10.dp, bottom = 25.dp),
+						horizontalArrangement = Arrangement.Center
+					) {
+						Text(
+							text = text,
+							textAlign = TextAlign.Center,
+							fontSize = 16.sp,
+							fontFamily = font,
+							color = colorResource(R.color.warning_color)
+						)
+					}
+
+					Row(
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(top = 30.dp, bottom = 15.dp),
+						horizontalArrangement = Arrangement.Center
+					) {
+						Row {
+							Text(
+								modifier = Modifier
+									.padding(horizontal = 15.dp)
+									.clickable(
+										interactionSource = interactionSource,
+										indication = null,
+										onClick = {
+											action(false)
+										}
+									),
+								text = "Нет",
+								fontWeight = FontWeight.SemiBold,
+								fontSize = 15.sp,
+								color = Color.Gray,
+								fontFamily = font,
+							)
+
+							Text(
+								modifier = Modifier
+									.padding(horizontal = 15.dp)
+									.clickable(
+										interactionSource = interactionSource,
+										indication = null,
+										onClick = {
+											action(true)
+										}
+									),
+								text = "Да",
+								fontWeight = FontWeight.SemiBold,
+								fontSize = 15.sp,
+								color = colorResource(R.color.danger_color),
+								fontFamily = font,
+							)
+						}
+					}
 				}
 			}
 		}

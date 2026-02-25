@@ -1,7 +1,5 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -11,9 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -24,7 +26,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -32,24 +33,18 @@ import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.edit
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.MaterialDialogState
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.WelcomeActivity
-import ru.ilnarkin.ilnarapp.helpers.KEY_TOKEN
-import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
-import ru.ilnarkin.ilnarapp.ui.components.ConfirmComponent
 import ru.ilnarkin.ilnarapp.ui.components.EmailFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.PasswordFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
 fun SettingsScreen() {
@@ -59,12 +54,9 @@ fun SettingsScreen() {
 
 	val font = getInterFont()
 
-	val context = LocalContext.current
-	val intent = Intent(context, WelcomeActivity::class.java)
+	var emailFormDialogShowed by remember { mutableStateOf(false) }
 
-	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
-	var showConfirmAlert by remember { mutableStateOf(false) }
+	var passwordFormDialogShowed by remember { mutableStateOf(false) }
 
 	val scope = rememberCoroutineScope()
 
@@ -74,9 +66,6 @@ fun SettingsScreen() {
 	var showAlert by remember { mutableStateOf(false) }
 
 	var emailLoading by remember { mutableStateOf(false) }
-	val emailFormDialogState = rememberMaterialDialogState()
-
-	val passwordFormDialogState = rememberMaterialDialogState()
 
 
 	Column(Modifier.fillMaxSize().padding(top = 30.dp)) {
@@ -91,9 +80,7 @@ fun SettingsScreen() {
 
 					delay(1500)
 
-					emailLoading = false
-
-					emailFormDialogState.show()
+					emailFormDialogShowed = true
 				}
 			}
 		)) {
@@ -142,7 +129,7 @@ fun SettingsScreen() {
 		Row(Modifier.fillMaxWidth().clickable(
 			interactionSource = remember { MutableInteractionSource() },
 			indication = ripple(),
-			onClick = { passwordFormDialogState.show() }
+			onClick = { passwordFormDialogShowed = true }
 		)) {
 			Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
 				horizontalArrangement = Arrangement.SpaceBetween,
@@ -185,50 +172,64 @@ fun SettingsScreen() {
 
 
 	// Email change form
-	MaterialDialog(
-		dialogState = emailFormDialogState,
-		shape = MaterialTheme.shapes.small,
-		onCloseRequest = { MaterialDialogState.Saver() },
-	){
-		EmailFormComponent(
-			email = testEmail,
-			action = {
-				delay(2000)
-				alertTitle.value = "Email успешно изменен"
-				showAlert = true
-				emailFormDialogState.hide()
-			},
+	if (emailFormDialogShowed){
+		BasicAlertDialog(
+			onDismissRequest = {},
+			properties = DialogProperties(
+				dismissOnBackPress = false,
+				dismissOnClickOutside = false
+			)
+		) {
+			Surface(
+				shape = MaterialTheme.shapes.small,
+				tonalElevation = AlertDialogDefaults.TonalElevation
+			) {
+				EmailFormComponent(
+					email = testEmail,
+					action = {
+						emailFormDialogShowed = false
+					},
 
-			close = { emailFormDialogState.hide() }
-		)
+					close = { emailFormDialogShowed = false }
+				)
+			}
+		}
 	}
 
 
 	// Password change form
-	MaterialDialog(
-		dialogState = passwordFormDialogState,
-		shape = MaterialTheme.shapes.small,
-		onCloseRequest = { MaterialDialogState.Saver() },
-	){
-		PasswordFormComponent(
-			action = { passwordModel ->
 
-				delay(2000)
+	if (passwordFormDialogShowed){
+		BasicAlertDialog(
+			onDismissRequest = {},
+			properties = DialogProperties(
+				dismissOnBackPress = false,
+				dismissOnClickOutside = false
+			)
+		) {
+			Surface(
+				shape = MaterialTheme.shapes.small,
+				tonalElevation = AlertDialogDefaults.TonalElevation
+			) {
+				PasswordFormComponent(
+					action = { passwordModel ->
 
-				if (passwordModel.oldPassword != testPassword){
-					success = false
-					alertTitle.value = "Неверный старый пароль"
-					showAlert = true
-				}
+						delay(2000)
 
-				else{
-					passwordFormDialogState.hide()
-					sharedPreferences.edit{ putString(KEY_TOKEN, null) }
-					context.startActivity(intent)
-				}
-			},
+						if (passwordModel.oldPassword != testPassword){
+							success = false
+							alertTitle.value = "Неверный старый пароль"
+							showAlert = true
+						}
 
-			close = { passwordFormDialogState.hide()}
-		)
+						else{
+							passwordFormDialogShowed = false
+						}
+					},
+
+					close = { passwordFormDialogShowed = false }
+				)
+			}
+		}
 	}
 }

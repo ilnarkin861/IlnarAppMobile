@@ -19,6 +19,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -30,6 +33,8 @@ import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -50,10 +55,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
@@ -62,7 +64,10 @@ import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.models.Tag
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.Instant
+
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -94,7 +99,6 @@ fun NoteFormComponent(
 	val noteText = remember { mutableStateOf(note?.text ?: "") }
 	var isNoteTextError by remember { mutableStateOf(false) }
 
-	val dateDialogState = rememberMaterialDialogState()
 	var noteDate by remember {mutableStateOf(if (note != null) LocalDate.parse(note.date) else LocalDate.now())}
 	val formattedDate = remember {
 		derivedStateOf {
@@ -103,6 +107,9 @@ fun NoteFormComponent(
 				.format(noteDate)
 		}
 	}
+
+	var showDatePicker by remember { mutableStateOf(false) }
+	val datePickerState = rememberDatePickerState()
 
 	val unSelectedArchiveTitle = "Архив не выбран"
 	var selectedArchiveTitle by remember { mutableStateOf(note?.archive?.title ?: unSelectedArchiveTitle) }
@@ -249,13 +256,13 @@ fun NoteFormComponent(
 			)
 		}
 
-		//Date field
+
 		OutlinedTextField(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), top = 10.dp, bottom = 20.dp),
 			readOnly = true,
-			enabled = false,
+			enabled = true,
 			value = formattedDate.value,
 			onValueChange = {},
 			colors = OutlinedTextFieldDefaults.colors(
@@ -265,7 +272,7 @@ fun NoteFormComponent(
 				unfocusedTextColor = colorResource(R.color.text_color),
 			),
 			trailingIcon = {
-				IconButton(onClick = { dateDialogState.show() }) {
+				IconButton(onClick = { showDatePicker = true }) {
 					Icon(
 						modifier = Modifier.size(30.dp),
 						painter = painterResource(R.drawable.ic_calendar),
@@ -277,34 +284,48 @@ fun NoteFormComponent(
 			shape = RoundedCornerShape(10.dp)
 		)
 
-		MaterialDialog(
-			dialogState = dateDialogState,
-			buttons = {
-				positiveButton(
-					text = "Ок",
-					textStyle = TextStyle(
-						color = colorResource(R.color.primary_color),
-						fontFamily = font,
-						fontWeight = FontWeight.Bold),
-					onClick = { dateDialogState.hide()},
-				)
-				negativeButton(
-					text = "Закрыть",
-					textStyle = TextStyle(
-						color = colorResource(R.color.primary_color),
-						fontFamily = font,
-						fontWeight = FontWeight.Bold)
+
+		if (showDatePicker) {
+			DatePickerDialog(
+				onDismissRequest = { showDatePicker = false },
+				colors = DatePickerDefaults.colors(
+					containerColor = colorResource(R.color.primary_color)
+				),
+				confirmButton = {
+					TextButton(onClick = {
+						datePickerState.selectedDateMillis?.let { millis ->
+							val date = Instant.ofEpochMilli(millis)
+								.atZone(ZoneId.systemDefault())
+								.toLocalDate()
+							noteDate = date
+						}
+						showDatePicker = false
+					}) {
+						Text("Ок", color = Color.White)
+					}
+				},
+				dismissButton = {
+					TextButton(onClick = { showDatePicker = false }) {
+						Text("Закрыть", color = Color.White)
+					}
+				}
+			) {
+				DatePicker(
+					state = datePickerState,
+					title = { Text("Выбрать дату", modifier = Modifier.padding(start = 24.dp, top = 16.dp)) },
+					colors = DatePickerDefaults.colors(
+						containerColor = Color.White,
+						selectedDayContainerColor = colorResource(R.color.primary_color),
+						todayContentColor = colorResource(R.color.primary_color),
+						selectedYearContainerColor = colorResource(R.color.primary_color),
+						todayDateBorderColor = colorResource(R.color.primary_color),
+						titleContentColor = colorResource(R.color.primary_color),
+						headlineContentColor = colorResource(R.color.title_color)// Цвет выбранной даты в шапке
+					)
 				)
 			}
-		) {
-			datepicker(
-				title = "Выбрать дату",
-				colors = DatePickerDefaults.colors(
-					headerBackgroundColor = colorResource(R.color.primary_color),
-					dateActiveBackgroundColor = colorResource(R.color.primary_color)
-				)
-			) { noteDate = it }
 		}
+
 
 		// Archive dropdown
 		ExposedDropdownMenuBox(
