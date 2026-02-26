@@ -57,6 +57,7 @@ import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
+import ru.ilnarkin.ilnarapp.models.NoteFilter
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
@@ -92,7 +93,7 @@ fun NotesScreen(
 
 	var currentNote by remember { mutableStateOf<Note?>(null) }
 
-	var showNoteSearchFormSheet by remember { mutableStateOf(false) }
+	var showNoteFilterFormSheet by remember { mutableStateOf(false) }
 	val noteSearchFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
 	val scope = rememberCoroutineScope()
@@ -119,6 +120,8 @@ fun NotesScreen(
 	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
 
 	var floatingButtonsVisible by remember { mutableStateOf(false) }
+
+	var noteFilter by remember { mutableStateOf<NoteFilter?>(null) }
 
 
 	LaunchedEffect(Unit) {
@@ -180,7 +183,7 @@ fun NotesScreen(
 								LoadButtonComponent(nextButton = false, action = {
 									actionType = ActionType.READ
 
-									noteViewModel.getNotesList(noteViewModelState.offset - notesLimit, notesLimit, showLoading = false)
+									noteViewModel.getNotesList(noteViewModelState.offset - notesLimit, notesLimit, showLoading = false, filter = noteFilter)
 								})
 							}
 						}
@@ -258,7 +261,7 @@ fun NotesScreen(
 								LoadButtonComponent(action = {
 									actionType = ActionType.READ
 
-									noteViewModel.getNotesList(noteViewModelState.offset + notesLimit, notesLimit, showLoading = false)
+									noteViewModel.getNotesList(noteViewModelState.offset + notesLimit, notesLimit, showLoading = false, filter = noteFilter)
 								})
 							}
 						}
@@ -301,7 +304,7 @@ fun NotesScreen(
 								tagViewModel.getTagsList(0, tagsLimit)
 								archiveViewModel.getArchivesList(0, 100)
 
-								showNoteSearchFormSheet = true
+								showNoteFilterFormSheet = true
 							}
 
 							floatingButtonsVisible = true
@@ -435,7 +438,7 @@ fun NotesScreen(
 								val updatedNote = noteViewModel.updateNote(note)
 
 								if (updatedNote != null){
-									noteViewModel.getNotesList(noteViewModelState.offset, notesLimit)
+									noteViewModel.getNotesList(noteViewModelState.offset, notesLimit, noteFilter)
 								}
 							}
 
@@ -452,11 +455,11 @@ fun NotesScreen(
 	}
 
 
-	// Search form sheet
-	if (showNoteSearchFormSheet){
+	// Filter form sheet
+	if (showNoteFilterFormSheet){
 
 		ModalBottomSheet(
-			onDismissRequest = { showNoteSearchFormSheet = false },
+			onDismissRequest = { showNoteFilterFormSheet = false },
 			containerColor = Color.White,
 			sheetState = noteSearchFormSheetState,
 		){
@@ -482,8 +485,13 @@ fun NotesScreen(
 						tags.toMutableList()
 					},
 
-					action = {
-						
+					action = {filter ->
+
+						noteViewModel.getNotesList(0, notesLimit, filter)
+
+						noteFilter = filter
+
+						showNoteFilterFormSheet = false
 					}
 				)
 			}

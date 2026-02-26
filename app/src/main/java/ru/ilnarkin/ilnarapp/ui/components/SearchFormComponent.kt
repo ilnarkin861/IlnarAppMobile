@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -47,7 +49,6 @@ import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Archive
-import ru.ilnarkin.ilnarapp.models.FilterModel
 import ru.ilnarkin.ilnarapp.models.NoteFilter
 import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.models.Tag
@@ -63,7 +64,7 @@ fun SearchFormComponent(
 	tags: MutableList<Tag>,
 	hasNextTags: Boolean = true,
 	loadTags: suspend () -> MutableList<Tag>,
-	action: suspend (filter: FilterModel) -> Unit
+	action: suspend (filter: NoteFilter?) -> Unit
 ) {
 
 	val selectableTags = remember { mutableStateListOf<Tag>().apply { addAll(tags) } }
@@ -71,6 +72,8 @@ fun SearchFormComponent(
 	val font = getInterFont()
 
 	var tagsLoading by remember { mutableStateOf(false) }
+
+	var filtering by remember { mutableStateOf(false) }
 
 	val scope = rememberCoroutineScope()
 
@@ -526,6 +529,7 @@ fun SearchFormComponent(
 				modifier = Modifier
 					.fillMaxWidth()
 					.height(60.dp),
+				enabled = !filtering,
 				shape = RoundedCornerShape(10.dp),
 				colors = ButtonDefaults.buttonColors(
 					containerColor = colorResource(R.color.primary_color),
@@ -548,16 +552,33 @@ fun SearchFormComponent(
 					)
 
 					scope.launch {
-						action(filter)
+						filtering = true
+						try {
+							action(filter)
+						} finally {
+							filtering = false
+						}
 					}
 				}
 			) {
-				Text(
-					text = "Искать",
-					fontFamily = font,
-					fontSize = 16.sp,
-					fontWeight = FontWeight.SemiBold
-				)
+
+				if (filtering){
+					CircularProgressIndicator(
+						modifier = Modifier.size(20.dp),
+						strokeWidth = 2.dp,
+						color = Color.White,
+						trackColor = Color.Transparent,
+					)
+				}
+
+				else{
+					Text(
+						text = "Искать",
+						fontFamily = font,
+						fontSize = 16.sp,
+						fontWeight = FontWeight.SemiBold
+					)
+				}
 			}
 		}
 	}
