@@ -58,7 +58,7 @@ import java.time.LocalDate
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchFormComponent(
+fun NoteFilterFormComponent(
 	noteTypes: List<NoteType>,
 	archives: List<Archive>,
 	tags: MutableList<Tag>,

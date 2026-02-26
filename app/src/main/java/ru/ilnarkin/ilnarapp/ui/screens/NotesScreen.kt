@@ -66,7 +66,7 @@ import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
-import ru.ilnarkin.ilnarapp.ui.components.SearchFormComponent
+import ru.ilnarkin.ilnarapp.ui.components.NoteFilterFormComponent
 import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteViewModel
@@ -474,7 +474,7 @@ fun NotesScreen(
 					)
 				}
 
-				SearchFormComponent(
+				NoteFilterFormComponent(
 					noteTypes = noteTypeViewModelState.list,
 					archives = archiveViewModelState.list,
 					tags = tagViewModelState.list.toMutableList(),
