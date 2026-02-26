@@ -30,7 +30,16 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				_uiState.value = _uiState.value.copy(loading = true)
 			}
 
-			val result = noteRepository.getList<AppPagination<Note>>(notesOffset, limit, filter)
+			val filterParams = mutableListOf<Pair<String, String>>().apply {
+				filter?.noteTypeId?.let { add("noteTypeId" to it) }
+				filter?.archiveId?.let { add("archiveId" to it) }
+				filter?.year?.let { add("year" to it.toString()) }
+				filter?.month?.let { add("month" to it.toString()) }
+				filter?.tagIds?.forEach { id -> add("tagIds" to id) }
+			}
+
+
+			val result = noteRepository.getList<AppPagination<Note>>(notesOffset, limit, filterParams)
 
 			_uiState.update { it.copy(
 				loading = false,

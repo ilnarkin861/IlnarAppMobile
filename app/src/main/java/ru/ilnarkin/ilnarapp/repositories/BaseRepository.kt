@@ -20,12 +20,15 @@ abstract class BaseRepository(
 ) {
 
 	@Suppress("UNCHECKED_CAST")
-	suspend inline fun <reified P : PaginationModel> getList(offset: Int, limit: Int, filter: FilterModel?): P {
+	suspend inline fun <reified P : PaginationModel> getList(
+		offset: Int,
+		limit: Int,
+		filterParams: List<Pair<String, String>>? = null): P {
 		return httpClient.get(endpoint) {
 			url {
 				parameters.append("offset", offset.toString())
 				parameters.append("limit", limit.toString())
-				filter?.let { parameters.append("filter", it.toString()) }
+				filterParams?.forEach { (key, value) -> parameters.append(key, value) }
 			}
 		}.body(typeInfo<P>()) as P
 	}
