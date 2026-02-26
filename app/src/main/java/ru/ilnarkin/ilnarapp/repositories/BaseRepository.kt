@@ -10,7 +10,6 @@ import io.ktor.client.request.setBody
 import io.ktor.http.isSuccess
 import io.ktor.util.reflect.typeInfo
 import ru.ilnarkin.ilnarapp.models.AppModel
-import ru.ilnarkin.ilnarapp.models.FilterModel
 import ru.ilnarkin.ilnarapp.models.PaginationModel
 
 
