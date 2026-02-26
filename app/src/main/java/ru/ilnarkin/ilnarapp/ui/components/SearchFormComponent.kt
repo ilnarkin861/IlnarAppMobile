@@ -66,7 +66,7 @@ fun SearchFormComponent(
 	action: suspend (filter: FilterModel) -> Unit
 ) {
 
-	val selectableTags = tags
+	val selectableTags = remember { mutableStateListOf<Tag>().apply { addAll(tags) } }
 
 	val font = getInterFont()
 
