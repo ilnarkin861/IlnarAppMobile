@@ -33,9 +33,10 @@ import ru.ilnarkin.ilnarapp.models.Tag
 @Composable
 fun TagCheckboxComponent(
 	tag: Tag,
+	isChecked: Boolean = false,
 	onChecked: (tag: Tag) -> Unit
 ) {
-	var checked by remember { mutableStateOf(false) }
+	var checked by remember { mutableStateOf(isChecked) }
 
 	Row(Modifier.fillMaxWidth().clickable(
 		interactionSource = remember { MutableInteractionSource() },
