@@ -29,9 +29,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,75 +47,44 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
-import ru.ilnarkin.ilnarapp.models.Archive
 import ru.ilnarkin.ilnarapp.models.NoteFilter
-import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.models.Tag
-import java.time.LocalDate
+import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteFilterFormComponent(
-	noteTypes: List<NoteType>,
-	archives: List<Archive>,
-	tags: MutableList<Tag>,
-	hasNextTags: Boolean = true,
+	viewModel: NoteFilterViewModel,
 	loadTags: suspend () -> MutableList<Tag>,
-	action: suspend (filter: NoteFilter?) -> Unit
+	action: suspend (filter: NoteFilter?) -> Unit,
 ) {
-
-	val selectableTags = remember { mutableStateListOf<Tag>().apply { addAll(tags) } }
-
 	val font = getInterFont()
+
+	val scope = rememberCoroutineScope()
+
+	val viewModelState by viewModel.uiState.collectAsState()
 
 	var tagsLoading by remember { mutableStateOf(false) }
 
 	var filtering by remember { mutableStateOf(false) }
 
-	val scope = rememberCoroutineScope()
-
-	var startYear = 2026
-
-	val unSelectedYearTitle = "Год не выбран"
 	var yearsMenuExpanded by remember { mutableStateOf(false) }
-	var selectedYearTitle by remember { mutableStateOf(unSelectedYearTitle) }
-	var selectedYear: Int? by remember { mutableStateOf(null) }
-	var yearSelected by remember { mutableStateOf(false) }
 
-	val years = mutableListOf<Int>()
-
-	while (startYear <= LocalDate.now().year){
-		years.add(startYear)
-		startYear++
-	}
-
-	val months = arrayOf("Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль",
-		"Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь",)
-	val unSelectedMonthTitle = "Месяц не выбран"
-	var monthSelected by remember { mutableStateOf(false) }
 	var monthMenuExpanded by remember { mutableStateOf(false) }
-	var selectedMonthTitle by remember { mutableStateOf(unSelectedMonthTitle) }
-	var selectedMonthNumber: Int? by remember { mutableStateOf(null) }
 
 	var noteTypeMenuExpanded by remember { mutableStateOf(false) }
-	val selectedNoteType = remember { mutableStateOf(noteTypes[0]) }
 
-	val unSelectedArchiveTitle = "Архив не выбран"
-	var selectedArchiveTitle by remember { mutableStateOf(unSelectedArchiveTitle) }
 	var archiveMenuExpanded by remember { mutableStateOf(false) }
-	var archiveIsSelected by remember { mutableStateOf(false) }
-	var selectedArchive: Archive? by remember { mutableStateOf(null) }
 
-	val selectedTags = remember { mutableStateListOf<Tag>() }
-	val selectedTagsCount = remember { mutableIntStateOf(0) }
 
 
 	Column(Modifier
 		.fillMaxSize()
 		.padding(top = 30.dp)
 		.verticalScroll(rememberScrollState())) {
+
 
 		//Note type dropdown menu
 		ExposedDropdownMenuBox(
@@ -136,8 +104,8 @@ fun NoteFilterFormComponent(
 					fontFamily = font,
 					fontSize = 15.sp,
 				),
-				value = selectedNoteType.value.title,
-				onValueChange = {selectedNoteType.value.title = it},
+				value = viewModelState.selectedNoteTypeTitle,
+				onValueChange = {},
 				readOnly = true,
 				colors = OutlinedTextFieldDefaults.colors(
 					unfocusedBorderColor = colorResource(R.color.inputs_border_color),
@@ -163,7 +131,7 @@ fun NoteFilterFormComponent(
 				expanded = noteTypeMenuExpanded,
 				onDismissRequest = { noteTypeMenuExpanded = false}
 			) {
-				noteTypes.forEach {noteType ->
+				viewModelState.selectableNoteTypes.forEach {noteType ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
 						colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
@@ -174,13 +142,14 @@ fun NoteFilterFormComponent(
 								fontSize = 15.sp
 							)},
 						onClick = {
-							selectedNoteType.value = noteType
+							viewModel.selectNoteType(noteType.id, noteType.title)
 							noteTypeMenuExpanded = false
 						}
 					)
 				}
 			}
 		}
+
 
 		// Year dropdown
 		ExposedDropdownMenuBox(
@@ -196,7 +165,7 @@ fun NoteFilterFormComponent(
 				modifier = Modifier
 					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
 					.fillMaxWidth(),
-				value = selectedYearTitle,
+				value = viewModelState.selectedYearTitle,
 				onValueChange = {},
 				readOnly = true,
 				textStyle = TextStyle(
@@ -232,20 +201,16 @@ fun NoteFilterFormComponent(
 					colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
 					text = {
 						Text(
-							text = unSelectedYearTitle,
+							text = viewModelState.unSelectedYearTitle,
 							fontFamily = font,
 							fontSize = 15.sp
 						)},
 					onClick = {
-						selectedYearTitle = unSelectedYearTitle
-						yearSelected = false
+						viewModel.selectYear(null, viewModelState.unSelectedYearTitle)
 						yearsMenuExpanded = false
-						monthSelected = false
-						selectedYear = null
-						selectedMonthNumber = null
 					}
 				)
-				years.forEach {year ->
+				viewModelState.years.forEach {year ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
 						colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
@@ -256,9 +221,7 @@ fun NoteFilterFormComponent(
 								fontSize = 15.sp
 							)},
 						onClick = {
-							selectedYear = year
-							selectedYearTitle = year.toString()
-							yearSelected = true
+							viewModel.selectYear(year, year.toString())
 							yearsMenuExpanded = false
 						}
 					)
@@ -266,8 +229,9 @@ fun NoteFilterFormComponent(
 			}
 		}
 
+
 		// Month dropdown
-		if (yearSelected){
+		if (viewModelState.yearSelected){
 			ExposedDropdownMenuBox(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -280,7 +244,7 @@ fun NoteFilterFormComponent(
 					modifier = Modifier
 						.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
 						.fillMaxWidth(),
-					value = selectedMonthTitle,
+					value = viewModelState.selectedMonthTitle,
 					onValueChange = {},
 					readOnly = true,
 					textStyle = TextStyle(
@@ -316,17 +280,16 @@ fun NoteFilterFormComponent(
 						colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
 						text = {
 							Text(
-								text = unSelectedYearTitle,
+								text = viewModelState.unSelectedMonthTitle,
 								fontFamily = font,
 								fontSize = 15.sp
 							)},
 						onClick = {
-							selectedMonthTitle = unSelectedMonthTitle
-							monthSelected = false
+							viewModel.selectMonth(null, viewModelState.unSelectedMonthTitle)
 							monthMenuExpanded = false
 						}
 					)
-					months.forEachIndexed {index, month ->
+					viewModelState.months.forEachIndexed {index, month ->
 						DropdownMenuItem(
 							modifier = Modifier.background(Color.White),
 							colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
@@ -337,9 +300,7 @@ fun NoteFilterFormComponent(
 									fontSize = 15.sp
 								)},
 							onClick = {
-								selectedMonthTitle = month
-								selectedMonthNumber = index + 1
-								monthSelected = true
+								viewModel.selectMonth(index + 1, month)
 								monthMenuExpanded = false
 							}
 						)
@@ -347,6 +308,7 @@ fun NoteFilterFormComponent(
 				}
 			}
 		}
+
 
 		// Archive dropdown
 		ExposedDropdownMenuBox(
@@ -361,7 +323,7 @@ fun NoteFilterFormComponent(
 				modifier = Modifier
 					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
 					.fillMaxWidth(),
-				value = selectedArchiveTitle,
+				value = viewModelState.selectedArchiveTitle,
 				onValueChange = {},
 				readOnly = true,
 				textStyle = TextStyle(
@@ -397,18 +359,17 @@ fun NoteFilterFormComponent(
 					colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
 					text = {
 						Text(
-							text = unSelectedArchiveTitle,
+							text = viewModelState.unSelectedArchiveTitle,
 							fontFamily = font,
 							fontSize = 15.sp
 						)},
 					onClick = {
-						selectedArchiveTitle = unSelectedArchiveTitle
-						archiveIsSelected = false
+						viewModel.selectArchive(null, viewModelState.unSelectedArchiveTitle)
 						archiveMenuExpanded = false
 					}
 				)
 
-				archives.forEach {archive ->
+				viewModelState.selectableArchives.forEach {archive ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
 						colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
@@ -419,15 +380,14 @@ fun NoteFilterFormComponent(
 								fontSize = 15.sp
 							)},
 						onClick = {
-							selectedArchive = archive
-							selectedArchiveTitle = archive.title
-							archiveIsSelected = true
+							viewModel.selectArchive(archive.id, archive.title)
 							archiveMenuExpanded = false
 						}
 					)
 				}
 			}
 		}
+
 
 		//Selectable tags
 		Column(
@@ -441,33 +401,33 @@ fun NoteFilterFormComponent(
 					end = dimensionResource(R.dimen.container_horizontal_padding),bottom = 20.dp)) {
 				Text(
 					color = Color.Gray,
-					text = "Выбрать теги (${selectedTagsCount.intValue})",
+					text = "Выбрать теги (${viewModelState.selectedTagIds.size})",
 					fontFamily = font,
 					fontSize = 15.sp,
 					fontWeight = FontWeight.Bold
 				)
 			}
-			selectableTags.forEachIndexed { index, tag ->
+			viewModelState.selectableTags.forEachIndexed { index, tag ->
 				Row(Modifier
 					.fillMaxWidth()) {
-					TagCheckboxComponent(tag, onChecked = {tag ->
-						if (selectedTags.count() == 0){
-							selectedTags.add(tag)
-						}
+					TagCheckboxComponent(
+						tag,
+						isChecked = viewModelState.selectedTagIds.find { it == tag.id } != null,
+						onChecked = {tag ->
 
-						else{
-							if (selectedTags.any{it.id == tag.id}){
-								selectedTags.remove(tag)
+							val existingTag = viewModelState.selectedTagIds.find { it == tag.id }
+
+							if (existingTag == null){
+								viewModel.addTag(tag.id)
 							}
 
-							else selectedTags.add(tag)
-						}
-
-						selectedTagsCount.intValue = selectedTags.count()
+							else{
+								viewModel.removeTag(tag.id)
+							}
 					})
 				}
 
-				if (index != selectableTags.count() -1){
+				if (index != viewModelState.selectableTags.count() -1){
 					HorizontalDivider(
 						modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
 						thickness = 1.dp,
@@ -476,7 +436,7 @@ fun NoteFilterFormComponent(
 			}
 		}
 
-		if (hasNextTags){
+		if (viewModelState.hasNextTags){
 			Row(Modifier
 				.fillMaxWidth()
 				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
@@ -496,10 +456,11 @@ fun NoteFilterFormComponent(
 							onClick = {
 								scope.launch {
 									tagsLoading = true
-									try {
-										val tags = loadTags()
 
-										selectableTags.addAll(tags)
+									try {
+
+										loadTags()
+
 									} finally {
 										tagsLoading = false
 									}
@@ -517,7 +478,8 @@ fun NoteFilterFormComponent(
 			}
 		}
 
-		// Search button
+
+		// Filter button
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
@@ -536,25 +498,13 @@ fun NoteFilterFormComponent(
 					disabledContainerColor = colorResource(R.color.primary_color).copy(alpha = 0.8f)),
 				onClick = {
 
-					val tagIds = mutableListOf<String>()
-
-					for (tag in selectedTags){
-						tagIds.add(tag.id)
-					}
-
-					val filter = NoteFilter(
-						noteTypeId = selectedNoteType.value.id,
-						archiveId = selectedArchive?.id,
-						year = selectedYear,
-						month = selectedMonthNumber,
-						day = null,
-						tagIds = tagIds
-					)
-
 					scope.launch {
 						filtering = true
 						try {
-							action(filter)
+							viewModel.updateFilter()
+
+							action(viewModelState.noteFilter)
+
 						} finally {
 							filtering = false
 						}
@@ -573,7 +523,7 @@ fun NoteFilterFormComponent(
 
 				else{
 					Text(
-						text = "Искать",
+						text = "Применить",
 						fontFamily = font,
 						fontSize = 16.sp,
 						fontWeight = FontWeight.SemiBold
