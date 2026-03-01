@@ -2,6 +2,8 @@ package ru.ilnarkin.ilnarapp.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
+import androidx.annotation.RequiresApi
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -14,12 +16,14 @@ import ru.ilnarkin.ilnarapp.repositories.NoteTypeRepository
 import ru.ilnarkin.ilnarapp.repositories.TagRepository
 import ru.ilnarkin.ilnarapp.repositories.UserRepository
 import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
+import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteViewModel
 import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 val appModule = module {
 
 	single<SharedPreferences> {
@@ -31,6 +35,7 @@ val appModule = module {
 	viewModel { ArchiveViewModel(get()) }
 	viewModel { NoteTypeViewModel(get()) }
 	viewModel { NoteViewModel(get()) }
+	viewModel { NoteFilterViewModel() }
 
 	single { TagRepository(get()) }
 	single { ArchiveRepository(get()) }
