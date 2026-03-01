@@ -68,6 +68,7 @@ import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFilterFormComponent
 import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
+import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteViewModel
 import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
@@ -81,6 +82,7 @@ fun NotesScreen(
 	noteTypeViewModel: NoteTypeViewModel = koinViewModel(),
 	tagViewModel: TagViewModel = koinViewModel(),
 	archiveViewModel: ArchiveViewModel = koinViewModel(),
+	noteFilterViewModel: NoteFilterViewModel = koinViewModel(),
 	errorManager: NetworkErrorManager = koinInject()
 ) {
 
@@ -118,6 +120,8 @@ fun NotesScreen(
 	val tagViewModelState by tagViewModel.uiState.collectAsState()
 
 	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
+
+	val noteFilterViewModelState by noteFilterViewModel.uiState.collectAsState()
 
 	var floatingButtonsVisible by remember { mutableStateOf(false) }
 
@@ -298,14 +302,23 @@ fun NotesScreen(
 
 							floatingButtonsVisible = false
 
-							val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
-
-							if (!noteTypes.isEmpty()){
-								tagViewModel.getTagsList(0, tagsLimit)
-								archiveViewModel.getArchivesList(0, 100)
-
-								showNoteFilterFormSheet = true
+							if (noteFilterViewModelState.selectableNoteTypes.isEmpty()){
+								val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
+								noteFilterViewModel.addNoteTypes(noteTypes)
 							}
+
+							if (noteFilterViewModelState.selectableArchives.isEmpty()){
+								val archives = archiveViewModel.getArchivesList(0, 100)
+								noteFilterViewModel.addArchives(archives)
+							}
+
+							if (noteFilterViewModelState.selectableTags.isEmpty()){
+								val tags = tagViewModel.getTagsList(0, tagsLimit)
+								val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
+								noteFilterViewModel.addTags(tags, hasNextTags)
+							}
+
+							showNoteFilterFormSheet = true
 
 							floatingButtonsVisible = true
 						}
@@ -475,13 +488,15 @@ fun NotesScreen(
 				}
 
 				NoteFilterFormComponent(
-					noteTypes = noteTypeViewModelState.list,
-					archives = archiveViewModelState.list,
-					tags = tagViewModelState.list.toMutableList(),
-					hasNextTags = tagViewModelState.pagination?.hasNextPage ?: false,
+					viewModel = noteFilterViewModel,
 
 					loadTags = {
 						val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
+
+						val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
+
+						noteFilterViewModel.addTags(tags, hasNextTags)
+
 						tags.toMutableList()
 					},
 
