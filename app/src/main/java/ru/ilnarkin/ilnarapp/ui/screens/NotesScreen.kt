@@ -405,7 +405,12 @@ fun NotesScreen(
 		success = noteViewModelState.success,
 		message = if (noteViewModelState.showAlert) noteViewModelState.message else noteTypeViewModelState.message,
 		showed = noteViewModelState.showAlert || noteTypeViewModelState.showAlert,
-		action = { noteViewModel.dismissAlert()	}
+		action = {
+
+			noteTypeViewModel.dismissAlert()
+
+			noteViewModel.dismissAlert()
+		}
 	)
 
 
