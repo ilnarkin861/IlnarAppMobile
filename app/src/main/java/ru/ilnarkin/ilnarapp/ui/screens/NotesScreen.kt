@@ -128,8 +128,6 @@ fun NotesScreen(
 
 	var floatingButtonsVisible by remember { mutableStateOf(false) }
 
-	var noteFilter by remember { mutableStateOf<NoteFilter?>(null) }
-
 
 	LaunchedEffect(Unit) {
 		errorManager.errorEvent.collect { error ->
@@ -192,7 +190,7 @@ fun NotesScreen(
 								LoadButtonComponent(nextButton = false, action = {
 									actionType = ActionType.READ
 
-									noteViewModel.getNotesList(noteViewModelState.offset - notesLimit, notesLimit, showLoading = false, filter = noteFilter)
+									noteViewModel.getNotesList(noteViewModelState.offset - notesLimit, notesLimit, showLoading = false, filter = noteFilterViewModel.uiState.value.noteFilter)
 								})
 							}
 						}
