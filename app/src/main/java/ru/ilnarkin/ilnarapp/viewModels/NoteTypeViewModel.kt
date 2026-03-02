@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import ru.ilnarkin.ilnarapp.models.AppPagination
 import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.repositories.NoteTypeRepository
@@ -49,5 +50,10 @@ class NoteTypeViewModel(private val noteTypeRepository: NoteTypeRepository) : Vi
 
 			return emptyList()
 		}
+	}
+
+
+	fun dismissAlert() {
+		_uiState.update { it.copy(showAlert = false) }
 	}
 }
