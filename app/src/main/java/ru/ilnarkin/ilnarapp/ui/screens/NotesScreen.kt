@@ -98,7 +98,7 @@ fun NotesScreen(
 	var currentNote by remember { mutableStateOf<Note?>(null) }
 
 	var showNoteFilterFormSheet by remember { mutableStateOf(false) }
-	val noteSearchFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+	val noteFilterFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
 	val scope = rememberCoroutineScope()
 
@@ -504,7 +504,7 @@ fun NotesScreen(
 		ModalBottomSheet(
 			onDismissRequest = { showNoteFilterFormSheet = false },
 			containerColor = Color.White,
-			sheetState = noteSearchFormSheetState,
+			sheetState = noteFilterFormSheetState,
 		){
 			Column {
 				Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
