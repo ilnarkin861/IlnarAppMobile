@@ -12,13 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -58,7 +56,7 @@ import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 fun NoteFilterFormComponent(
 	viewModel: NoteFilterViewModel,
 	loadTags: suspend () -> MutableList<Tag>,
-	action: suspend () -> Unit,
+	action: () -> Unit,
 	resetFilter: () -> Unit
 ) {
 	val font = getInterFont()
@@ -68,8 +66,6 @@ fun NoteFilterFormComponent(
 	val viewModelState by viewModel.uiState.collectAsState()
 
 	var tagsLoading by remember { mutableStateOf(false) }
-
-	var filtering by remember { mutableStateOf(false) }
 
 	var yearsMenuExpanded by remember { mutableStateOf(false) }
 
@@ -492,44 +488,23 @@ fun NoteFilterFormComponent(
 				modifier = Modifier
 					.fillMaxWidth()
 					.height(60.dp),
-				enabled = !filtering,
 				shape = RoundedCornerShape(10.dp),
 				colors = ButtonDefaults.buttonColors(
 					containerColor = colorResource(R.color.primary_color),
 					disabledContainerColor = colorResource(R.color.primary_color).copy(alpha = 0.8f)),
 				onClick = {
 
-					scope.launch {
-						filtering = true
-						try {
-							viewModel.applyFilter()
+					viewModel.applyFilter()
 
-							action()
-
-						} finally {
-							filtering = false
-						}
-					}
+					action()
 				}
 			) {
-
-				if (filtering){
-					CircularProgressIndicator(
-						modifier = Modifier.size(20.dp),
-						strokeWidth = 2.dp,
-						color = Color.White,
-						trackColor = Color.Transparent,
-					)
-				}
-
-				else{
-					Text(
-						text = "Применить",
-						fontFamily = font,
-						fontSize = 16.sp,
-						fontWeight = FontWeight.SemiBold
-					)
-				}
+				Text(
+					text = "Применить",
+					fontFamily = font,
+					fontSize = 16.sp,
+					fontWeight = FontWeight.SemiBold
+				)
 			}
 		}
 
@@ -543,23 +518,26 @@ fun NoteFilterFormComponent(
 					top = 30.dp, bottom = 80.dp),
 			horizontalArrangement = Arrangement.Center
 		){
-			Text(
-				modifier = Modifier.clickable(
-					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
-					onClick = {
 
-						viewModel.resetFilter()
+			if (viewModelState.filterApplied){
+				Text(
+					modifier = Modifier.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+						onClick = {
 
-						resetFilter()
-					}
-				),
-				text = "Сбросить фильтр",
-				fontWeight = FontWeight.SemiBold,
-				fontSize = 15.sp,
-				color = Color.Gray,
-				fontFamily = font,
-			)
+							viewModel.resetFilter()
+
+							resetFilter()
+						}
+					),
+					text = "Сбросить фильтр",
+					fontWeight = FontWeight.SemiBold,
+					fontSize = 15.sp,
+					color = Color.Gray,
+					fontFamily = font,
+				)
+			}
 		}
 	}
 }

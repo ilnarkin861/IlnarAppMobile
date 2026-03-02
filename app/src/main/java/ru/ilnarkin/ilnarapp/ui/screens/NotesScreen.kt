@@ -524,9 +524,12 @@ fun NotesScreen(
 					},
 
 					action = {
-						noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
 
 						showNoteFilterFormSheet = false
+
+						scope.launch {
+							noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
+						}
 					},
 
 					resetFilter = {
