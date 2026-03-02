@@ -60,16 +60,15 @@ import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
-import ru.ilnarkin.ilnarapp.models.NoteFilter
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
+import ru.ilnarkin.ilnarapp.ui.components.NoteFilterFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
-import ru.ilnarkin.ilnarapp.ui.components.NoteFilterFormComponent
 import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
