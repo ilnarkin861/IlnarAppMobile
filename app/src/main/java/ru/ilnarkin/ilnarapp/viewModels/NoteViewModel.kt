@@ -27,7 +27,9 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 			val notesOffset = if (offset <= 0) 0 else offset
 
 			if (showLoading){
-				_uiState.value = _uiState.value.copy(loading = true)
+				_uiState.update { it.copy(
+					loading = true
+				)}
 			}
 
 			val filterParams = mutableListOf<Pair<String, String>>().apply {
@@ -37,7 +39,6 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				filter?.month?.let { add("month" to it.toString()) }
 				filter?.tagIds?.forEach { id -> add("tagIds" to id) }
 			}
-
 
 			val result = noteRepository.getList<AppPagination<Note>>(notesOffset, limit, filterParams)
 
@@ -51,6 +52,7 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 			result.data
 
 		}
+
 		catch (_: Exception){
 			_uiState.update { it.copy(
 				loading = false,
@@ -66,29 +68,30 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 
 
 	suspend fun getNoteById(id: String): Note?{
-		try {
 
+		try {
 			return noteRepository.getById<Note>(id)
 
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				data = null,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
 			return null
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				data = null,
 				showAlert = true,
-				message = "Ошибка при получении записи")
+				message = "Ошибка при получении записи"
+			)}
 
 			return null
 		}
@@ -102,20 +105,22 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
 			return null
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
-				message = "Ошибка при добавлении записи")
+				message = "Ошибка при добавлении записи"
+			)}
 
 			return null
 		}
@@ -129,20 +134,21 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
 			return null
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
-				message = "Ошибка при изменении записи")
+				message = "Ошибка при изменении записи"
+			)}
 
 			return null
 		}
@@ -156,20 +162,21 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
 			return false
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
-				message = "Ошибка при изменении записи")
+				message = "Ошибка при удалении записи"
+			)}
 
 			return false
 		}

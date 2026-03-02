@@ -27,29 +27,32 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 			val tagsOffset = if (offset <= 0) 0 else offset
 
 			if (showLoading){
-				_uiState.value = _uiState.value.copy(loading = true)
+				_uiState.update { it.copy(
+					loading = true
+				)}
 			}
 
 			val result = tagRepository.getList<AppPagination<Tag>>(tagsOffset, limit, null)
 
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				loading = false,
 				success = true,
 				list = result.data,
 				offset = tagsOffset,
-				pagination = result.pagination)
+				pagination = result.pagination
+			)}
 
 			result.data
 
 		}
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				loading = false,
 				success = false,
 				list = emptyList(),
 				showAlert = true,
 				message = DEFAULT_ERROR_MESSAGE
-			)
+			) }
 
 			return emptyList()
 		}
@@ -58,109 +61,114 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 	suspend fun getTagById(id: String): Tag?{
 
-		return try {
-			tagRepository.getById<Tag>(id) as Tag
+		try {
+			return tagRepository.getById<Tag>(id) as Tag
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				data = null,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
-			null
+			return null
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				data = null,
 				showAlert = true,
-				message = "Ошибка при получении тега")
+				message = "Ошибка при получении тега"
+			)}
 
-			null
+			return null
 		}
 	}
 
 
 	suspend fun createTag(tag: Tag): Tag?{
 
-		return try {
-			tagRepository.create<Tag>(tag)
+		try {
+			return tagRepository.create<Tag>(tag)
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
-			null
+			return null
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
-				message = "Ошибка при добавлении тега")
+				message = "Ошибка при добавлении тега"
+			)}
 
-			null
+			return null
 		}
 	}
 
 
 	suspend fun updateTag(tag: Tag): Tag?{
 
-		return try {
-			tagRepository.update<Tag>(tag.id, tag)
+		try {
+			return tagRepository.update<Tag>(tag.id, tag)
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
-			null
+			return null
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
-				message = "Ошибка при обновлении тега")
-			null
+				message = "Ошибка при обновлении тега"
+			) }
+
+			return null
 		}
 	}
 
 
 	suspend fun deleteTag(id: String): Boolean{
 
-		return try {
-			tagRepository.delete(id)
+		try {
+			return tagRepository.delete(id)
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
-			false
+			return false
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
-				message = "Ошибка при удалении тега")
+				message = "Ошибка при удалении тега"
+			)}
 
-			false
+			return false
 		}
 	}
 

@@ -37,13 +37,16 @@ class NoteFilterViewModel : ViewModel() {
 
 
     fun addNoteTypes(noteTypes: List<NoteType>) {
-        _uiState.update { it.copy(
-            selectableNoteTypes = noteTypes,
-            selectedNoteTypeId = noteTypes[0].id,
-            selectedNoteTypeTitle = noteTypes[0].title
-        )}
 
-        updateFilter()
+        if (!noteTypes.isEmpty()){
+            _uiState.update { it.copy(
+                selectableNoteTypes = noteTypes,
+                selectedNoteTypeId = noteTypes[0].id,
+                selectedNoteTypeTitle = noteTypes[0].title
+            )}
+
+            updateFilter()
+        }
     }
 
 

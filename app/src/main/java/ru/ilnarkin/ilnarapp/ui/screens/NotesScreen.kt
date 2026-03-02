@@ -318,23 +318,26 @@ fun NotesScreen(
 
 								floatingButtonsVisible = false
 
-								if (noteFilterViewModelState.selectableNoteTypes.isEmpty()){
-									val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
-									noteFilterViewModel.addNoteTypes(noteTypes)
-								}
+								val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
 
-								if (noteFilterViewModelState.selectableArchives.isEmpty()){
-									val archives = archiveViewModel.getArchivesList(0, 100)
-									noteFilterViewModel.addArchives(archives)
-								}
+								if (!noteTypes.isEmpty()){
+									if (noteFilterViewModelState.selectableNoteTypes.isEmpty()){
+										noteFilterViewModel.addNoteTypes(noteTypes)
+									}
 
-								if (noteFilterViewModelState.selectableTags.isEmpty()){
-									val tags = tagViewModel.getTagsList(0, tagsLimit)
-									val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
-									noteFilterViewModel.addTags(tags, hasNextTags)
-								}
+									if (noteFilterViewModelState.selectableArchives.isEmpty()){
+										val archives = archiveViewModel.getArchivesList(0, 100)
+										noteFilterViewModel.addArchives(archives)
+									}
 
-								showNoteFilterFormSheet = true
+									if (noteFilterViewModelState.selectableTags.isEmpty()){
+										val tags = tagViewModel.getTagsList(0, tagsLimit)
+										val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
+										noteFilterViewModel.addTags(tags, hasNextTags)
+									}
+
+									showNoteFilterFormSheet = true
+								}
 
 								floatingButtonsVisible = true
 							}

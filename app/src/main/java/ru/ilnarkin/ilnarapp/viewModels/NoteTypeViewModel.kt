@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import ru.ilnarkin.ilnarapp.exceptions.ApiException
+import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.AppPagination
 import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.repositories.NoteTypeRepository
@@ -25,28 +27,48 @@ class NoteTypeViewModel(private val noteTypeRepository: NoteTypeRepository) : Vi
 			val tagsOffset = if (offset <= 0) 0 else offset
 
 			if (showLoading){
-				_uiState.value = _uiState.value.copy(loading = true)
+				_uiState.update { it.copy(
+					loading = true
+				)}
 			}
 
 			val result = noteTypeRepository.getList<AppPagination<NoteType>>(tagsOffset, limit, null)
 
-			_uiState.value = _uiState.value.copy(
+			if (result.data.isEmpty()){
+				throw ApiException("Нет спика типов записи")
+			}
+
+			_uiState.update { it.copy(
 				loading = false,
 				success = true,
 				list = result.data,
 				offset = tagsOffset,
-				pagination = result.pagination)
+				pagination = result.pagination
+			)}
 
 			return result.data
-
 		}
+
+		catch (e: ApiException){
+
+			_uiState.update { it.copy(
+				loading = false,
+				success = false,
+				showAlert = true,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)}
+
+			return emptyList()
+		}
+
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+
+			_uiState.update { it.copy(
 				loading = false,
 				success = false,
 				showAlert = true,
 				message = "Ошибка при получении типов записи"
-			)
+			)}
 
 			return emptyList()
 		}

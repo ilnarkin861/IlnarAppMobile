@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.UserInfo
@@ -29,21 +30,23 @@ class UserViewModel(
 			val result = userRepository.checkAuth()
 
 			if (result){
-				_uiState.value = _uiState.value.copy(isAuth = true)
+				_uiState.update { it.copy(
+					isAuth = true
+				)}
 			}
 
 		}catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 		}
 
-		catch (e: Exception){
-			_uiState.value = _uiState.value.copy(
+		catch (_: Exception){
+			_uiState.update { it.copy(
 				success = false,
 				message = DEFAULT_ERROR_MESSAGE
-			)
+			)}
 		}
 	}
 
@@ -56,11 +59,16 @@ class UserViewModel(
 			val result = userRepository.login(userAuthData)
 
 			tokenManager.saveAuthToken(result.token)
-			_uiState.value = _uiState.value.copy(success = true)
 
+			_uiState.update { it.copy(
+				success = true
+			)}
+		}
 
-		}catch (_: ApiException){
-			_uiState.value = _uiState.value.copy(success = false)
+		catch (_: ApiException){
+			_uiState.update { it.copy(
+				success = false
+			)}
 		}
 	}
 

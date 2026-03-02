@@ -27,29 +27,32 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 			val tagsOffset = if (offset <= 0) 0 else offset
 
 			if (showLoading){
-				_uiState.value = _uiState.value.copy(loading = true)
+				_uiState.update { it.copy(
+					loading = true
+				)}
 			}
 
 			val result = archiveRepository.getList<AppPagination<Archive>>(tagsOffset, limit, null)
 
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				loading = false,
 				success = true,
 				list = result.data,
 				offset = tagsOffset,
-				pagination = result.pagination)
+				pagination = result.pagination
+			)}
 
 			return result.data
-
 		}
+
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				loading = false,
 				success = false,
 				showAlert = true,
 				list = emptyList(),
 				message = DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
 			return emptyList()
 		}
@@ -58,31 +61,32 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 
 	suspend fun getArchiveById(id: String): Archive?{
 
-		return try {
+		try {
 			_uiState.value = _uiState.value.copy(showAlert = false, data = null)
 
-			archiveRepository.getById<Archive>(id) as Archive
+			return archiveRepository.getById<Archive>(id)
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				data = null,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
-			null
+			return null
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				data = null,
 				showAlert = true,
-				message = DEFAULT_ERROR_MESSAGE)
+				message = DEFAULT_ERROR_MESSAGE
+			)}
 
-			null
+			return null
 		}
 	}
 
@@ -96,20 +100,22 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
 			return null
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
-				message = "Ошибка при добавлении архива")
+				message = "Ошибка при добавлении архива"
+			)}
 
 			return null
 		}
@@ -125,20 +131,22 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
 			return null
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
-				message = "Ошибка при обновлении архива")
+				message = "Ошибка при обновлении архива"
+			)}
+
 			return null
 		}
 	}
@@ -146,38 +154,40 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 
 	suspend fun deleteArchive(id: String): Boolean{
 
-		return try {
+		try {
 			_uiState.value = _uiState.value.copy(success = false)
 
 			archiveRepository.delete(id)
 
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = true,
 				message = "Архив успешно удален"
-			)
+			)}
 
-			true
+			return true
 		}
 
 		catch (e: ApiException){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
-			)
+			)}
 
-			false
+			return false
 		}
 
 		catch (_: Exception){
-			_uiState.value = _uiState.value.copy(
+			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
-				message = "Ошибка при удалении архива")
+				message = "Ошибка при удалении архива"
+			)}
 
-			false
+			return false
 		}
 	}
+
 
 	fun dismissAlert() {
 		_uiState.update { it.copy(showAlert = false) }
