@@ -22,8 +22,7 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 
 	suspend fun getNotesList(offset: Int, limit: Int, filter: NoteFilter? = null, showLoading: Boolean = true): List<Note>{
 
-		return try {
-
+		try {
 			val notesOffset = if (offset <= 0) 0 else offset
 
 			if (showLoading){
@@ -49,7 +48,7 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				list = result.data)
 			}
 
-			result.data
+			return result.data
 
 		}
 
@@ -62,7 +61,7 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 				message = DEFAULT_ERROR_MESSAGE
 			)}
 
-			emptyList()
+			return emptyList()
 		}
 	}
 
