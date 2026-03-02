@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,7 +48,6 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
-import ru.ilnarkin.ilnarapp.models.NoteFilter
 import ru.ilnarkin.ilnarapp.models.Tag
 import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 
@@ -58,7 +58,8 @@ import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 fun NoteFilterFormComponent(
 	viewModel: NoteFilterViewModel,
 	loadTags: suspend () -> MutableList<Tag>,
-	action: suspend (filter: NoteFilter?) -> Unit,
+	action: suspend () -> Unit,
+	resetFilter: () -> Unit
 ) {
 	val font = getInterFont()
 
@@ -485,7 +486,7 @@ fun NoteFilterFormComponent(
 				.fillMaxWidth()
 				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
 					end = dimensionResource(R.dimen.container_horizontal_padding),
-					top = 60.dp, bottom = 80.dp)
+					top = 60.dp)
 		) {
 			Button(
 				modifier = Modifier
@@ -501,9 +502,9 @@ fun NoteFilterFormComponent(
 					scope.launch {
 						filtering = true
 						try {
-							viewModel.updateFilter()
+							viewModel.applyFilter()
 
-							action(viewModelState.noteFilter)
+							action()
 
 						} finally {
 							filtering = false
@@ -530,6 +531,35 @@ fun NoteFilterFormComponent(
 					)
 				}
 			}
+		}
+
+
+		// Reset button
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
+					end = dimensionResource(R.dimen.container_horizontal_padding),
+					top = 30.dp, bottom = 80.dp),
+			horizontalArrangement = Arrangement.Center
+		){
+			Text(
+				modifier = Modifier.clickable(
+					interactionSource = remember { MutableInteractionSource() },
+					indication = null,
+					onClick = {
+
+						viewModel.resetFilter()
+
+						resetFilter()
+					}
+				),
+				text = "Сбросить фильтр",
+				fontWeight = FontWeight.SemiBold,
+				fontSize = 15.sp,
+				color = Color.Gray,
+				fontFamily = font,
+			)
 		}
 	}
 }

@@ -171,11 +171,36 @@ class NoteFilterViewModel : ViewModel() {
     }
 
 
-    fun resetFilter(){
-        //...
+    fun applyFilter(){
+        updateFilter()
 
         _uiState.update { it.copy(
-            noteFilter = null
-        ) }
+            filterApplied = true
+        )}
+    }
+
+
+    fun resetFilter(){
+
+        selectNoteType(_uiState.value.selectableNoteTypes[0].id, _uiState.value.selectableNoteTypes[0].title)
+
+        selectYear(null, _uiState.value.unSelectedYearTitle)
+
+        selectMonth(null, _uiState.value.unSelectedMonthTitle)
+
+        selectArchive(null, _uiState.value.unSelectedArchiveTitle)
+
+        _uiState.update { currentState ->
+
+            val updatedList = currentState.selectedTagIds.toMutableList()
+
+            updatedList.clear()
+
+            currentState.copy(
+                selectedTagIds = updatedList,
+                noteFilter = null,
+                filterApplied = false
+            )
+        }
     }
 }

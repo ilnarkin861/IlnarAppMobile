@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -157,6 +160,8 @@ fun NotesScreen(
 
 
 	LaunchedEffect(Unit) {
+		floatingButtonsVisible = false
+
 		noteViewModel.getNotesList(0, notesLimit)
 
 		floatingButtonsVisible = true
@@ -251,7 +256,7 @@ fun NotesScreen(
 							if (isDeleted){
 								val offset = if (noteViewModelState.list.size == 1) noteViewModelState.offset - notesLimit else noteViewModelState.offset
 
-								noteViewModel.getNotesList(offset, notesLimit, showLoading = false)
+								noteViewModel.getNotesList(offset, notesLimit, showLoading = false, filter = noteFilterViewModel.uiState.value.noteFilter)
 							}
 
 							floatingButtonsVisible = true
@@ -265,7 +270,7 @@ fun NotesScreen(
 								LoadButtonComponent(action = {
 									actionType = ActionType.READ
 
-									noteViewModel.getNotesList(noteViewModelState.offset + notesLimit, notesLimit, showLoading = false, filter = noteFilter)
+									noteViewModel.getNotesList(noteViewModelState.offset + notesLimit, notesLimit, showLoading = false, filter = noteFilterViewModel.uiState.value.noteFilter)
 								})
 							}
 						}
@@ -285,48 +290,63 @@ fun NotesScreen(
 
 
 		Column(
-			modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
+			modifier = Modifier
+				.align(Alignment.BottomEnd)
+				.padding(20.dp),
 			horizontalAlignment = Alignment.End,
 			verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-
-			SmallFloatingActionButton(
+			BadgedBox(
 				modifier = Modifier.align(Alignment.CenterHorizontally),
-				shape = CircleShape,
-				containerColor = Color.White,
-				contentColor = colorResource(R.color.primary_color),
-				onClick = {
-
-					if(floatingButtonsVisible){
-						scope.launch {
-
-							floatingButtonsVisible = false
-
-							if (noteFilterViewModelState.selectableNoteTypes.isEmpty()){
-								val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
-								noteFilterViewModel.addNoteTypes(noteTypes)
-							}
-
-							if (noteFilterViewModelState.selectableArchives.isEmpty()){
-								val archives = archiveViewModel.getArchivesList(0, 100)
-								noteFilterViewModel.addArchives(archives)
-							}
-
-							if (noteFilterViewModelState.selectableTags.isEmpty()){
-								val tags = tagViewModel.getTagsList(0, tagsLimit)
-								val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
-								noteFilterViewModel.addTags(tags, hasNextTags)
-							}
-
-							showNoteFilterFormSheet = true
-
-							floatingButtonsVisible = true
-						}
+				badge = {
+					if (noteFilterViewModelState.filterApplied){
+						Badge(
+							Modifier.size(12.dp).offset(x = (-1).dp, y = 1.dp),
+							containerColor = colorResource(R.color.danger_color)
+						)
 					}
+				}
+			) {
+				SmallFloatingActionButton(
+					shape = CircleShape,
+					containerColor = Color.White,
+					contentColor = colorResource(R.color.primary_color),
+					onClick = {
 
-				}) {
+						if(floatingButtonsVisible){
+							scope.launch {
 
-				Icon(painter = painterResource(R.drawable.ic_filter), contentDescription = "Filter")
+								floatingButtonsVisible = false
+
+								if (noteFilterViewModelState.selectableNoteTypes.isEmpty()){
+									val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
+									noteFilterViewModel.addNoteTypes(noteTypes)
+								}
+
+								if (noteFilterViewModelState.selectableArchives.isEmpty()){
+									val archives = archiveViewModel.getArchivesList(0, 100)
+									noteFilterViewModel.addArchives(archives)
+								}
+
+								if (noteFilterViewModelState.selectableTags.isEmpty()){
+									val tags = tagViewModel.getTagsList(0, tagsLimit)
+									val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
+									noteFilterViewModel.addTags(tags, hasNextTags)
+								}
+
+								showNoteFilterFormSheet = true
+
+								floatingButtonsVisible = true
+							}
+						}
+
+					}) {
+
+					Icon(painter = painterResource(R.drawable.ic_filter), contentDescription = "Filter")
+				}
+
+
+
 			}
 
 			FloatingActionButton(
@@ -442,6 +462,9 @@ fun NotesScreen(
 								val createdNote = noteViewModel.createNote(note)
 
 								if (createdNote != null){
+
+									noteFilterViewModel.resetFilter()
+
 									noteViewModel.getNotesList(0, notesLimit)
 								}
 							}
@@ -451,7 +474,7 @@ fun NotesScreen(
 								val updatedNote = noteViewModel.updateNote(note)
 
 								if (updatedNote != null){
-									noteViewModel.getNotesList(noteViewModelState.offset, notesLimit, noteFilter)
+									noteViewModel.getNotesList(noteViewModelState.offset, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
 								}
 							}
 
@@ -500,13 +523,18 @@ fun NotesScreen(
 						tags.toMutableList()
 					},
 
-					action = {filter ->
-
-						noteViewModel.getNotesList(0, notesLimit, filter)
-
-						noteFilter = filter
+					action = {
+						noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
 
 						showNoteFilterFormSheet = false
+					},
+
+					resetFilter = {
+						showNoteFilterFormSheet = false
+
+						scope.launch {
+							noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
+						}
 					}
 				)
 			}

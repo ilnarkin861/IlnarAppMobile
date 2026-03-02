@@ -35,5 +35,7 @@ data class NoteFilterUiState(
     var selectedArchiveId: String? = null,
 
     val selectedTagIds: List<String> = listOf(),
-    val hasNextTags: Boolean = false
+    val hasNextTags: Boolean = false,
+
+    val filterApplied: Boolean = false
 )
