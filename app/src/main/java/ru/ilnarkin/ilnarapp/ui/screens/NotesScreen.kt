@@ -463,7 +463,9 @@ fun NotesScreen(
 
 								if (createdNote != null){
 
-									noteFilterViewModel.resetFilter()
+									if (noteFilterViewModelState.filterApplied){
+										noteFilterViewModel.resetFilter()
+									}
 
 									noteViewModel.getNotesList(0, notesLimit)
 								}
