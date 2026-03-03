@@ -67,7 +67,7 @@ fun WelcomeScreen(
 
 					NetworkErrorType.UNAUTHORIZED -> {
 						navController.navigate(NavRoutes.LoginScreen.route) {
-							popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+							popUpTo(navController.graph.startDestinationId) { inclusive = true }
 						}
 
 						errorJob.cancel()

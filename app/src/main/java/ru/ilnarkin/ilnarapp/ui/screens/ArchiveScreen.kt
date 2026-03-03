@@ -1,6 +1,5 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,22 +34,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.WelcomeActivity
 import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.Archive
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
+import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.ItemFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
@@ -63,13 +62,12 @@ import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArchiveScreen(
+	navController: NavController,
 	archiveViewModel: ArchiveViewModel = koinViewModel(),
 	errorManager: NetworkErrorManager = koinInject()
 ) {
 
 	val limit = 100
-
-	val context = LocalContext.current
 
 	val listState = rememberLazyListState()
 
@@ -91,16 +89,21 @@ fun ArchiveScreen(
 	LaunchedEffect(Unit) {
 		errorManager.errorEvent.collect { error ->
 			when(error) {
-				NetworkErrorType.NO_INTERNET ->
-					snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE)
+				NetworkErrorType.NO_INTERNET,  NetworkErrorType.SERVER_ERROR ->{
+					val message = if (error == NetworkErrorType.NO_INTERNET) NO_INTERNET_ERROR_MESSAGE else  SERVER_ERROR_MESSAGE
 
-				NetworkErrorType.SERVER_ERROR ->
-					snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE)
+					snackBarHostState.showSnackbar(message)
+				}
 
 				NetworkErrorType.UNAUTHORIZED -> {
-					context.startActivity(Intent(context, WelcomeActivity::class.java).apply {
-						flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-					})
+					archiveViewModel.dismissAlert()
+
+					navController.navigate(NavRoutes.LoginScreen.route) {
+						popUpTo(0) { inclusive = true }
+
+						launchSingleTop = true
+					}
+
 					return@collect
 				}
 			}
@@ -113,7 +116,7 @@ fun ArchiveScreen(
 	}
 
 
-	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
+	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)).background(colorResource(R.color.app_bg_color))) {
 
 		if (!state.loading && !state.list.isEmpty()){
 			LazyColumn(

@@ -1,7 +1,6 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,23 +36,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
+import androidx.navigation.NavController
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.KEY_PIN
 import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.PinKeypadItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 
 
 @Composable
-fun PinResetScreen() {
+fun PinResetScreen(navController: NavController) {
 
 	val context = LocalContext.current
-	val intent = Intent(context, MainActivity::class.java)
 	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
 	val orientation = LocalConfiguration.current.orientation
@@ -108,7 +107,10 @@ fun PinResetScreen() {
 					dialogState.show()
 					sharedPreferences.edit {putString(KEY_PIN, inputPin.joinToString(""))}
 					dialogState.hide()
-					context.startActivity(intent)
+
+					navController.navigate(NavRoutes.OverlayScreen.route) {
+						popUpTo(NavRoutes.PinResetScreen.route) { inclusive = true }
+					}
 				}
 			}
 

@@ -1,7 +1,6 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -48,7 +47,6 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import ru.ilnarkin.ilnarapp.MainActivity
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.KEY_PIN
 import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
@@ -68,7 +66,6 @@ fun PinLockScreen(
 ) {
 
 	val context = LocalContext.current
-	val intent = Intent(context, MainActivity::class.java)
 	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
 	val orientation = LocalConfiguration.current.orientation
@@ -105,7 +102,10 @@ fun PinLockScreen(
 
 			else{
 				dialogState.hide()
-				context.startActivity(intent)
+
+				navController.navigate(NavRoutes.OverlayScreen.route) {
+					popUpTo(NavRoutes.PinLockScreen.route) { inclusive = true }
+				}
 			}
 
 			inputPin.clear()

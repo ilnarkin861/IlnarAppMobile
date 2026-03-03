@@ -1,6 +1,5 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
-import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -42,18 +41,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.WelcomeActivity
 import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
@@ -61,6 +59,7 @@ import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
+import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
@@ -80,6 +79,7 @@ import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NotesScreen(
+	navController: NavController,
 	noteViewModel: NoteViewModel = koinViewModel(),
 	noteTypeViewModel: NoteTypeViewModel = koinViewModel(),
 	tagViewModel: TagViewModel = koinViewModel(),
@@ -90,8 +90,6 @@ fun NotesScreen(
 
 	val notesLimit = 10
 	val tagsLimit = 10
-
-	val context = LocalContext.current
 
 	var actionType by remember { mutableStateOf(ActionType.READ) }
 
@@ -131,24 +129,25 @@ fun NotesScreen(
 	LaunchedEffect(Unit) {
 		errorManager.errorEvent.collect { error ->
 			when(error) {
-				NetworkErrorType.NO_INTERNET ->{
+				NetworkErrorType.NO_INTERNET, NetworkErrorType.SERVER_ERROR -> {
 					showNoteDetailsSheet = false
 					noteDetailsLoading = false
 					currentNote = null
-					snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE)
-				}
-
-				NetworkErrorType.SERVER_ERROR -> {
-					showNoteDetailsSheet = false
-					noteDetailsLoading = false
-					currentNote = null
-					snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE)
+					val message = if (error == NetworkErrorType.NO_INTERNET) NO_INTERNET_ERROR_MESSAGE else SERVER_ERROR_MESSAGE
+					snackBarHostState.showSnackbar(message)
 				}
 
 				NetworkErrorType.UNAUTHORIZED -> {
-					context.startActivity(Intent(context, WelcomeActivity::class.java).apply {
-						flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-					})
+					noteTypeViewModel.dismissAlert()
+
+					noteViewModel.dismissAlert()
+
+					navController.navigate(NavRoutes.LoginScreen.route) {
+						popUpTo(0) { inclusive = true }
+
+						launchSingleTop = true
+					}
+
 					return@collect
 				}
 			}
