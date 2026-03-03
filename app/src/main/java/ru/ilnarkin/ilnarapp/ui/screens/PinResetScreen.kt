@@ -15,7 +15,11 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,11 +39,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.edit
 import androidx.navigation.NavController
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.MaterialDialogState
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.KEY_PIN
 import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
@@ -49,6 +51,7 @@ import ru.ilnarkin.ilnarapp.ui.components.PinKeypadItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PinResetScreen(navController: NavController) {
 
@@ -75,8 +78,9 @@ fun PinResetScreen(navController: NavController) {
 	var newPin: String? by remember { mutableStateOf(null) }
 	var confirmPin: String? by remember { mutableStateOf(null) }
 
-	val dialogState = rememberMaterialDialogState()
 	val scrollState = rememberScrollState()
+
+	var showLoading by remember { mutableStateOf(false) }
 
 
 	if (inputPin.size == 4){
@@ -104,9 +108,11 @@ fun PinResetScreen(navController: NavController) {
 				}
 
 				else{
-					dialogState.show()
+					showLoading = true
+
 					sharedPreferences.edit {putString(KEY_PIN, inputPin.joinToString(""))}
-					dialogState.hide()
+
+					showLoading = false
 
 					navController.navigate(NavRoutes.OverlayScreen.route) {
 						popUpTo(NavRoutes.PinResetScreen.route) { inclusive = true }
@@ -262,21 +268,29 @@ fun PinResetScreen(navController: NavController) {
 	}
 
 
-	MaterialDialog(
-		dialogState = dialogState,
-		shape = MaterialTheme.shapes.small,
-		onCloseRequest = { MaterialDialogState.Saver() },
-	){
-		Column(modifier = Modifier.background(Color.White).padding(horizontal = 16.dp, vertical = 20.dp)) {
-			Row(modifier = Modifier.fillMaxWidth(),	verticalAlignment = Alignment.CenterVertically) {
+	if (showLoading){
+		BasicAlertDialog(
+			onDismissRequest = {},
+			properties = DialogProperties(
+				dismissOnBackPress = false,
+				dismissOnClickOutside = false
+			)) {
+			Surface(
+				shape = MaterialTheme.shapes.small,
+				tonalElevation = AlertDialogDefaults.TonalElevation
+			) {
+				Column(modifier = Modifier.background(Color.White).padding(horizontal = 16.dp, vertical = 20.dp)) {
+					Row(modifier = Modifier.fillMaxWidth(),	verticalAlignment = Alignment.CenterVertically) {
 
-				ProgressIndicatorComponent(size = 40, color = colorResource(R.color.primary_color))
+						ProgressIndicatorComponent(size = 40, color = colorResource(R.color.primary_color))
 
-				Text("Подожди...",
-					modifier = Modifier.padding(start = 15.dp),
-					color = colorResource(R.color.text_color),
-					fontFamily = font,
-					fontSize = 16.sp)
+						Text("Подожди...",
+							modifier = Modifier.padding(start = 15.dp),
+							color = colorResource(R.color.text_color),
+							fontFamily = font,
+							fontSize = 16.sp)
+					}
+				}
 			}
 		}
 	}

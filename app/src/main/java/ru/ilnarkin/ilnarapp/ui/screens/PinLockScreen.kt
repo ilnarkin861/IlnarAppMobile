@@ -16,8 +16,12 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,12 +43,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.MaterialDialogState
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.KEY_PIN
@@ -58,6 +58,7 @@ import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PinLockScreen(
 	navController: NavController,
@@ -73,7 +74,6 @@ fun PinLockScreen(
 
 	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
 
-
 	val font = getInterFont()
 
 	val inputPin = remember { mutableStateListOf<Int>() }
@@ -81,32 +81,29 @@ fun PinLockScreen(
 
 	var showConfirmAlert by remember { mutableStateOf(false) }
 
-	val dialogState = rememberMaterialDialogState()
-
 	val scrollState = rememberScrollState()
 
-	val scope = rememberCoroutineScope()
+	var showLoading by remember { mutableStateOf(false) }
 
 
 	if (inputPin.size == 4){
 		LaunchedEffect(true) {
 
-			dialogState.show()
+			showLoading = true
 
 			val pin = sharedPreferences.getString(KEY_PIN, null)
 
 			if (pin != null && pin != inputPin.joinToString("")){
 				incorrectPin = true
-				dialogState.hide()
 			}
 
 			else{
-				dialogState.hide()
-
 				navController.navigate(NavRoutes.OverlayScreen.route) {
 					popUpTo(NavRoutes.PinLockScreen.route) { inclusive = true }
 				}
 			}
+
+			showLoading = false
 
 			inputPin.clear()
 		}
@@ -287,22 +284,31 @@ fun PinLockScreen(
 	}
 
 
-	MaterialDialog(
-		dialogState = dialogState,
-		shape = MaterialTheme.shapes.small,
-		onCloseRequest = { MaterialDialogState.Saver() },
-	){
-		Column(modifier = Modifier.background(Color.White).padding(horizontal = 16.dp, vertical = 20.dp)) {
-			Row(modifier = Modifier.fillMaxWidth(),
-				verticalAlignment = Alignment.CenterVertically) {
 
-				ProgressIndicatorComponent(size = 40, color = colorResource(R.color.primary_color))
+	if (showLoading){
+		BasicAlertDialog(
+			onDismissRequest = {},
+			properties = DialogProperties(
+				dismissOnBackPress = false,
+				dismissOnClickOutside = false
+			)) {
+			Surface(
+				shape = MaterialTheme.shapes.small,
+				tonalElevation = AlertDialogDefaults.TonalElevation
+			) {
+				Column(modifier = Modifier.background(Color.White).padding(horizontal = 16.dp, vertical = 20.dp)) {
+					Row(modifier = Modifier.fillMaxWidth(),
+						verticalAlignment = Alignment.CenterVertically) {
 
-				Text("Проверка PIN-кода",
-					modifier = Modifier.padding(start = 15.dp),
-					color = colorResource(R.color.text_color),
-					fontFamily = font,
-					fontSize = 16.sp)
+						ProgressIndicatorComponent(size = 40, color = colorResource(R.color.primary_color))
+
+						Text("Проверка PIN-кода",
+							modifier = Modifier.padding(start = 15.dp),
+							color = colorResource(R.color.text_color),
+							fontFamily = font,
+							fontSize = 16.sp)
+					}
+				}
 			}
 		}
 	}
@@ -315,11 +321,7 @@ fun PinLockScreen(
 
 			if (confirmed){
 
-				scope.launch {
-					async {
-						userViewModel.clearToken()
-					}.await()
-				}
+				userViewModel.clearToken()
 
 				navController.navigate(NavRoutes.WelcomeScreen.route){
 					popUpTo(NavRoutes.PinLockScreen.route) {
