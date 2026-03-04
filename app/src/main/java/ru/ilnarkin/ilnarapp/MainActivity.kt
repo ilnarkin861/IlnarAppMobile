@@ -49,11 +49,7 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
-		setContent {
-			Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-				Main()
-			}
-		}
+		setContent { Main() }
 	}
 }
 
@@ -71,7 +67,10 @@ fun Main(){
 
 	val borderColor = colorResource(R.color.border_color)
 
-	Column(Modifier.displayCutoutPadding()
+	Column(Modifier.fillMaxSize()
+		.statusBarsPadding()
+		.navigationBarsPadding()
+		.displayCutoutPadding()
 		.background(colorResource(R.color.app_bg_color))) {
 
 		if (currentRoute != null && !currentRoute.contains("welcome")){
