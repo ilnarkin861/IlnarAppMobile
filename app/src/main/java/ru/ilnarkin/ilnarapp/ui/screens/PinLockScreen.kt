@@ -1,6 +1,5 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
-import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -47,8 +45,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.KEY_PIN
-import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.ConfirmComponent
@@ -64,9 +60,6 @@ fun PinLockScreen(
 	userViewModel: UserViewModel = koinViewModel()
 
 ) {
-
-	val context = LocalContext.current
-	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
 	val orientation = LocalConfiguration.current.orientation
 	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -90,9 +83,9 @@ fun PinLockScreen(
 
 			showLoading = true
 
-			val pin = sharedPreferences.getString(KEY_PIN, null)
+			val pin = userViewModel.getPinCode()
 
-			if (pin != null && pin != inputPin.joinToString("")){
+			if (pin != inputPin.joinToString("")){
 				incorrectPin = true
 			}
 

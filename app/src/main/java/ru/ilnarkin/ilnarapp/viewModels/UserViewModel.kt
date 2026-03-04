@@ -9,13 +9,13 @@ import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.UserInfo
 import ru.ilnarkin.ilnarapp.models.UserLoginData
-import ru.ilnarkin.ilnarapp.network.TokenManager
+import ru.ilnarkin.ilnarapp.network.UserManager
 import ru.ilnarkin.ilnarapp.repositories.UserRepository
 import ru.ilnarkin.ilnarapp.ui.AppUiState
 
 
 class UserViewModel(
-	private val tokenManager: TokenManager,
+	private val userManager: UserManager,
 	private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -58,7 +58,7 @@ class UserViewModel(
 
 			val result = userRepository.login(userAuthData)
 
-			tokenManager.saveAuthToken(result.token)
+			userManager.saveAuthToken(result.token)
 
 			_uiState.update { it.copy(
 				success = true
@@ -73,7 +73,22 @@ class UserViewModel(
 	}
 
 
+	fun setPinCode(pinCode: String){
+		userManager.setPinCode(pinCode)
+	}
+
+
+	fun getPinCode(): String?{
+		return userManager.getPinCode()
+	}
+
+
+	fun clearPinCode(){
+		userManager.clearPinCode()
+	}
+
+
 	fun clearToken(){
-		tokenManager.clearAuthToken()
+		userManager.clearAuthToken()
 	}
 }

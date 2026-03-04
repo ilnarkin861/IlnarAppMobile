@@ -1,6 +1,5 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
-import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,30 +32,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.content.edit
 import androidx.navigation.NavController
+import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.KEY_PIN
-import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.PinKeypadItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PinResetScreen(navController: NavController) {
-
-	val context = LocalContext.current
-	val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+fun PinResetScreen(
+	navController: NavController,
+	userViewModel: UserViewModel = koinViewModel()
+	) {
 
 	val orientation = LocalConfiguration.current.orientation
 	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -110,7 +107,7 @@ fun PinResetScreen(navController: NavController) {
 				else{
 					showLoading = true
 
-					sharedPreferences.edit {putString(KEY_PIN, inputPin.joinToString(""))}
+					userViewModel.setPinCode(inputPin.joinToString(""))
 
 					showLoading = false
 

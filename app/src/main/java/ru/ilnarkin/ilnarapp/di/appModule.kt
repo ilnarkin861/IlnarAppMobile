@@ -30,7 +30,7 @@ val appModule = module {
 		androidContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 	}
 
-	viewModel { UserViewModel(get(), get() ) }
+	viewModel { UserViewModel(get(), get()) }
 	viewModel { TagViewModel(get()) }
 	viewModel { ArchiveViewModel(get()) }
 	viewModel { NoteTypeViewModel(get()) }

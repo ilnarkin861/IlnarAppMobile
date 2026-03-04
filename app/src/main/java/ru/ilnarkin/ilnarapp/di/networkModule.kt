@@ -20,25 +20,20 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.exceptions.ApiException
-import ru.ilnarkin.ilnarapp.interceptors.AuthInterceptor
-import ru.ilnarkin.ilnarapp.interceptors.NetworkErrorInterceptor
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
-import ru.ilnarkin.ilnarapp.network.TokenManager
+import ru.ilnarkin.ilnarapp.network.UserManager
 import java.net.ConnectException
 
 
 val networkModule = module {
 
 	single { NetworkErrorManager() }
-	single { TokenManager(get()) }
-
-	single { NetworkErrorInterceptor(get(), get()) }
-	single { AuthInterceptor(get()) }
+	single { UserManager(get()) }
 
 
 	single {
 		val errorManager: NetworkErrorManager = get()
-		val tokenManager: TokenManager = get()
+		val userManager: UserManager = get()
 		val context = androidContext()
 
 		HttpClient(CIO) {
@@ -57,7 +52,7 @@ val networkModule = module {
 
 				header(HttpHeaders.ContentType, ContentType.Application.Json)
 
-				val token = tokenManager.getAuthToken()
+				val token = userManager.getAuthToken()
 
 				if (!token.isNullOrBlank()) {
 					header("Authorization", "Bearer $token")

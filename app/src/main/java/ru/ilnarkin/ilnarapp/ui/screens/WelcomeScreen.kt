@@ -48,8 +48,19 @@ fun WelcomeScreen(
 
 	LaunchedEffect(state.isAuth) {
 		if (state.isAuth) {
-			navController.navigate(NavRoutes.PinLockScreen.route) {
-				popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+
+			val pinCode = userViewModel.getPinCode()
+
+			if (pinCode != null){
+				navController.navigate(NavRoutes.PinLockScreen.route) {
+					popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+				}
+			}
+
+			else{
+				navController.navigate(NavRoutes.PinResetScreen.route) {
+					popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+				}
 			}
 		}
 	}
@@ -66,6 +77,9 @@ fun WelcomeScreen(
 					NetworkErrorType.SERVER_ERROR -> snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE)
 
 					NetworkErrorType.UNAUTHORIZED -> {
+
+						userViewModel.clearPinCode()
+
 						navController.navigate(NavRoutes.LoginScreen.route) {
 							popUpTo(navController.graph.startDestinationId) { inclusive = true }
 						}
