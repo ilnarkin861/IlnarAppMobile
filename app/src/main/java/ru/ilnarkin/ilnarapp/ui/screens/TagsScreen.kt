@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,22 +67,19 @@ fun TagsScreen(
 	tagViewModel: TagViewModel = koinViewModel(),
 	errorManager: NetworkErrorManager = koinInject()
 	) {
-
 	val limit = 15
+
+	val itemId = rememberSaveable { mutableStateOf("") }
+
+	val itemText = rememberSaveable { mutableStateOf("") }
 
 	val listState = rememberLazyListState()
 
-	var modalFormLabel by remember { mutableStateOf("") }
+	var modalFormLabel by rememberSaveable { mutableStateOf("") }
 
-	var formDialogShowed by remember { mutableStateOf(false) }
-
-	var actionType by remember { mutableStateOf(ActionType.READ) }
+	var formDialogShowed by rememberSaveable { mutableStateOf(false) }
 
 	val state by tagViewModel.uiState.collectAsState()
-
-	val itemId = remember { mutableStateOf("") }
-
-	val itemText = remember { mutableStateOf("") }
 
 	val snackBarHostState = remember { SnackbarHostState() }
 
@@ -112,7 +110,9 @@ fun TagsScreen(
 
 
 	LaunchedEffect(Unit) {
-		tagViewModel.getTagsList(state.offset, limit)
+		if (state.list.isEmpty()){
+			tagViewModel.getTagsList(state.offset, limit)
+		}
 	}
 
 
@@ -129,7 +129,7 @@ fun TagsScreen(
 						item {
 							Row(Modifier.padding(bottom = 25.dp)) {
 								LoadButtonComponent(nextButton = false, action = {
-									actionType = ActionType.READ
+									tagViewModel.setActionType(ActionType.READ)
 
 									tagViewModel.getTagsList(state.offset - limit, limit, false)
 								})
@@ -148,7 +148,7 @@ fun TagsScreen(
 								val tag = tagViewModel.getTagById(item.id)
 
 								if (tag != null) {
-									actionType = ActionType.UPDATE
+									tagViewModel.setActionType(ActionType.UPDATE)
 									itemText.value = tag.title
 									itemId.value = tag.id
 									modalFormLabel = "Изменить тег"
@@ -157,7 +157,6 @@ fun TagsScreen(
 							},
 
 							deleteAction = {
-
 								val isDeleted = tagViewModel.deleteTag(item.id)
 
 								if (isDeleted){
@@ -179,7 +178,7 @@ fun TagsScreen(
 						item {
 							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
 								LoadButtonComponent(action = {
-									actionType = ActionType.READ
+									tagViewModel.setActionType(ActionType.READ)
 
 									tagViewModel.getTagsList(state.offset + limit, limit, false)
 								})
@@ -215,7 +214,7 @@ fun TagsScreen(
 				.absolutePadding(bottom = 20.dp, right = 20.dp)
 				.background(Color.Transparent),
 			onClick = {
-				actionType = ActionType.CREATE
+				tagViewModel.setActionType(ActionType.CREATE)
 				modalFormLabel = "Добавить тег"
 				itemText.value = ""
 				formDialogShowed = true
@@ -264,7 +263,7 @@ fun TagsScreen(
 
 					action = {text->
 
-						if (actionType == ActionType.CREATE){
+						if (state.actionType == ActionType.CREATE){
 
 							val createdTag = tagViewModel.createTag(Tag(title = text))
 
@@ -273,7 +272,7 @@ fun TagsScreen(
 							}
 						}
 
-						if (actionType == ActionType.UPDATE){
+						if (state.actionType == ActionType.UPDATE){
 
 							val updatedTag = tagViewModel.updateTag(Tag(id = itemId.value, title = text))
 

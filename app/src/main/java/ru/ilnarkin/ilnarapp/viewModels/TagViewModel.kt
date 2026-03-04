@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.AppPagination
@@ -171,6 +172,14 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 			return false
 		}
 	}
+
+
+	fun setActionType(actionType: ActionType){
+		_uiState.update { it.copy(
+			actionType = actionType
+		) }
+	}
+
 
 	fun dismissAlert() {
 		_uiState.update { it.copy(showAlert = false) }

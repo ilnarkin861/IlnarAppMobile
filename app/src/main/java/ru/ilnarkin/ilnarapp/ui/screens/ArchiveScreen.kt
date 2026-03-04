@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,17 +72,15 @@ fun ArchiveScreen(
 
 	val listState = rememberLazyListState()
 
-	var modalFormLabel by remember { mutableStateOf("") }
+	var modalFormLabel by rememberSaveable { mutableStateOf("") }
 
-	var formDialogShowed by remember { mutableStateOf(false) }
-
-	var actionType by remember { mutableStateOf(ActionType.READ) }
+	var formDialogShowed by rememberSaveable { mutableStateOf(false) }
 
 	val state by archiveViewModel.uiState.collectAsState()
 
-	val itemId = remember { mutableStateOf("") }
+	val itemId = rememberSaveable { mutableStateOf("") }
 
-	val itemText = remember { mutableStateOf("") }
+	val itemText = rememberSaveable { mutableStateOf("") }
 
 	val snackBarHostState = remember { SnackbarHostState() }
 
@@ -112,7 +111,9 @@ fun ArchiveScreen(
 
 
 	LaunchedEffect(Unit) {
-		archiveViewModel.getArchivesList(state.offset, limit)
+		if (state.list.isEmpty()){
+			archiveViewModel.getArchivesList(state.offset, limit)
+		}
 	}
 
 
@@ -129,7 +130,7 @@ fun ArchiveScreen(
 						item {
 							Row(Modifier.padding(bottom = 25.dp)) {
 								LoadButtonComponent(nextButton = false, action = {
-									actionType = ActionType.READ
+									archiveViewModel.setActionType(ActionType.READ)
 
 									archiveViewModel.getArchivesList(state.offset - limit, limit, false)
 								})
@@ -148,7 +149,7 @@ fun ArchiveScreen(
 								val archive = archiveViewModel.getArchiveById(item.id)
 
 								if (archive != null) {
-									actionType = ActionType.UPDATE
+									archiveViewModel.setActionType(ActionType.UPDATE)
 									itemText.value = archive.title
 									itemId.value = archive.id
 									modalFormLabel = "Изменить архив"
@@ -178,7 +179,7 @@ fun ArchiveScreen(
 						item {
 							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
 								LoadButtonComponent(action = {
-									actionType = ActionType.READ
+									archiveViewModel.setActionType(ActionType.READ)
 
 									archiveViewModel.getArchivesList(state.offset + limit, limit, false)
 								})
@@ -214,7 +215,7 @@ fun ArchiveScreen(
 				.absolutePadding(bottom = 20.dp, right = 20.dp)
 				.background(Color.Transparent),
 			onClick = {
-				actionType = ActionType.CREATE
+				archiveViewModel.setActionType(ActionType.CREATE)
 				modalFormLabel = "Добавить архив"
 				itemText.value = ""
 				formDialogShowed = true
@@ -263,7 +264,7 @@ fun ArchiveScreen(
 					modalFormLabel,
 					action = {text->
 
-						if (actionType == ActionType.CREATE){
+						if (state.actionType == ActionType.CREATE){
 
 							val createdArchive = archiveViewModel.createArchive(Archive(title = text))
 
@@ -272,7 +273,7 @@ fun ArchiveScreen(
 							}
 						}
 
-						if (actionType == ActionType.UPDATE){
+						if (state.actionType == ActionType.UPDATE){
 
 							val updatedArchive = archiveViewModel.updateArchive(Archive(id = itemId.value, title = text))
 
