@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +58,6 @@ import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
-import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
@@ -91,25 +91,21 @@ fun NotesScreen(
 	val notesLimit = 10
 	val tagsLimit = 10
 
-	var actionType by remember { mutableStateOf(ActionType.READ) }
-
-	var currentNote by remember { mutableStateOf<Note?>(null) }
-
-	var showNoteFilterFormSheet by remember { mutableStateOf(false) }
+	var showNoteFilterFormSheet by rememberSaveable { mutableStateOf(false) }
 	val noteFilterFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
 	val scope = rememberCoroutineScope()
 
 	val listState = rememberLazyListState()
 
-	var showNoteFormSheet by remember { mutableStateOf(false) }
+	var showNoteFormSheet by rememberSaveable { mutableStateOf(false) }
 	val noteFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-	var showNoteDetailsSheet by remember { mutableStateOf(false) }
+	var showNoteDetailsSheet by rememberSaveable { mutableStateOf(false) }
 	val noteDetailsSheetState = rememberModalBottomSheetState()
-	var noteDetailsLoading by remember { mutableStateOf(false) }
+	var noteDetailsLoading by rememberSaveable { mutableStateOf(false) }
 
-	val sheetTitle = remember { mutableStateOf("") }
+	val sheetTitle = rememberSaveable { mutableStateOf("") }
 
 	val snackBarHostState = remember { SnackbarHostState() }
 
@@ -123,7 +119,7 @@ fun NotesScreen(
 
 	val noteFilterViewModelState by noteFilterViewModel.uiState.collectAsState()
 
-	var floatingButtonsVisible by remember { mutableStateOf(false) }
+	var floatingButtonsVisible by rememberSaveable { mutableStateOf(false) }
 
 
 	LaunchedEffect(Unit) {
@@ -132,7 +128,6 @@ fun NotesScreen(
 				NetworkErrorType.NO_INTERNET, NetworkErrorType.SERVER_ERROR -> {
 					showNoteDetailsSheet = false
 					noteDetailsLoading = false
-					currentNote = null
 					val message = if (error == NetworkErrorType.NO_INTERNET) NO_INTERNET_ERROR_MESSAGE else SERVER_ERROR_MESSAGE
 					snackBarHostState.showSnackbar(message)
 				}
@@ -156,18 +151,16 @@ fun NotesScreen(
 
 
 	LaunchedEffect(Unit) {
-		floatingButtonsVisible = false
+		if (noteViewModelState.list.isEmpty()){
 
-		noteViewModel.getNotesList(0, notesLimit)
+			noteViewModel.getNotesList(0, notesLimit)
+		}
 
 		floatingButtonsVisible = true
 	}
 
 
-	Box(Modifier
-		.fillMaxSize()
-		.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
-
+	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 		if (noteViewModelState.loading){
 			Box(
 				modifier = Modifier.fillMaxSize(),
@@ -186,7 +179,7 @@ fun NotesScreen(
 						item {
 							Row(Modifier.padding(bottom = 25.dp)) {
 								LoadButtonComponent(nextButton = false, action = {
-									actionType = ActionType.READ
+									noteViewModel.setActionType(ActionType.READ)
 
 									noteViewModel.getNotesList(noteViewModelState.offset - notesLimit, notesLimit, showLoading = false, filter = noteFilterViewModel.uiState.value.noteFilter)
 								})
@@ -199,20 +192,13 @@ fun NotesScreen(
 					NoteItemComponent(
 						value,
 						viewAction = {
-
 							floatingButtonsVisible = false
-
-							currentNote = null
 
 							showNoteDetailsSheet = true
 
 							noteDetailsLoading = true
 
-							val result = noteViewModel.getNoteById(value.id)
-
-							if (result != null){
-								currentNote = result
-							}
+							noteViewModel.getNoteById(value.id)
 
 							noteDetailsLoading = false
 
@@ -233,8 +219,8 @@ fun NotesScreen(
 									tagViewModel.getTagsList(0, tagsLimit)
 									archiveViewModel.getArchivesList(0, 100)
 
-									currentNote = result
-									actionType = ActionType.UPDATE
+									noteViewModel.setActionType(ActionType.UPDATE)
+
 									sheetTitle.value = "Изменить запись"
 									showNoteFormSheet = true
 								}
@@ -244,7 +230,6 @@ fun NotesScreen(
 						},
 
 						deleteAction = {
-
 							floatingButtonsVisible = false
 
 							val isDeleted = noteViewModel.deleteNote(value.id)
@@ -264,7 +249,7 @@ fun NotesScreen(
 						item {
 							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
 								LoadButtonComponent(action = {
-									actionType = ActionType.READ
+									noteViewModel.setActionType(ActionType.READ)
 
 									noteViewModel.getNotesList(noteViewModelState.offset + notesLimit, notesLimit, showLoading = false, filter = noteFilterViewModel.uiState.value.noteFilter)
 								})
@@ -276,9 +261,7 @@ fun NotesScreen(
 		}
 
 		if (!noteViewModelState.loading && noteViewModelState.list.isEmpty()){
-			Box(modifier = Modifier
-				.background(colorResource(R.color.app_bg_color))
-				.fillMaxSize(),
+			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
 				contentAlignment = Alignment.Center){
 				MessageComponent("Записей нет")
 			}
@@ -286,9 +269,7 @@ fun NotesScreen(
 
 
 		Column(
-			modifier = Modifier
-				.align(Alignment.BottomEnd)
-				.padding(20.dp),
+			modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
 			horizontalAlignment = Alignment.End,
 			verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
@@ -343,19 +324,15 @@ fun NotesScreen(
 
 					Icon(painter = painterResource(R.drawable.ic_filter), contentDescription = "Filter")
 				}
-
-
-
 			}
 
 			FloatingActionButton(
+				modifier = Modifier.background(Color.Transparent),
 				containerColor = colorResource(R.color.primary_color),
 				contentColor = Color.White,
 				shape = CircleShape,
-				modifier = Modifier
-					.background(Color.Transparent),
-				onClick = {
 
+				onClick = {
 					if(floatingButtonsVisible){
 						scope.launch {
 
@@ -367,8 +344,10 @@ fun NotesScreen(
 								tagViewModel.getTagsList(0, tagsLimit)
 								archiveViewModel.getArchivesList(0, 100)
 
-								currentNote = null
-								actionType = ActionType.CREATE
+								noteViewModel.setActionType(ActionType.CREATE)
+
+								noteViewModel.clearNote()
+
 								sheetTitle.value = "Добавить запись"
 								showNoteFormSheet = true
 							}
@@ -386,10 +365,8 @@ fun NotesScreen(
 
 
 		SnackbarHost(
-			hostState = snackBarHostState,
-			modifier = Modifier
-				.padding(16.dp)
-				.align(Alignment.BottomCenter)
+			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter),
+			hostState = snackBarHostState
 		){data ->
 			Snackbar(
 				snackbarData = data,
@@ -405,7 +382,6 @@ fun NotesScreen(
 		message = if (noteViewModelState.showAlert) noteViewModelState.message else noteTypeViewModelState.message,
 		showed = noteViewModelState.showAlert || noteTypeViewModelState.showAlert,
 		action = {
-
 			noteTypeViewModel.dismissAlert()
 
 			noteViewModel.dismissAlert()
@@ -416,10 +392,7 @@ fun NotesScreen(
 	// Form sheet
 	if (showNoteFormSheet){
 		ModalBottomSheet(
-			onDismissRequest = {
-				currentNote = null
-				showNoteFormSheet = false
-			},
+			onDismissRequest = { showNoteFormSheet = false },
 			containerColor = Color.White,
 			sheetState = noteFormSheetState,
 		) {
@@ -437,9 +410,7 @@ fun NotesScreen(
 
 				if (noteDetailsLoading){
 					Box(
-						modifier = Modifier
-							.fillMaxWidth()
-							.height(200.dp),
+						modifier = Modifier.fillMaxWidth().height(200.dp),
 						contentAlignment = Alignment.Center
 					) {
 						ProgressIndicatorComponent(50, colorResource(R.color.primary_color))
@@ -448,7 +419,7 @@ fun NotesScreen(
 
 				else{
 					NoteFormComponent(
-						currentNote,
+						noteViewModelState.data,
 						noteTypes = noteTypeViewModelState.list,
 						archives = archiveViewModelState.list,
 						tags = tagViewModelState.list,
@@ -461,7 +432,7 @@ fun NotesScreen(
 
 						action = {note ->
 
-							if (actionType == ActionType.CREATE){
+							if (noteViewModelState.actionType == ActionType.CREATE){
 
 								val createdNote = noteViewModel.createNote(note)
 
@@ -475,7 +446,7 @@ fun NotesScreen(
 								}
 							}
 
-							if (actionType == ActionType.UPDATE){
+							if (noteViewModelState.actionType == ActionType.UPDATE){
 
 								val updatedNote = noteViewModel.updateNote(note)
 
@@ -484,11 +455,7 @@ fun NotesScreen(
 								}
 							}
 
-							noteFormSheetState.hide()
-
 							showNoteFormSheet = false
-
-							currentNote = null
 						}
 					)
 				}
@@ -499,7 +466,6 @@ fun NotesScreen(
 
 	// Filter form sheet
 	if (showNoteFilterFormSheet){
-
 		ModalBottomSheet(
 			onDismissRequest = { showNoteFilterFormSheet = false },
 			containerColor = Color.White,
@@ -556,7 +522,6 @@ fun NotesScreen(
 		ModalBottomSheet(
 			onDismissRequest = {
 				showNoteDetailsSheet = false
-				currentNote = null
 				floatingButtonsVisible = true
 			},
 			containerColor = Color.White,
@@ -564,17 +529,15 @@ fun NotesScreen(
 		) {
 			if (noteDetailsLoading){
 				Box(
-					modifier = Modifier
-						.fillMaxWidth()
-						.height(200.dp),
+					modifier = Modifier.fillMaxWidth().height(200.dp),
 					contentAlignment = Alignment.Center
 				) {
 					ProgressIndicatorComponent(50, colorResource(R.color.primary_color))
 				}
 			}
 
-			if(!noteDetailsLoading && currentNote != null){
-				NoteDetailsComponent(currentNote)
+			if(!noteDetailsLoading && noteViewModelState.data != null){
+				NoteDetailsComponent(noteViewModelState.data)
 			}
 		}
 	}

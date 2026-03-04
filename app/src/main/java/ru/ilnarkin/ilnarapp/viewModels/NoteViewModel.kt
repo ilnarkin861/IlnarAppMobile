@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.AppPagination
@@ -69,8 +70,14 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 	suspend fun getNoteById(id: String): Note?{
 
 		try {
-			return noteRepository.getById<Note>(id)
+			val note = noteRepository.getById<Note>(id)
 
+			_uiState.update { it.copy(
+				success = true,
+				data = note,
+			)}
+
+			return  note
 		}
 
 		catch (e: ApiException){
@@ -100,6 +107,8 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 	suspend fun createNote(note: Note): Note?{
 
 		try {
+			_uiState.update { it.copy( data = null )}
+
 			return noteRepository.create<Note>(note)
 		}
 
@@ -129,6 +138,8 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 	suspend fun updateNote(note: Note): Note?{
 
 		try {
+			_uiState.update { it.copy( data = null )}
+
 			return noteRepository.update<Note>(note.id, note)
 		}
 
@@ -179,6 +190,18 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 
 			return false
 		}
+	}
+
+
+	fun clearNote(){
+		_uiState.update { it.copy( data = null )}
+	}
+
+
+	fun setActionType(actionType: ActionType){
+		_uiState.update { it.copy(
+			actionType = actionType
+		) }
 	}
 
 
