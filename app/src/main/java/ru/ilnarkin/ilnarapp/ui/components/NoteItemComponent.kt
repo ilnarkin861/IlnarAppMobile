@@ -66,7 +66,7 @@ fun NoteItemComponent(
 
 	val font = getInterFont()
 
-	val titleColor = if (note.title != null) colorResource(R.color.title_color) else colorResource(R.color.title_color).copy(alpha = 0.3f)
+	val titleColor = if (note.title != null) colorResource(R.color.title_color) else colorResource(R.color.title_color).copy(alpha = 0.4f)
 
 
 	Box(
