@@ -17,6 +17,7 @@ import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -122,7 +124,7 @@ fun ArchiveScreen(
 		if (!state.loading && !state.list.isEmpty()){
 			LazyColumn(
 				state = listState,
-				contentPadding = PaddingValues(top = 30.dp, bottom = 80.dp)
+				contentPadding = PaddingValues(top = 30.dp, bottom = 30.dp)
 			) {
 
 				state.pagination?.let {
@@ -213,7 +215,9 @@ fun ArchiveScreen(
 			modifier = Modifier
 				.align(Alignment.BottomEnd)
 				.absolutePadding(bottom = 20.dp, right = 20.dp)
-				.background(Color.Transparent),
+				.alpha(0.6f),
+			elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+
 			onClick = {
 				archiveViewModel.setActionType(ActionType.CREATE)
 				modalFormLabel = "Добавить архив"
