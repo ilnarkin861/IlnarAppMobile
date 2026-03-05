@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -59,11 +60,11 @@ fun ListItemComponent(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
 
-            Row(Modifier.size(35.dp),
+            Row(Modifier.size(35.dp).alpha(0.6f),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
                 if (isLoading){
-                    ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
+                    ProgressIndicatorComponent(25, colorResource(R.color.grey))
                 }
 
                 else{
@@ -79,15 +80,15 @@ fun ListItemComponent(
                         }
 
                     }) {
-                        Icon(modifier = Modifier.size(25.dp),
+                        Icon(modifier = Modifier.size(25.dp).alpha(0.6f),
                             painter = painterResource(R.drawable.ic_edit), contentDescription = "",
-                            tint = colorResource(R.color.primary_color))
+                            tint = colorResource(R.color.grey))
                     }
                 }
             }
 
 
-            Row(Modifier.size(35.dp),
+            Row(Modifier.size(35.dp).alpha(0.6f),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
                 if (isDeleting){

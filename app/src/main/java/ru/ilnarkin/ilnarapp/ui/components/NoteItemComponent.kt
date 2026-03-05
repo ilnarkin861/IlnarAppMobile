@@ -28,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -134,7 +135,7 @@ fun NoteItemComponent(
 
 				Row(verticalAlignment = Alignment.CenterVertically){
 
-					Row(Modifier.size(35.dp),
+					Row(Modifier.size(35.dp).alpha(0.6f),
 						horizontalArrangement = Arrangement.Center,
 						verticalAlignment = Alignment.CenterVertically) {
 
@@ -142,7 +143,7 @@ fun NoteItemComponent(
 							Row(modifier = Modifier.fillMaxSize(),
 								horizontalArrangement = Arrangement.Center,
 								verticalAlignment = Alignment.CenterVertically) {
-								ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
+								ProgressIndicatorComponent(25, colorResource(R.color.grey))
 							}
 						}
 
@@ -158,11 +159,11 @@ fun NoteItemComponent(
 						}) {
 							Icon(modifier = Modifier.size(25.dp),
 								painter = painterResource(R.drawable.ic_edit), contentDescription = "",
-								tint = colorResource(R.color.primary_color))
+								tint = colorResource(R.color.grey))
 						}
 					}
 
-					Row(Modifier.size(35.dp).padding(start = 10.dp)) {
+					Row(Modifier.size(35.dp).alpha(0.6f)) {
 						if (deleting){
 							Row(modifier = Modifier.fillMaxSize(),
 								horizontalArrangement = Arrangement.Center,
