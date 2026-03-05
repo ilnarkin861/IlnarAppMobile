@@ -4,8 +4,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -14,12 +14,14 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.exceptions.ApiException
+import ru.ilnarkin.ilnarapp.models.Info
 import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.network.UserManager
 import java.net.ConnectException
@@ -46,7 +48,7 @@ val networkModule = module {
 				})
 			}
 
-			expectSuccess = true
+			expectSuccess = false
 
 			defaultRequest {
 
@@ -61,25 +63,29 @@ val networkModule = module {
 
 			HttpResponseValidator {
 
+				validateResponse { response ->
+					if (!response.status.isSuccess()){
+						val statusCode = response.status.value
+
+						if (statusCode != HttpStatusCode.Unauthorized.value){
+							val body = response.body<Info>()
+
+							val message = body.messages.joinToString("\n")
+
+							when(statusCode){
+								HttpStatusCode.BadRequest.value -> throw ApiException(message)
+								HttpStatusCode.NotFound.value -> throw ApiException(message)
+							}
+						}
+
+						else {
+							errorManager.notifyError(NetworkErrorType.UNAUTHORIZED)
+						}
+					}
+				}
 
 				handleResponseExceptionWithRequest { cause, _ ->
 					val networkAvailable = isNetworkAvailable(context)
-
-					if (cause is ApiException) {
-						errorManager.notifyError(NetworkErrorType.SERVER_ERROR)
-					}
-
-					if (cause is ClientRequestException){
-						val status = cause.response.status
-
-						if (networkAvailable && status == HttpStatusCode.Unauthorized) {
-							errorManager.notifyError(NetworkErrorType.UNAUTHORIZED)
-						}
-
-						if (status == HttpStatusCode.NotFound){
-							throw ApiException("Ресурс не найден")
-						}
-					}
 
 					if(cause is HttpRequestTimeoutException || cause is ConnectException) {
 						if (networkAvailable) errorManager.notifyError(NetworkErrorType.SERVER_ERROR)
@@ -90,6 +96,7 @@ val networkModule = module {
 		}
 	}
 }
+
 
 private fun isNetworkAvailable(context: Context): Boolean {
 	val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

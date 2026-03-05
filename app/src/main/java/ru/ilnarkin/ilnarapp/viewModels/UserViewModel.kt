@@ -65,9 +65,17 @@ class UserViewModel(
 			)}
 		}
 
-		catch (_: ApiException){
+		catch (e: ApiException){
 			_uiState.update { it.copy(
-				success = false
+				success = false,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)}
+		}
+
+		catch (_: Exception){
+			_uiState.update { it.copy(
+				success = false,
+				message = DEFAULT_ERROR_MESSAGE
 			)}
 		}
 	}

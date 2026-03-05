@@ -63,7 +63,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 	suspend fun getTagById(id: String): Tag?{
 
 		try {
-			return tagRepository.getById<Tag>(id) as Tag
+			return tagRepository.getById<Tag>(id)
 		}
 
 		catch (e: ApiException){
