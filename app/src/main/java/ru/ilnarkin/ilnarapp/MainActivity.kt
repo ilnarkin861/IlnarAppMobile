@@ -98,7 +98,7 @@ fun Main(){
 			composable(NavRoutes.NotesScreen.route) { NotesScreen(navController) }
 			composable(NavRoutes.TagsScreen.route) { TagsScreen(navController) }
 			composable(NavRoutes.ArchiveScreen.route) { ArchiveScreen(navController) }
-			composable(NavRoutes.SettingsScreen.route) { SettingsScreen() }
+			composable(NavRoutes.SettingsScreen.route) { SettingsScreen(navController) }
 
 			composable(NavRoutes.WelcomeScreen.route) { WelcomeScreen(navController) }
 			composable(NavRoutes.OverlayScreen.route) { OverlayScreen(navController) }
