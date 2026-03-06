@@ -46,7 +46,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -57,15 +56,9 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.navigation.compose)
-    implementation (libs.vanpra.material.design.core)
-    implementation (libs.vanpra.material.design.datetime)
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation (libs.okhttp)
     implementation (libs.koin.android)
     implementation (libs.koin.androidx.navigation)
     implementation (libs.koin.androidx.compose)
-    implementation (libs.logging.interceptor)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.content.negotiation)
