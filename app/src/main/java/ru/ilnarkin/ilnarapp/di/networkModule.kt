@@ -22,8 +22,8 @@ import org.koin.dsl.module
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.models.Info
-import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
-import ru.ilnarkin.ilnarapp.network.UserManager
+import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
+import ru.ilnarkin.ilnarapp.services.UserManager
 import java.net.ConnectException
 
 

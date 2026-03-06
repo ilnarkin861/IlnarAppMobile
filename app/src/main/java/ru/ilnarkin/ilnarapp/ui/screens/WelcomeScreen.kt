@@ -29,7 +29,7 @@ import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
-import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
+import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 

@@ -1,4 +1,4 @@
-package ru.ilnarkin.ilnarapp.network
+package ru.ilnarkin.ilnarapp.services
 
 import android.content.SharedPreferences
 import androidx.core.content.edit

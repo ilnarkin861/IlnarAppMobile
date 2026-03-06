@@ -10,7 +10,7 @@ import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.Info
 import ru.ilnarkin.ilnarapp.models.UserInfo
 import ru.ilnarkin.ilnarapp.models.UserLoginData
-import ru.ilnarkin.ilnarapp.network.UserManager
+import ru.ilnarkin.ilnarapp.services.UserManager
 import ru.ilnarkin.ilnarapp.repositories.UserRepository
 import ru.ilnarkin.ilnarapp.ui.AppUiState
 
