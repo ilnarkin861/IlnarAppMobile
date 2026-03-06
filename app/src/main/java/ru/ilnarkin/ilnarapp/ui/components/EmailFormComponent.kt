@@ -32,7 +32,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
@@ -48,7 +47,7 @@ fun EmailFormComponent(
 
 	val font = getInterFont()
 
-	val mutableEmail = remember { mutableStateOf(email) }
+	val updatedEmail = remember { mutableStateOf(email) }
 
 	var emailIsError by remember { mutableStateOf(false) }
 
@@ -83,14 +82,14 @@ fun EmailFormComponent(
 						fontFamily = font,
 						fontSize = 15.sp,
 					),
-					value = mutableEmail.value,
+					value = updatedEmail.value,
 					singleLine = true,
-					isError = emailIsError || (!mutableEmail.value.isEmpty() && !validEmail(mutableEmail.value)),
+					isError = emailIsError || (!updatedEmail.value.isEmpty() && !validEmail(updatedEmail.value)),
 					label = { Text("Изменить email") },
 					onValueChange = {text ->
 
-						mutableEmail.value = text
-						emailIsError = mutableEmail.value.isEmpty() },
+						updatedEmail.value = text
+						emailIsError = updatedEmail.value.isEmpty() },
 
 					colors = OutlinedTextFieldDefaults.colors(
 						unfocusedBorderColor = colorResource(R.color.inputs_border_color),
@@ -114,7 +113,7 @@ fun EmailFormComponent(
 				}
 			}
 
-			if (!mutableEmail.value.isEmpty() && !validEmail(mutableEmail.value)){
+			if (!updatedEmail.value.isEmpty() && !validEmail(updatedEmail.value)){
 				Text(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 					text = "Некорректный email",
@@ -135,15 +134,19 @@ fun EmailFormComponent(
 						containerColor = colorResource(R.color.primary_color),
 						disabledContainerColor = colorResource(R.color.primary_color).copy(alpha = 0.8f)),
 					onClick = {
-						emailIsError = mutableEmail.value.isEmpty()
+						emailIsError = updatedEmail.value.isEmpty()
 
-						if(!emailIsError && validEmail(mutableEmail.value)){
-							saving = true
+						if(!emailIsError && validEmail(updatedEmail.value)){
 
 							scope.launch {
-								scope.async {
-									action(mutableEmail.value) }.await()
-							}.invokeOnCompletion { saving = false }
+								saving = true
+
+								try {
+									action(updatedEmail.value)
+								}finally {
+								    saving = false
+								}
+							}
 						}
 					}
 				) {

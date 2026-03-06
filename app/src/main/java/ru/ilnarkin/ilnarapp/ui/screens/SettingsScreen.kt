@@ -3,6 +3,7 @@ package ru.ilnarkin.ilnarapp.ui.screens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,10 +16,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,30 +32,41 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
+import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
+import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.models.UserInfo
+import ru.ilnarkin.ilnarapp.network.NetworkErrorManager
+import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.EmailFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.PasswordFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
-fun SettingsScreen() {
+fun SettingsScreen(
+	navController: NavController,
+	userViewModel: UserViewModel = koinViewModel(),
+	errorManager: NetworkErrorManager = koinInject()
+	) {
 
-	val testEmail = "info@example.com"
 	val testPassword = "qwerty1234"
 
 	val font = getInterFont()
@@ -65,51 +82,126 @@ fun SettingsScreen() {
 	val alertTitle = remember { mutableStateOf("") }
 	var showAlert by remember { mutableStateOf(false) }
 
-	var emailLoading by remember { mutableStateOf(false) }
+	var userInfoLoading by remember { mutableStateOf(false) }
+
+	val state by userViewModel.uiState.collectAsState()
+
+	val snackBarHostState = remember { SnackbarHostState() }
 
 
-	Column(Modifier.fillMaxSize().padding(top = 30.dp)) {
+	LaunchedEffect(Unit) {
+		errorManager.errorEvent.collect { error ->
+			when(error) {
+				NetworkErrorType.NO_INTERNET,  NetworkErrorType.SERVER_ERROR ->{
+					val message = if (error == NetworkErrorType.NO_INTERNET) NO_INTERNET_ERROR_MESSAGE else  SERVER_ERROR_MESSAGE
 
-		Row(Modifier.fillMaxWidth().clickable(
-			interactionSource = remember { MutableInteractionSource() },
-			indication = ripple(),
-			onClick = {
-
-				scope.launch {
-					emailLoading = true
-
-					delay(1500)
-
-					emailFormDialogShowed = true
-				}
-			}
-		)) {
-
-			Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
-				horizontalArrangement = Arrangement.SpaceBetween) {
-				Row(verticalAlignment = Alignment.CenterVertically) {
-					Icon(
-						modifier = Modifier.size(25.dp),
-						painter = painterResource(R.drawable.ic_mail),
-						contentDescription = "Mail",
-						tint = colorResource(R.color.grey)
-					)
-					Text(text = "Изменить Email",
-						modifier = Modifier.padding(start = 10.dp),
-						fontFamily = font,
-						fontSize = 16.sp,
-						color = colorResource(R.color.grey))
+					snackBarHostState.showSnackbar(message)
 				}
 
-				Row(modifier = Modifier.size(25.dp),
-					horizontalArrangement = Arrangement.Center,
-					verticalAlignment = Alignment.CenterVertically) {
+				NetworkErrorType.UNAUTHORIZED -> {
+					userViewModel.dismissAlert()
 
-					if (emailLoading){
-						ProgressIndicatorComponent(15, colorResource(R.color.grey).copy(alpha = 0.7f))
+					navController.navigate(NavRoutes.LoginScreen.route) {
+						popUpTo(0) { inclusive = true }
+
+						launchSingleTop = true
 					}
 
-					else{
+					return@collect
+				}
+			}
+		}
+	}
+
+
+	Box(Modifier.fillMaxSize().padding(top = 30.dp)){
+
+		Column(Modifier.fillMaxWidth()) {
+			Row(Modifier.fillMaxWidth().clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = ripple(),
+				onClick = {
+
+					scope.launch {
+						userInfoLoading = true
+
+						val userInfo = userViewModel.getUserInfo()
+
+						if (userInfo != null){
+							emailFormDialogShowed = true
+						}
+
+						userInfoLoading = false
+					}
+				}
+			)) {
+
+				Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
+					horizontalArrangement = Arrangement.SpaceBetween) {
+					Row(verticalAlignment = Alignment.CenterVertically) {
+						Icon(
+							modifier = Modifier.size(25.dp),
+							painter = painterResource(R.drawable.ic_mail),
+							contentDescription = "Mail",
+							tint = colorResource(R.color.grey)
+						)
+						Text(text = "Изменить Email",
+							modifier = Modifier.padding(start = 10.dp),
+							fontFamily = font,
+							fontSize = 16.sp,
+							color = colorResource(R.color.grey))
+					}
+
+					Row(modifier = Modifier.size(25.dp),
+						horizontalArrangement = Arrangement.Center,
+						verticalAlignment = Alignment.CenterVertically) {
+
+						if (userInfoLoading){
+							ProgressIndicatorComponent(15, colorResource(R.color.grey).copy(alpha = 0.7f))
+						}
+
+						else{
+							Icon(
+								modifier = Modifier.size(15.dp),
+								painter = painterResource(R.drawable.ic_arrow_right),
+								contentDescription = "Arrow right",
+								tint = colorResource(R.color.grey).copy(alpha = 0.7f)
+							)
+						}
+					}
+				}
+			}
+
+			HorizontalDivider(
+				modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
+				thickness = 1.dp,
+				color = colorResource(R.color.border_color))
+
+			Row(Modifier.fillMaxWidth().clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = ripple(),
+				onClick = { passwordFormDialogShowed = true }
+			)) {
+				Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
+					horizontalArrangement = Arrangement.SpaceBetween,
+					verticalAlignment = Alignment.CenterVertically) {
+					Row(verticalAlignment = Alignment.CenterVertically) {
+						Icon(
+							modifier = Modifier.size(25.dp),
+							painter = painterResource(R.drawable.ic_password),
+							contentDescription = "Password",
+							tint = colorResource(R.color.grey)
+						)
+						Text(text = "Сменить пароль",
+							modifier = Modifier.padding(start = 10.dp),
+							fontFamily = font,
+							fontSize = 16.sp,
+							color = colorResource(R.color.grey))
+					}
+
+					Row(modifier = Modifier.size(25.dp),
+						horizontalArrangement = Arrangement.Center,
+						verticalAlignment = Alignment.CenterVertically) {
 						Icon(
 							modifier = Modifier.size(15.dp),
 							painter = painterResource(R.drawable.ic_arrow_right),
@@ -119,55 +211,28 @@ fun SettingsScreen() {
 					}
 				}
 			}
+
 		}
 
-		HorizontalDivider(
-			modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
-			thickness = 1.dp,
-			color = colorResource(R.color.border_color))
-
-		Row(Modifier.fillMaxWidth().clickable(
-			interactionSource = remember { MutableInteractionSource() },
-			indication = ripple(),
-			onClick = { passwordFormDialogShowed = true }
-		)) {
-			Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
-				horizontalArrangement = Arrangement.SpaceBetween,
-				verticalAlignment = Alignment.CenterVertically) {
-				Row(verticalAlignment = Alignment.CenterVertically) {
-					Icon(
-						modifier = Modifier.size(25.dp),
-						painter = painterResource(R.drawable.ic_password),
-						contentDescription = "Password",
-						tint = colorResource(R.color.grey)
-					)
-					Text(text = "Сменить пароль",
-						modifier = Modifier.padding(start = 10.dp),
-						fontFamily = font,
-						fontSize = 16.sp,
-						color = colorResource(R.color.grey))
-				}
-
-				Row(modifier = Modifier.size(25.dp),
-					horizontalArrangement = Arrangement.Center,
-					verticalAlignment = Alignment.CenterVertically) {
-					Icon(
-						modifier = Modifier.size(15.dp),
-						painter = painterResource(R.drawable.ic_arrow_right),
-						contentDescription = "Arrow right",
-						tint = colorResource(R.color.grey).copy(alpha = 0.7f)
-					)
-				}
-			}
+		SnackbarHost(
+			hostState = snackBarHostState,
+			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter)
+		){data ->
+			Snackbar(
+				snackbarData = data,
+				containerColor = colorResource(R.color.primary_color),
+				contentColor = Color.White
+			)
 		}
+
 	}
 
 
 	AlertComponent(
-		success = success,
-		message = alertTitle.value,
-		showed = showAlert,
-		action = { showAlert = false }
+		success = state.success,
+		message = state.message,
+		showed = state.showAlert,
+		action = { userViewModel.dismissAlert()	}
 	)
 
 
@@ -185,9 +250,15 @@ fun SettingsScreen() {
 				tonalElevation = AlertDialogDefaults.TonalElevation
 			) {
 				EmailFormComponent(
-					email = testEmail,
-					action = {
-						emailFormDialogShowed = false
+					email = state.data!!.email,
+
+					action = {email ->
+
+						val result = userViewModel.changeEmail(UserInfo(email = email))
+
+						if (result != null){
+							emailFormDialogShowed = false
+						}
 					},
 
 					close = { emailFormDialogShowed = false }

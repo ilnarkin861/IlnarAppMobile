@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
+import ru.ilnarkin.ilnarapp.models.Info
 import ru.ilnarkin.ilnarapp.models.UserInfo
 import ru.ilnarkin.ilnarapp.models.UserLoginData
 import ru.ilnarkin.ilnarapp.network.UserManager
@@ -81,6 +82,75 @@ class UserViewModel(
 	}
 
 
+	suspend fun getUserInfo(): UserInfo?{
+		try {
+		    val userInfo = userRepository.getUserInfo()
+
+			_uiState.update { it.copy(
+				success = true,
+				data = userInfo
+			)}
+
+			return userInfo
+		}
+
+		catch (e: ApiException){
+			_uiState.update { it.copy(
+				success = false,
+				showAlert = true,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)}
+
+			return null
+		}
+
+		catch (_: Exception){
+			_uiState.update { it.copy(
+				success = false,
+				showAlert = true,
+				message = DEFAULT_ERROR_MESSAGE
+			) }
+
+			return null
+		}
+	}
+
+
+	suspend fun changeEmail(userInfo: UserInfo): Info?{
+		try {
+			val result = userRepository.changeEmail(userInfo)
+
+			_uiState.update { it.copy(
+				success = true,
+				showAlert = true,
+				message = result.messages.joinToString("\n")
+			)}
+
+			return result
+		}
+
+		catch (e: ApiException){
+			_uiState.update { it.copy(
+				success = false,
+				showAlert = true,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)}
+
+			return null
+		}
+
+		catch (_: Exception){
+			_uiState.update { it.copy(
+				success = false,
+				showAlert = true,
+				message = DEFAULT_ERROR_MESSAGE
+			)}
+
+			return null
+		}
+	}
+
+
 	fun setPinCode(pinCode: String){
 		userManager.setPinCode(pinCode)
 	}
@@ -98,5 +168,10 @@ class UserViewModel(
 
 	fun clearToken(){
 		userManager.clearAuthToken()
+	}
+
+
+	fun dismissAlert() {
+		_uiState.update { it.copy(showAlert = false) }
 	}
 }
