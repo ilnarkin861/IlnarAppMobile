@@ -13,18 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +37,7 @@ fun TopBar (navController: NavController) {
 		NavRoutes.TagsScreen.route -> stringResource(R.string.tags_title)
 		NavRoutes.ArchiveScreen.route -> stringResource(R.string.archives_title)
 		NavRoutes.SettingsScreen.route -> stringResource(R.string.settings_title)
-		else -> stringResource(R.string.app_name)
+		else -> ""
 	}
 
 
@@ -48,24 +45,21 @@ fun TopBar (navController: NavController) {
 		modifier = Modifier.padding(bottom = 2.dp),
 		colors = TopAppBarDefaults.topAppBarColors(
 			containerColor = Color.White,
-			navigationIconContentColor = colorResource(R.color.primary_color),
-			titleContentColor = colorResource(R.color.primary_color)
+			navigationIconContentColor = AppTheme.colors.primaryColor,
+			titleContentColor = AppTheme.colors.primaryColor
 		),
 
 		expandedHeight = dimensionResource(R.dimen.top_bar_height),
 
 		title = {
-			Text(text = title,
-				fontSize = dimensionResource(R.dimen.top_bar_title_font_size).value.sp,
-				fontFamily = getInterFont(),
-				fontWeight = FontWeight.ExtraBold)
+			Text(text = title, style = AppTheme.typography.appBarTitle)
 		},
 
 		actions = {
 			IconButton(
 				modifier = Modifier.padding(end = 10.dp).size(30.dp),
 				colors = IconButtonDefaults.iconButtonColors(
-					contentColor = colorResource(R.color.primary_color)
+					contentColor = AppTheme.colors.primaryColor
 				),
 				onClick = {
 
