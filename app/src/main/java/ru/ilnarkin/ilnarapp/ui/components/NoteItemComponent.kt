@@ -104,7 +104,7 @@ fun NoteItemComponent(
 			Row(Modifier.padding(top = 5.dp, bottom = 20.dp)) {
 				Text(
 					text = DateTimeFormatter
-						.ofPattern("dd.MM.yyyy")
+						.ofPattern("d MMMM yyyy, EEEE")
 						.format(LocalDate.parse(note.date)),
 					fontFamily = font,
 					color = colorResource(R.color.grey),
