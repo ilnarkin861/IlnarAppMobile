@@ -9,50 +9,75 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+
+data class AppColors(
+    val appBgColor: Color,
+    val primaryColor: Color,
+    val borderColor: Color,
+    val bottomNavigationColor: Color,
+    val dangerColor: Color,
+    val warningColor: Color,
+    val titleColor: Color,
+    val textColor: Color,
+    val inputsBorderColor: Color,
+    val inputsPlaceholderColor: Color,
+    val colorGrey: Color
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
-)
+object AppTheme {
+    val colors: AppColors
+        @Composable
+        get() = LocalAppColors.current
+}
+
+val LocalAppColors = staticCompositionLocalOf {
+    AppColors(
+        appBgColor = Color.Unspecified,
+        primaryColor = Color.Unspecified,
+        borderColor = Color.Unspecified,
+        bottomNavigationColor = Color.Unspecified,
+        dangerColor = Color.Unspecified,
+        warningColor = Color.Unspecified,
+        titleColor = Color.Unspecified,
+        textColor = Color.Unspecified,
+        inputsBorderColor = Color.Unspecified,
+        inputsPlaceholderColor = Color.Unspecified,
+        colorGrey = Color.Unspecified
+    )
+}
+
 
 @Composable
-fun IlnarAppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
-) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+fun IlnarAppTheme(content: @Composable () -> Unit) {
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+    val colors = AppColors(
+        appBgColor = AppBgColor,
+        primaryColor = PrimaryColor,
+        borderColor = BorderColor,
+        bottomNavigationColor = BottomNavigationColor,
+        dangerColor = DangerColor,
+        warningColor = WarningColor,
+        titleColor = TitleColor,
+        textColor = TextColor,
+        inputsBorderColor = InputsBorderColor,
+        inputsPlaceholderColor = InputsPlaceholderColor,
+        colorGrey = ColorGrey,
     )
+
+    val materialColors = lightColorScheme(
+        primary = colors.primaryColor,
+        // перенаправьте нужные цвета
+    )
+
+    CompositionLocalProvider(LocalAppColors provides colors) {
+        MaterialTheme(colorScheme = materialColors) {
+            content()
+        }
+    }
 }

@@ -42,6 +42,7 @@ import ru.ilnarkin.ilnarapp.ui.screens.OverlayScreen
 import ru.ilnarkin.ilnarapp.ui.screens.SettingsScreen
 import ru.ilnarkin.ilnarapp.ui.screens.TagsScreen
 import ru.ilnarkin.ilnarapp.ui.screens.WelcomeScreen
+import ru.ilnarkin.ilnarapp.ui.theme.IlnarAppTheme
 
 
 class MainActivity : ComponentActivity() {
@@ -49,7 +50,9 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
-		setContent { Main() }
+		setContent {
+			IlnarAppTheme { Main() }
+		}
 	}
 }
 

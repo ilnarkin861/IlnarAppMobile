@@ -2,10 +2,15 @@ package ru.ilnarkin.ilnarapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val AppBgColor = Color(0xFFF4F4F4)
+val PrimaryColor = Color(0xFF026CD6)
+val BorderColor = Color(0xFFE2E2E2)
+val BottomNavigationColor = Color(0xFF808080)
+val DangerColor = Color(0xFFCA0000)
+val WarningColor = Color(0xFFF6C904)
+val TitleColor = Color(0xFF363636)
+val TextColor = Color(0xFF393939)
+val InputsBorderColor = Color(0xFFA8A8A8)
+val InputsPlaceholderColor = Color(0xFFA6A6A6)
+val ColorGrey = Color(0xFF6E6E6E)
