@@ -27,6 +27,8 @@ object AppTheme {
     val colors: AppColors
         @Composable
         get() = LocalAppColors.current
+    val typography: AppTypography
+        @Composable get() = LocalAppTypography.current
 }
 
 val LocalAppColors = staticCompositionLocalOf {
@@ -46,6 +48,9 @@ val LocalAppColors = staticCompositionLocalOf {
 }
 
 
+val LocalAppTypography = staticCompositionLocalOf { AppTypography() }
+
+
 @Composable
 fun IlnarAppTheme(content: @Composable () -> Unit) {
 
@@ -63,13 +68,18 @@ fun IlnarAppTheme(content: @Composable () -> Unit) {
         colorGrey = ColorGrey,
     )
 
+    val typography = AppTypography()
+
     val materialColors = lightColorScheme(
         primary = colors.primaryColor,
         // перенаправьте нужные цвета
     )
 
-    CompositionLocalProvider(LocalAppColors provides colors) {
-        MaterialTheme(colorScheme = materialColors) {
+    CompositionLocalProvider(
+        LocalAppColors provides colors,
+        LocalAppTypography provides typography) {
+        MaterialTheme(
+            colorScheme = materialColors,) {
             content()
         }
     }
