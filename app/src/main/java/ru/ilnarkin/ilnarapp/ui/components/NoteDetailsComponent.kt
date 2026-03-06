@@ -39,7 +39,7 @@ fun NoteDetailsComponent(note: Note?) {
 
 
 	Column(Modifier.fillMaxSize()
-		.padding(start = containerPadding, top = 30.dp, end = containerPadding)
+		.padding(start = containerPadding, top = 30.dp, end = containerPadding, bottom = 40.dp)
 		.verticalScroll(rememberScrollState())){
 
 		Row {
@@ -54,7 +54,9 @@ fun NoteDetailsComponent(note: Note?) {
 
 		Row(Modifier.padding(top = 10.dp)) {
 			Text(
-				text = DateTimeFormatter.ofPattern("dd.MM.yyyy").format(LocalDate.parse(note!!.date)),
+				text = DateTimeFormatter
+					.ofPattern("d MMMM yyyy, EEEE")
+					.format(LocalDate.parse(note!!.date)),
 				fontFamily = font,
 				color = colorResource(R.color.grey),
 				fontSize = dimensionResource(R.dimen.note_date_font_size).value.sp
