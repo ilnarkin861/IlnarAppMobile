@@ -11,18 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
@@ -32,13 +28,13 @@ fun BottomNavigationBar(navController: NavController) {
 
 	val currentRoute = navBackStackEntry?.destination?.route
 
-	val borderColor = colorResource(R.color.border_color)
+	val borderColor = AppTheme.colors.borderColor
 
 	val colors = NavigationBarItemDefaults.colors(
-		selectedIconColor = colorResource(R.color.primary_color),
-		unselectedIconColor = colorResource(R.color.bottom_navigation_color),
-		selectedTextColor = colorResource(R.color.primary_color),
-		unselectedTextColor = colorResource(R.color.bottom_navigation_color),
+		selectedIconColor = AppTheme.colors.primaryColor,
+		unselectedIconColor = AppTheme.colors.bottomNavigationColor,
+		selectedTextColor = AppTheme.colors.primaryColor,
+		unselectedTextColor = AppTheme.colors.bottomNavigationColor,
 		indicatorColor = Color.Transparent)
 
 
@@ -61,9 +57,7 @@ fun BottomNavigationBar(navController: NavController) {
 			icon = { Icon(painter = painterResource(R.drawable.ic_notes), contentDescription = "") },
 			label = { Text(
 				text = stringResource(R.string.notes_title),
-				fontFamily = getInterFont(),
-				fontSize = dimensionResource(R.dimen.bottom_bar_label_font_size).value.sp,
-				fontWeight = FontWeight.Bold)
+				style = AppTheme.typography.navBarItemTitle)
 			},
 			onClick = {
 				if (currentRoute != NavRoutes.NotesScreen.route){
@@ -86,9 +80,7 @@ fun BottomNavigationBar(navController: NavController) {
 			icon = { Icon(painter = painterResource(R.drawable.ic_hashtag), contentDescription = "") },
 			label = { Text(
 				text = stringResource(R.string.tags_title),
-				fontFamily = getInterFont(),
-				fontSize = dimensionResource(R.dimen.bottom_bar_label_font_size).value.sp,
-				fontWeight = FontWeight.Bold)
+				style = AppTheme.typography.navBarItemTitle)
 			},
 			onClick = {
 				if (currentRoute != NavRoutes.TagsScreen.route){
@@ -112,9 +104,7 @@ fun BottomNavigationBar(navController: NavController) {
 			icon = { Icon(painter = painterResource(R.drawable.ic_archive), contentDescription = "") },
 			label = { Text(
 				text = stringResource(R.string.archives_title),
-				fontFamily = getInterFont(),
-				fontSize = dimensionResource(R.dimen.bottom_bar_label_font_size).value.sp,
-				fontWeight = FontWeight.Bold)
+				style = AppTheme.typography.navBarItemTitle)
 			},
 			onClick = {
 				if (currentRoute != NavRoutes.ArchiveScreen.route){
@@ -138,9 +128,7 @@ fun BottomNavigationBar(navController: NavController) {
 			icon = { Icon(painter = painterResource(R.drawable.ic_user_settings), contentDescription = "") },
 			label = { Text(
 				text = stringResource(R.string.settings_title),
-				fontFamily = getInterFont(),
-				fontSize = dimensionResource(R.dimen.bottom_bar_label_font_size).value.sp,
-				fontWeight = FontWeight.Bold)
+				style = AppTheme.typography.navBarItemTitle)
 			},
 			onClick = {
 				if (currentRoute != NavRoutes.SettingsScreen.route){

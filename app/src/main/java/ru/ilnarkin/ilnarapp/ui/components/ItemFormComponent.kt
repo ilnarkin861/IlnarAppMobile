@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
@@ -171,7 +172,7 @@ fun ItemFormComponent(
 						text = "Закрыть",
 						fontWeight = FontWeight.SemiBold,
 						fontSize = 15.sp,
-						color = Color.Gray,
+						color = AppTheme.colors.colorGrey,
 						fontFamily = font,
 					)
 				}

@@ -20,15 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,8 +35,6 @@ fun ConfirmComponent(
 	action: (confirmed: Boolean) -> Unit) {
 
 	val interactionSource = remember { MutableInteractionSource() }
-
-	val font = getInterFont()
 
 
 	if (showed){
@@ -69,7 +63,7 @@ fun ConfirmComponent(
 							modifier = Modifier.size(60.dp),
 							painter = painterResource(R.drawable.ic_warning),
 							contentDescription = "",
-							tint = colorResource(R.color.warning_color))
+							tint = AppTheme.colors.warningColor)
 					}
 
 					Row(
@@ -80,10 +74,8 @@ fun ConfirmComponent(
 					) {
 						Text(
 							text = text,
-							textAlign = TextAlign.Center,
-							fontSize = 16.sp,
-							fontFamily = font,
-							color = colorResource(R.color.warning_color)
+							style = AppTheme.typography.modalText,
+							color = AppTheme.colors.warningColor
 						)
 					}
 
@@ -100,15 +92,11 @@ fun ConfirmComponent(
 									.clickable(
 										interactionSource = interactionSource,
 										indication = null,
-										onClick = {
-											action(false)
-										}
+										onClick = {	action(false) }
 									),
 								text = "Нет",
-								fontWeight = FontWeight.SemiBold,
-								fontSize = 15.sp,
-								color = Color.Gray,
-								fontFamily = font,
+								style = AppTheme.typography.textButton,
+								color = AppTheme.colors.colorGrey,
 							)
 
 							Text(
@@ -122,10 +110,8 @@ fun ConfirmComponent(
 										}
 									),
 								text = "Да",
-								fontWeight = FontWeight.SemiBold,
-								fontSize = 15.sp,
-								color = colorResource(R.color.danger_color),
-								fontFamily = font,
+								style = AppTheme.typography.textButton,
+								color = AppTheme.colors.dangerColor
 							)
 						}
 					}

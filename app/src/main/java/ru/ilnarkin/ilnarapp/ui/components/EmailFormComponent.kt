@@ -27,15 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.helpers.validEmail
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
@@ -44,8 +39,6 @@ fun EmailFormComponent(
 	action: suspend (email: String) -> Unit,
 	close: () -> Unit
 ) {
-
-	val font = getInterFont()
 
 	val updatedEmail = remember { mutableStateOf(email) }
 
@@ -65,11 +58,9 @@ fun EmailFormComponent(
 				modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
 			){
 				Text(
-					color = colorResource(R.color.title_color),
+					color = AppTheme.colors.titleColor,
 					text = "Изменить email",
-					fontFamily = font,
-					fontSize = 18.sp,
-					fontWeight = FontWeight.Bold
+					style = AppTheme.typography.modalTitleText
 				)
 			}
 
@@ -78,10 +69,7 @@ fun EmailFormComponent(
 			){
 				OutlinedTextField(
 					modifier = Modifier.fillMaxWidth(),
-					textStyle = TextStyle(
-						fontFamily = font,
-						fontSize = 15.sp,
-					),
+					textStyle = AppTheme.typography.formInputText,
 					value = updatedEmail.value,
 					singleLine = true,
 					isError = emailIsError || (!updatedEmail.value.isEmpty() && !validEmail(updatedEmail.value)),
@@ -92,12 +80,12 @@ fun EmailFormComponent(
 						emailIsError = updatedEmail.value.isEmpty() },
 
 					colors = OutlinedTextFieldDefaults.colors(
-						unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-						focusedBorderColor = colorResource(R.color.primary_color),
-						unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-						focusedLabelColor = colorResource(R.color.primary_color),
-						focusedTextColor = colorResource(R.color.text_color),
-						unfocusedTextColor = colorResource(R.color.text_color)
+						unfocusedBorderColor = AppTheme.colors.inputsBorderColor,
+						focusedBorderColor = AppTheme.colors.primaryColor,
+						unfocusedLabelColor = AppTheme.colors.inputsPlaceholderColor,
+						focusedLabelColor = AppTheme.colors.primaryColor,
+						focusedTextColor = AppTheme.colors.textColor,
+						unfocusedTextColor = AppTheme.colors.textColor
 					),
 					shape = RoundedCornerShape(10.dp))
 			}
@@ -106,9 +94,8 @@ fun EmailFormComponent(
 				Row(modifier = Modifier.padding(top = 5.dp, bottom = 10.dp)) {
 					Text(
 						text = "Обязательное поле",
-						color = colorResource(R.color.danger_color),
-						fontFamily = font,
-						fontSize = 13.sp
+						style = AppTheme.typography.errorText,
+						color = AppTheme.colors.dangerColor
 					)
 				}
 			}
@@ -117,9 +104,8 @@ fun EmailFormComponent(
 				Text(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 					text = "Некорректный email",
-					color = colorResource(R.color.danger_color),
-					fontFamily = font,
-					fontSize = 13.sp
+					style = AppTheme.typography.errorText,
+					color = AppTheme.colors.dangerColor
 				)
 			}
 
@@ -131,8 +117,8 @@ fun EmailFormComponent(
 					enabled = !saving,
 					shape = RoundedCornerShape(10.dp),
 					colors = ButtonDefaults.buttonColors(
-						containerColor = colorResource(R.color.primary_color),
-						disabledContainerColor = colorResource(R.color.primary_color).copy(alpha = 0.8f)),
+						containerColor = AppTheme.colors.primaryColor,
+						disabledContainerColor = AppTheme.colors.primaryColor.copy(alpha = 0.8f)),
 					onClick = {
 						emailIsError = updatedEmail.value.isEmpty()
 
@@ -164,9 +150,7 @@ fun EmailFormComponent(
 					else{
 						Text(
 							text = "Изменить",
-							fontFamily = font,
-							fontSize = 16.sp,
-							fontWeight = FontWeight.SemiBold
+							style = AppTheme.typography.inputButtonText
 						)
 					}
 				}
@@ -184,10 +168,8 @@ fun EmailFormComponent(
 							onClick = {	close()	}
 						),
 						text = "Закрыть",
-						fontWeight = FontWeight.SemiBold,
-						fontSize = 15.sp,
-						color = Color.Gray,
-						fontFamily = font,
+						color = AppTheme.colors.colorGrey,
+						style = AppTheme.typography.textButton
 					)
 				}
 			}

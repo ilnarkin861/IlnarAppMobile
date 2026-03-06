@@ -16,15 +16,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
@@ -50,10 +46,8 @@ fun ListItemComponent(
         Row {
             Text(
                 text = text,
-                fontFamily = getInterFont(),
-                fontWeight = FontWeight.SemiBold,
-                color = colorResource(R.color.title_color),
-                fontSize = dimensionResource(R.dimen.tag_item_title_font_size).value.sp
+                color = AppTheme.colors.titleColor,
+                style = AppTheme.typography.listItemText
             )
         }
 
@@ -63,7 +57,7 @@ fun ListItemComponent(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
                 if (isLoading){
-                    ProgressIndicatorComponent(25, colorResource(R.color.grey))
+                    ProgressIndicatorComponent(25, AppTheme.colors.colorGrey)
                 }
 
                 else{
@@ -81,7 +75,7 @@ fun ListItemComponent(
                     }) {
                         Icon(modifier = Modifier.size(25.dp).alpha(0.6f),
                             painter = painterResource(R.drawable.ic_edit), contentDescription = "",
-                            tint = colorResource(R.color.grey))
+                            tint = AppTheme.colors.colorGrey)
                     }
                 }
             }
@@ -91,7 +85,7 @@ fun ListItemComponent(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
                 if (isDeleting){
-                    ProgressIndicatorComponent(25, colorResource(R.color.danger_color))
+                    ProgressIndicatorComponent(25, AppTheme.colors.dangerColor)
                 }
 
                 else{
@@ -101,7 +95,7 @@ fun ListItemComponent(
                         Icon(
                             modifier = Modifier.size(25.dp),
                             painter = painterResource(R.drawable.ic_trash), contentDescription = "",
-                            tint = colorResource(R.color.danger_color))
+                            tint = AppTheme.colors.dangerColor)
                     }
                 }
             }

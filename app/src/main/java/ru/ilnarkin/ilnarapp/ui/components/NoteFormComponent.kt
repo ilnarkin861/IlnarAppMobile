@@ -24,11 +24,11 @@ import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -48,14 +48,12 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getInterFont
@@ -63,11 +61,11 @@ import ru.ilnarkin.ilnarapp.models.Archive
 import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.models.NoteType
 import ru.ilnarkin.ilnarapp.models.Tag
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.Instant
-
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -124,6 +122,17 @@ fun NoteFormComponent(
 	val selectedTagsCount = remember { mutableIntStateOf(0) }
 	val uploadableTags = mutableListOf<Tag>()
 
+	val inputColors = OutlinedTextFieldDefaults.colors(
+		unfocusedBorderColor = AppTheme.colors.inputsBorderColor,
+		focusedBorderColor = AppTheme.colors.primaryColor,
+		unfocusedLabelColor = AppTheme.colors.inputsPlaceholderColor,
+		focusedLabelColor = AppTheme.colors.primaryColor,
+		focusedTrailingIconColor = AppTheme.colors.primaryColor,
+		unfocusedTrailingIconColor = AppTheme.colors.primaryColor,
+		focusedTextColor = AppTheme.colors.textColor,
+		unfocusedTextColor = AppTheme.colors.textColor
+	)
+
 
 	Column(Modifier
 		.fillMaxSize()
@@ -140,25 +149,13 @@ fun NoteFormComponent(
 		) {
 			OutlinedTextField(
 				modifier = Modifier
-					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
+					.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
 					.fillMaxWidth(),
-				textStyle = TextStyle(
-					fontFamily = font,
-					fontSize = 15.sp,
-					),
+				textStyle = AppTheme.typography.formInputText,
 				value = selectedNoteType.value.title,
 				onValueChange = {selectedNoteType.value.title = it},
 				readOnly = true,
-				colors = OutlinedTextFieldDefaults.colors(
-					unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-					focusedBorderColor = colorResource(R.color.primary_color),
-					unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-					focusedLabelColor = colorResource(R.color.primary_color),
-					focusedTrailingIconColor = colorResource(R.color.primary_color),
-					unfocusedTrailingIconColor = colorResource(R.color.primary_color),
-					focusedTextColor = colorResource(R.color.text_color),
-					unfocusedTextColor = colorResource(R.color.text_color)
-				),
+				colors = inputColors,
 				shape = RoundedCornerShape(10.dp),
 				trailingIcon = {
 					Icon(
@@ -176,12 +173,11 @@ fun NoteFormComponent(
 				noteTypes.forEach {noteType ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
-						colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
+						colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 						text = {
 							Text(
 								text = noteType.title,
-								fontFamily = font,
-								fontSize = 15.sp
+								style = AppTheme.typography.formInputText
 							)},
 						onClick = {
 							selectedNoteType.value = noteType
@@ -205,14 +201,7 @@ fun NoteFormComponent(
 			singleLine = true,
 			label = { Text("Заголовок") },
 			onValueChange = {text -> noteTitle.value = text	},
-			colors = OutlinedTextFieldDefaults.colors(
-				unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-				focusedBorderColor = colorResource(R.color.primary_color),
-				unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-				focusedLabelColor = colorResource(R.color.primary_color),
-				focusedTextColor = colorResource(R.color.text_color),
-				unfocusedTextColor = colorResource(R.color.text_color)
-			),
+			colors = inputColors,
 			shape = RoundedCornerShape(10.dp))
 
 
@@ -222,10 +211,7 @@ fun NoteFormComponent(
 				.fillMaxWidth()
 				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), bottom = 10.dp)
 				.height(250.dp),
-			textStyle = TextStyle(
-				fontFamily = font,
-				fontSize = 15.sp,
-			),
+			textStyle = AppTheme.typography.formInputText,
 			value = noteText.value,
 			minLines = 10,
 			label = { Text("Текст") },
@@ -234,25 +220,15 @@ fun NoteFormComponent(
 				noteText.value = text
 				isNoteTextError = noteText.value.isEmpty()
 			},
-			colors = OutlinedTextFieldDefaults.colors(
-				unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-				focusedBorderColor = colorResource(R.color.primary_color),
-				unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-				focusedLabelColor = colorResource(R.color.primary_color),
-				focusedTextColor = colorResource(R.color.text_color),
-				unfocusedTextColor = colorResource(R.color.text_color),
-				errorLabelColor = colorResource(R.color.danger_color),
-				errorBorderColor = colorResource(R.color.danger_color)
-			),
+			colors = inputColors,
 			shape = RoundedCornerShape(10.dp))
 
 		if (isNoteTextError){
 			Text(
-				modifier = Modifier.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), top = 5.dp, bottom = 10.dp),
+				modifier = Modifier.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), bottom = 10.dp),
 				text = "Обязательное поле",
-				color = colorResource(R.color.danger_color),
-				fontFamily = font,
-				fontSize = 13.sp
+				color = AppTheme.colors.dangerColor,
+				style = AppTheme.typography.errorText
 			)
 		}
 
@@ -266,10 +242,10 @@ fun NoteFormComponent(
 			value = formattedDate.value,
 			onValueChange = {},
 			colors = OutlinedTextFieldDefaults.colors(
-				unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-				focusedBorderColor = colorResource(R.color.primary_color),
-				focusedTextColor = colorResource(R.color.text_color),
-				unfocusedTextColor = colorResource(R.color.text_color),
+				unfocusedBorderColor = AppTheme.colors.borderColor,
+				focusedBorderColor = AppTheme.colors.primaryColor,
+				focusedTextColor = AppTheme.colors.textColor,
+				unfocusedTextColor = AppTheme.colors.textColor,
 			),
 			trailingIcon = {
 				IconButton(onClick = { showDatePicker = true }) {
@@ -277,7 +253,7 @@ fun NoteFormComponent(
 						modifier = Modifier.size(30.dp),
 						painter = painterResource(R.drawable.ic_calendar),
 						contentDescription = "Выбрать дату",
-						tint = colorResource(R.color.primary_color)
+						tint = AppTheme.colors.primaryColor
 					)
 				}
 			},
@@ -289,7 +265,7 @@ fun NoteFormComponent(
 			DatePickerDialog(
 				onDismissRequest = { showDatePicker = false },
 				colors = DatePickerDefaults.colors(
-					containerColor = colorResource(R.color.primary_color)
+					containerColor = AppTheme.colors.primaryColor
 				),
 				confirmButton = {
 					TextButton(onClick = {
@@ -315,12 +291,12 @@ fun NoteFormComponent(
 					title = { Text("Выбрать дату", modifier = Modifier.padding(start = 24.dp, top = 16.dp)) },
 					colors = DatePickerDefaults.colors(
 						containerColor = Color.White,
-						selectedDayContainerColor = colorResource(R.color.primary_color),
-						todayContentColor = colorResource(R.color.primary_color),
-						selectedYearContainerColor = colorResource(R.color.primary_color),
-						todayDateBorderColor = colorResource(R.color.primary_color),
-						titleContentColor = colorResource(R.color.primary_color),
-						headlineContentColor = colorResource(R.color.title_color)// Цвет выбранной даты в шапке
+						selectedDayContainerColor = AppTheme.colors.primaryColor,
+						todayContentColor = AppTheme.colors.primaryColor,
+						selectedYearContainerColor = AppTheme.colors.primaryColor,
+						todayDateBorderColor = AppTheme.colors.primaryColor,
+						titleContentColor = AppTheme.colors.primaryColor,
+						headlineContentColor = AppTheme.colors.titleColor
 					)
 				)
 			}
@@ -337,7 +313,7 @@ fun NoteFormComponent(
 		){
 			OutlinedTextField(
 				modifier = Modifier
-					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
+					.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
 					.fillMaxWidth(),
 				value = selectedArchiveTitle,
 				onValueChange = {},
@@ -346,16 +322,7 @@ fun NoteFormComponent(
 					fontFamily = font,
 					fontSize = 15.sp,
 				),
-				colors = OutlinedTextFieldDefaults.colors(
-					unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-					focusedBorderColor = colorResource(R.color.primary_color),
-					unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-					focusedLabelColor = colorResource(R.color.primary_color),
-					focusedTrailingIconColor = colorResource(R.color.primary_color),
-					unfocusedTrailingIconColor = colorResource(R.color.primary_color),
-					focusedTextColor = colorResource(R.color.text_color),
-					unfocusedTextColor = colorResource(R.color.text_color)
-				),
+				colors = inputColors,
 				shape = RoundedCornerShape(10.dp),
 				trailingIcon = {
 					Icon(
@@ -372,12 +339,11 @@ fun NoteFormComponent(
 			) {
 				DropdownMenuItem(
 					modifier = Modifier.background(Color.White),
-					colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
+					colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 					text = {
 						Text(
 							text = unSelectedArchiveTitle,
-							fontFamily = font,
-							fontSize = 15.sp
+							style = AppTheme.typography.formInputText
 							)},
 					onClick = {
 						selectedArchiveTitle = unSelectedArchiveTitle
@@ -388,12 +354,11 @@ fun NoteFormComponent(
 				archives.forEach {archive ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
-						colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
+						colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 						text = {
 							Text(
 								text = archive.title,
-								fontFamily = font,
-								fontSize = 15.sp
+								style = AppTheme.typography.formInputText
 							)},
 						onClick = {
 							selectedArchive = archive
@@ -416,11 +381,9 @@ fun NoteFormComponent(
 				.fillMaxWidth()
 				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), bottom = 20.dp)) {
 				Text(
-					color = Color.Gray,
 					text = "Выбрать теги (${selectedTagsCount.intValue})",
-					fontFamily = font,
-					fontSize = 15.sp,
-					fontWeight = FontWeight.Bold
+					color = AppTheme.colors.colorGrey,
+					style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold)
 				)
 			}
 			selectableTags.forEachIndexed { index, tag ->
@@ -446,7 +409,7 @@ fun NoteFormComponent(
 					HorizontalDivider(
 						modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
 						thickness = 1.dp,
-						color = colorResource(R.color.border_color))
+						color = AppTheme.colors.borderColor)
 				}
 			}
 		}
@@ -459,7 +422,7 @@ fun NoteFormComponent(
 					top = 20.dp, bottom = 40.dp)) {
 
 				if (tagsLoading){
-					ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
+					ProgressIndicatorComponent(25, AppTheme.colors.primaryColor)
 				}
 
 				else{
@@ -481,11 +444,9 @@ fun NoteFormComponent(
 							}
 
 						),
-						color = colorResource(R.color.primary_color),
 						text = "Загрузить еще",
-						fontFamily = font,
-						fontSize = 15.sp,
-						fontWeight = FontWeight.Bold
+						color = AppTheme.colors.primaryColor,
+						style = AppTheme.typography.textButton
 					)
 				}
 			}
@@ -502,11 +463,9 @@ fun NoteFormComponent(
 					.fillMaxWidth()
 					.padding(bottom = 20.dp)) {
 					Text(
-						color = Color.Gray,
 						text = "Добавленные теги",
-						fontFamily = font,
-						fontSize = 15.sp,
-						fontWeight = FontWeight.Bold
+						color = AppTheme.colors.colorGrey,
+						style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold)
 					)
 				}
 				addedTags.forEachIndexed {index, tag ->
@@ -516,10 +475,9 @@ fun NoteFormComponent(
 						horizontalArrangement = Arrangement.SpaceBetween) {
 
 						Text(
-							color = colorResource(R.color.text_color),
 							text = tag.title,
-							fontFamily = font,
-							fontSize = 16.sp,
+							color = AppTheme.colors.textColor,
+							style = AppTheme.typography.formInputText
 						)
 
 						IconButton(onClick = { addedTags.removeAt(index) }) {
@@ -527,12 +485,12 @@ fun NoteFormComponent(
 								modifier = Modifier.size(20.dp),
 								painter = painterResource(
 									R.drawable.ic_trash), contentDescription = "",
-								tint = colorResource(R.color.danger_color))
+								tint = AppTheme.colors.dangerColor)
 						}
 					}
 
 					if (index != addedTags.count() -1){
-						HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
+						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 					}
 				}
 			}
@@ -552,12 +510,10 @@ fun NoteFormComponent(
 				enabled = !saving,
 				shape = RoundedCornerShape(10.dp),
 				colors = ButtonDefaults.buttonColors(
-					containerColor = colorResource(R.color.primary_color),
-					disabledContainerColor = colorResource(R.color.primary_color).copy(alpha = 0.8f)),
+					containerColor = AppTheme.colors.primaryColor,
+					disabledContainerColor = AppTheme.colors.primaryColor.copy(alpha = 0.8f)),
 				onClick = {
 					isNoteTextError = noteText.value.isEmpty()
-
-
 
 					if(!isNoteTextError){
 						saving = true
@@ -600,9 +556,7 @@ fun NoteFormComponent(
 				else{
 					Text(
 						text = "Сохранить",
-						fontFamily = font,
-						fontSize = 16.sp,
-						fontWeight = FontWeight.SemiBold
+						style = AppTheme.typography.inputButtonText
 					)
 				}
 			}

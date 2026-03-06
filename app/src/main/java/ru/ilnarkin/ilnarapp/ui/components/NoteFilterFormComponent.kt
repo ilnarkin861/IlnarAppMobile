@@ -19,10 +19,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -36,17 +36,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Tag
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 
 
@@ -59,7 +56,6 @@ fun NoteFilterFormComponent(
 	action: () -> Unit,
 	resetFilter: () -> Unit
 ) {
-	val font = getInterFont()
 
 	val scope = rememberCoroutineScope()
 
@@ -75,6 +71,16 @@ fun NoteFilterFormComponent(
 
 	var archiveMenuExpanded by remember { mutableStateOf(false) }
 
+	val inputColors = OutlinedTextFieldDefaults.colors(
+		unfocusedBorderColor = AppTheme.colors.inputsBorderColor,
+		focusedBorderColor = AppTheme.colors.primaryColor,
+		unfocusedLabelColor = AppTheme.colors.inputsPlaceholderColor,
+		focusedLabelColor = AppTheme.colors.primaryColor,
+		focusedTrailingIconColor = AppTheme.colors.primaryColor,
+		unfocusedTrailingIconColor = AppTheme.colors.primaryColor,
+		focusedTextColor = AppTheme.colors.textColor,
+		unfocusedTextColor = AppTheme.colors.textColor
+	)
 
 
 	Column(Modifier
@@ -95,25 +101,13 @@ fun NoteFilterFormComponent(
 		) {
 			OutlinedTextField(
 				modifier = Modifier
-					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
+					.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
 					.fillMaxWidth(),
-				textStyle = TextStyle(
-					fontFamily = font,
-					fontSize = 15.sp,
-				),
+				textStyle = AppTheme.typography.formInputText,
 				value = viewModelState.selectedNoteTypeTitle,
 				onValueChange = {},
 				readOnly = true,
-				colors = OutlinedTextFieldDefaults.colors(
-					unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-					focusedBorderColor = colorResource(R.color.primary_color),
-					unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-					focusedLabelColor = colorResource(R.color.primary_color),
-					focusedTrailingIconColor = colorResource(R.color.primary_color),
-					unfocusedTrailingIconColor = colorResource(R.color.primary_color),
-					focusedTextColor = colorResource(R.color.text_color),
-					unfocusedTextColor = colorResource(R.color.text_color)
-				),
+				colors = inputColors,
 				shape = RoundedCornerShape(10.dp),
 				trailingIcon = {
 					Icon(
@@ -131,12 +125,11 @@ fun NoteFilterFormComponent(
 				viewModelState.selectableNoteTypes.forEach {noteType ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
-						colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
+						colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 						text = {
 							Text(
 								text = noteType.title,
-								fontFamily = font,
-								fontSize = 15.sp
+								style = AppTheme.typography.formInputText
 							)},
 						onClick = {
 							viewModel.selectNoteType(noteType.id, noteType.title)
@@ -160,25 +153,13 @@ fun NoteFilterFormComponent(
 		){
 			OutlinedTextField(
 				modifier = Modifier
-					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
+					.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
 					.fillMaxWidth(),
 				value = viewModelState.selectedYearTitle,
 				onValueChange = {},
 				readOnly = true,
-				textStyle = TextStyle(
-					fontFamily = font,
-					fontSize = 15.sp,
-				),
-				colors = OutlinedTextFieldDefaults.colors(
-					unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-					focusedBorderColor = colorResource(R.color.primary_color),
-					unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-					focusedLabelColor = colorResource(R.color.primary_color),
-					focusedTrailingIconColor = colorResource(R.color.primary_color),
-					unfocusedTrailingIconColor = colorResource(R.color.primary_color),
-					focusedTextColor = colorResource(R.color.text_color),
-					unfocusedTextColor = colorResource(R.color.text_color)
-				),
+				textStyle = AppTheme.typography.formInputText,
+				colors = inputColors,
 				shape = RoundedCornerShape(10.dp),
 				trailingIcon = {
 					Icon(
@@ -195,12 +176,11 @@ fun NoteFilterFormComponent(
 			) {
 				DropdownMenuItem(
 					modifier = Modifier.background(Color.White),
-					colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
+					colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 					text = {
 						Text(
 							text = viewModelState.unSelectedYearTitle,
-							fontFamily = font,
-							fontSize = 15.sp
+							style = AppTheme.typography.formInputText
 						)},
 					onClick = {
 						viewModel.selectYear(null, viewModelState.unSelectedYearTitle)
@@ -210,12 +190,11 @@ fun NoteFilterFormComponent(
 				viewModelState.years.forEach {year ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
-						colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
+						colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 						text = {
 							Text(
 								text = year.toString(),
-								fontFamily = font,
-								fontSize = 15.sp
+								style = AppTheme.typography.formInputText
 							)},
 						onClick = {
 							viewModel.selectYear(year, year.toString())
@@ -239,25 +218,13 @@ fun NoteFilterFormComponent(
 			){
 				OutlinedTextField(
 					modifier = Modifier
-						.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
+						.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
 						.fillMaxWidth(),
 					value = viewModelState.selectedMonthTitle,
 					onValueChange = {},
 					readOnly = true,
-					textStyle = TextStyle(
-						fontFamily = font,
-						fontSize = 15.sp,
-					),
-					colors = OutlinedTextFieldDefaults.colors(
-						unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-						focusedBorderColor = colorResource(R.color.primary_color),
-						unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-						focusedLabelColor = colorResource(R.color.primary_color),
-						focusedTrailingIconColor = colorResource(R.color.primary_color),
-						unfocusedTrailingIconColor = colorResource(R.color.primary_color),
-						focusedTextColor = colorResource(R.color.text_color),
-						unfocusedTextColor = colorResource(R.color.text_color)
-					),
+					textStyle = AppTheme.typography.formInputText,
+					colors = inputColors,
 					shape = RoundedCornerShape(10.dp),
 					trailingIcon = {
 						Icon(
@@ -274,12 +241,11 @@ fun NoteFilterFormComponent(
 				) {
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
-						colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
+						colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 						text = {
 							Text(
 								text = viewModelState.unSelectedMonthTitle,
-								fontFamily = font,
-								fontSize = 15.sp
+								style = AppTheme.typography.formInputText
 							)},
 						onClick = {
 							viewModel.selectMonth(null, viewModelState.unSelectedMonthTitle)
@@ -289,12 +255,11 @@ fun NoteFilterFormComponent(
 					viewModelState.months.forEachIndexed {index, month ->
 						DropdownMenuItem(
 							modifier = Modifier.background(Color.White),
-							colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
+							colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 							text = {
 								Text(
 									text = month,
-									fontFamily = font,
-									fontSize = 15.sp
+									style = AppTheme.typography.formInputText
 								)},
 							onClick = {
 								viewModel.selectMonth(index + 1, month)
@@ -318,25 +283,13 @@ fun NoteFilterFormComponent(
 		){
 			OutlinedTextField(
 				modifier = Modifier
-					.menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
+					.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
 					.fillMaxWidth(),
 				value = viewModelState.selectedArchiveTitle,
 				onValueChange = {},
 				readOnly = true,
-				textStyle = TextStyle(
-					fontFamily = font,
-					fontSize = 15.sp,
-				),
-				colors = OutlinedTextFieldDefaults.colors(
-					unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-					focusedBorderColor = colorResource(R.color.primary_color),
-					unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-					focusedLabelColor = colorResource(R.color.primary_color),
-					focusedTrailingIconColor = colorResource(R.color.primary_color),
-					unfocusedTrailingIconColor = colorResource(R.color.primary_color),
-					focusedTextColor = colorResource(R.color.text_color),
-					unfocusedTextColor = colorResource(R.color.text_color)
-				),
+				textStyle = AppTheme.typography.formInputText,
+				colors = inputColors,
 				shape = RoundedCornerShape(10.dp),
 				trailingIcon = {
 					Icon(
@@ -353,12 +306,11 @@ fun NoteFilterFormComponent(
 			) {
 				DropdownMenuItem(
 					modifier = Modifier.background(Color.White),
-					colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
+					colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 					text = {
 						Text(
 							text = viewModelState.unSelectedArchiveTitle,
-							fontFamily = font,
-							fontSize = 15.sp
+							style = AppTheme.typography.formInputText
 						)},
 					onClick = {
 						viewModel.selectArchive(null, viewModelState.unSelectedArchiveTitle)
@@ -369,12 +321,11 @@ fun NoteFilterFormComponent(
 				viewModelState.selectableArchives.forEach {archive ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
-						colors = MenuDefaults.itemColors(textColor = colorResource(R.color.text_color)),
+						colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 						text = {
 							Text(
 								text = archive.title,
-								fontFamily = font,
-								fontSize = 15.sp
+								style = AppTheme.typography.formInputText
 							)},
 						onClick = {
 							viewModel.selectArchive(archive.id, archive.title)
@@ -397,11 +348,9 @@ fun NoteFilterFormComponent(
 				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
 					end = dimensionResource(R.dimen.container_horizontal_padding),bottom = 20.dp)) {
 				Text(
-					color = Color.Gray,
 					text = "Выбрать теги (${viewModelState.selectedTagIds.size})",
-					fontFamily = font,
-					fontSize = 15.sp,
-					fontWeight = FontWeight.Bold
+					color = AppTheme.colors.colorGrey,
+					style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold)
 				)
 			}
 			viewModelState.selectableTags.forEachIndexed { index, tag ->
@@ -428,7 +377,7 @@ fun NoteFilterFormComponent(
 					HorizontalDivider(
 						modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
 						thickness = 1.dp,
-						color = colorResource(R.color.border_color))
+						color = AppTheme.colors.borderColor)
 				}
 			}
 		}
@@ -442,7 +391,7 @@ fun NoteFilterFormComponent(
 					bottom = 40.dp)) {
 
 				if (tagsLoading){
-					ProgressIndicatorComponent(25, colorResource(R.color.primary_color))
+					ProgressIndicatorComponent(25, AppTheme.colors.primaryColor)
 				}
 
 				else{
@@ -455,9 +404,7 @@ fun NoteFilterFormComponent(
 									tagsLoading = true
 
 									try {
-
 										loadTags()
-
 									} finally {
 										tagsLoading = false
 									}
@@ -465,11 +412,9 @@ fun NoteFilterFormComponent(
 							}
 
 						),
-						color = colorResource(R.color.primary_color),
+						color = AppTheme.colors.primaryColor,
 						text = "Загрузить еще",
-						fontFamily = font,
-						fontSize = 15.sp,
-						fontWeight = FontWeight.Bold
+						style = AppTheme.typography.textButton
 					)
 				}
 			}
@@ -490,10 +435,9 @@ fun NoteFilterFormComponent(
 					.height(60.dp),
 				shape = RoundedCornerShape(10.dp),
 				colors = ButtonDefaults.buttonColors(
-					containerColor = colorResource(R.color.primary_color),
-					disabledContainerColor = colorResource(R.color.primary_color).copy(alpha = 0.8f)),
+					containerColor = AppTheme.colors.primaryColor,
+					disabledContainerColor = AppTheme.colors.primaryColor.copy(alpha = 0.8f)),
 				onClick = {
-
 					viewModel.applyFilter()
 
 					action()
@@ -501,9 +445,7 @@ fun NoteFilterFormComponent(
 			) {
 				Text(
 					text = "Применить",
-					fontFamily = font,
-					fontSize = 16.sp,
-					fontWeight = FontWeight.SemiBold
+					style = AppTheme.typography.inputButtonText
 				)
 			}
 		}
@@ -525,17 +467,14 @@ fun NoteFilterFormComponent(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
 						onClick = {
-
 							viewModel.resetFilter()
 
 							resetFilter()
 						}
 					),
 					text = "Сбросить фильтр",
-					fontWeight = FontWeight.SemiBold,
-					fontSize = 15.sp,
-					color = Color.Gray,
-					fontFamily = font,
+					color = AppTheme.colors.colorGrey,
+					style = AppTheme.typography.textButton
 				)
 			}
 		}

@@ -87,18 +87,6 @@ fun PasswordFormComponent(
 				)
 			}
 
-
-			Row(
-				modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp)
-			){
-				Text(
-					color = colorResource(R.color.warning_color),
-					text = "После смены пароля нужно будет авторизоваться заново",
-					fontFamily = font,
-					fontSize = 14.sp
-				)
-			}
-
 			// Old password field
 			Row(
 				modifier = Modifier.fillMaxWidth()

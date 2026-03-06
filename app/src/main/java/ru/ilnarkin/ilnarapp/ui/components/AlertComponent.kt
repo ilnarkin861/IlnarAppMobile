@@ -20,15 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,8 +35,6 @@ fun AlertComponent(
 	showed: Boolean = false,
 	action: () -> Unit
 ) {
-
-	val font = getInterFont()
 
 	if (showed) {
 		BasicAlertDialog(
@@ -64,13 +58,13 @@ fun AlertComponent(
 								modifier = Modifier.size(70.dp),
 								painter = painterResource(R.drawable.ic_error),
 								contentDescription = "",
-								tint = colorResource(R.color.danger_color))
+								tint = AppTheme.colors.dangerColor)
 						else{
 							Icon(
 								modifier = Modifier.size(70.dp),
 								painter = painterResource(R.drawable.ic_success),
 								contentDescription = "",
-								tint = colorResource(R.color.primary_color))
+								tint = AppTheme.colors.primaryColor)
 						}
 					}
 
@@ -80,11 +74,8 @@ fun AlertComponent(
 					) {
 						Text(
 							text = message,
-							fontSize = 16.sp,
-							fontFamily = font,
-							textAlign = TextAlign.Center,
-							color = if (!success) colorResource(R.color.danger_color)
-							else colorResource(R.color.primary_color)
+							style = AppTheme.typography.modalText,
+							color = if (!success) AppTheme.colors.dangerColor else AppTheme.colors.primaryColor
 						)
 					}
 
@@ -96,15 +87,11 @@ fun AlertComponent(
 							modifier = Modifier.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
-								onClick = {
-									action()
-								}
+								onClick = {	action() }
 							),
 							text = "Понятно",
-							fontWeight = FontWeight.SemiBold,
-							fontSize = 15.sp,
-							color = Color.Gray,
-							fontFamily = font,
+							color = AppTheme.colors.colorGrey,
+							style = AppTheme.typography.textButton
 						)
 					}
 				}

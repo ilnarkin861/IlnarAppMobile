@@ -13,9 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import ru.ilnarkin.ilnarapp.R
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
@@ -33,7 +32,7 @@ fun PinKeypadItemComponent(
 			).size(70.dp),
 		onClick = onClick,
 	) {
-		Box(modifier = Modifier.fillMaxSize().background(colorResource(R.color.app_bg_color)),
+		Box(modifier = Modifier.fillMaxSize().background(AppTheme.colors.appBgColor),
 			contentAlignment = Alignment.Center) {  content() }
 	}
 }

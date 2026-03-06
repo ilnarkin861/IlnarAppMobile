@@ -16,15 +16,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -35,8 +32,6 @@ fun NoteDetailsComponent(note: Note?) {
 
 	val containerPadding = dimensionResource(R.dimen.container_horizontal_padding)
 
-	val font = getInterFont()
-
 
 	Column(Modifier.fillMaxSize()
 		.padding(start = containerPadding, top = 30.dp, end = containerPadding, bottom = 40.dp)
@@ -44,11 +39,9 @@ fun NoteDetailsComponent(note: Note?) {
 
 		Row {
 			Text(
-				color = colorResource(R.color.title_color),
+				color = AppTheme.colors.titleColor,
 				text = note?.title ?: "Без названия",
-				fontFamily = font,
-				fontSize = dimensionResource(R.dimen.note_title_font_size).value.sp,
-				fontWeight = FontWeight.Bold
+				style = AppTheme.typography.noteTitle
 			)
 		}
 
@@ -57,44 +50,38 @@ fun NoteDetailsComponent(note: Note?) {
 				text = DateTimeFormatter
 					.ofPattern("d MMMM yyyy, EEEE")
 					.format(LocalDate.parse(note!!.date)),
-				fontFamily = font,
-				color = colorResource(R.color.grey),
-				fontSize = dimensionResource(R.dimen.note_date_font_size).value.sp
+				style = AppTheme.typography.noteDate,
+				color = AppTheme.colors.colorGrey
 			)
 		}
 
 		Row(Modifier.padding(top = 15.dp, bottom = 20.dp)) {
-			HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
+			HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 		}
 
 		Row {
 			Text(
 				text = note!!.text,
-				fontFamily = font,
-				lineHeight = 1.5.em,
-				color = colorResource(R.color.text_color),
-				fontSize = dimensionResource(R.dimen.note_text_font_size).value.sp
+				style = AppTheme.typography.noteText,
+				color = AppTheme.colors.textColor
 			)
 		}
 
 		Row(Modifier.padding(top = 15.dp, bottom = 20.dp)) {
-			HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
+			HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 		}
 
 		Row(Modifier.padding(bottom = 10.dp)) {
 			Text(
 				text = "Тип: ",
-				fontFamily = font,
-				fontWeight = FontWeight.Bold,
-				fontSize = 15.sp,
-				color = colorResource(R.color.title_color),
+				style = AppTheme.typography.noteDetailsText.copy(fontWeight = FontWeight.Bold),
+				color = AppTheme.colors.titleColor,
 			)
 
 			Text(
 				text = note!!.noteType.title,
-				fontFamily = font,
-				fontSize = 15.sp,
-				color = colorResource(R.color.text_color),
+				style = AppTheme.typography.noteDetailsText,
+				color = AppTheme.colors.textColor,
 			)
 		}
 
@@ -102,17 +89,14 @@ fun NoteDetailsComponent(note: Note?) {
 			Row(Modifier.padding(bottom = 10.dp)) {
 				Text(
 					text = "Архив: ",
-					fontFamily = font,
-					fontWeight = FontWeight.Bold,
-					fontSize = 15.sp,
-					color = colorResource(R.color.title_color),
+					style = AppTheme.typography.noteDetailsText.copy(fontWeight = FontWeight.Bold),
+					color = AppTheme.colors.titleColor,
 				)
 
 				Text(
 					text = note.archive!!.title,
-					fontFamily = font,
-					fontSize = 15.sp,
-					color = colorResource(R.color.text_color),
+					style = AppTheme.typography.noteDetailsText,
+					color = AppTheme.colors.textColor,
 				)
 			}
 		}
@@ -129,12 +113,12 @@ fun NoteDetailsComponent(note: Note?) {
 						modifier = Modifier
 							.border(
 								width = 1.dp,
-								color = colorResource(R.color.primary_color),
+								color = AppTheme.colors.primaryColor,
 								shape = RoundedCornerShape(10.dp))
 							.padding(horizontal = 20.dp, vertical = 10.dp),
 						text = tag.title,
-						fontSize = 13.sp,
-						color = colorResource(R.color.primary_color))
+						style = AppTheme.typography.noteTags,
+						color = AppTheme.colors.primaryColor)
 				}
 			}
 		}

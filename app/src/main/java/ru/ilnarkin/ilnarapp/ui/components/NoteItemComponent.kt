@@ -31,19 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_NOTE_TITLE
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Note
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -65,9 +60,7 @@ fun NoteItemComponent(
 
 	var showConfirmAlert by remember { mutableStateOf(false) }
 
-	val font = getInterFont()
-
-	val titleColor = if (note.title != null) colorResource(R.color.title_color) else colorResource(R.color.title_color).copy(alpha = 0.4f)
+	val titleColor = if (note.title != null) AppTheme.colors.titleColor else AppTheme.colors.titleColor.copy(alpha = 0.4f)
 
 
 	Box(
@@ -94,10 +87,8 @@ fun NoteItemComponent(
 			Row {
 				Text(
 					text = note.title ?: DEFAULT_NOTE_TITLE,
-					fontFamily = font,
-					fontWeight = FontWeight.SemiBold,
-					color = titleColor,
-					fontSize = dimensionResource(R.dimen.note_item_title_font_size).value.sp
+					style = AppTheme.typography.noteItemTitle,
+					color = titleColor
 				)
 			}
 
@@ -106,27 +97,22 @@ fun NoteItemComponent(
 					text = DateTimeFormatter
 						.ofPattern("d MMMM yyyy, EEEE")
 						.format(LocalDate.parse(note.date)),
-					fontFamily = font,
-					color = colorResource(R.color.grey),
-					fontSize = dimensionResource(R.dimen.note_item_date_font_size).value.sp
-				)
+					color = AppTheme.colors.colorGrey,
+					style = AppTheme.typography.noteItemDate)
 			}
 
-			Row { HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))	}
+			Row { HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)	}
 
 			Row(Modifier.padding(vertical = 15.dp)) {
 				Text(
 					text = note.text,
 					maxLines = 3,
 					overflow = TextOverflow.Ellipsis,
-					fontFamily = font,
-					lineHeight = 1.5.em,
-					color = colorResource(R.color.text_color),
-					fontSize = dimensionResource(R.dimen.note_item_text_font_size).value.sp
-				)
+					style = AppTheme.typography.noteItemText,
+					color = AppTheme.colors.textColor)
 			}
 
-			Row { HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))	}
+			Row { HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)	}
 
 			Row(
 				Modifier.padding(top = 20.dp).fillMaxWidth(),
@@ -143,7 +129,7 @@ fun NoteItemComponent(
 							Row(modifier = Modifier.fillMaxSize(),
 								horizontalArrangement = Arrangement.Center,
 								verticalAlignment = Alignment.CenterVertically) {
-								ProgressIndicatorComponent(25, colorResource(R.color.grey))
+								ProgressIndicatorComponent(25, AppTheme.colors.colorGrey)
 							}
 						}
 
@@ -159,7 +145,7 @@ fun NoteItemComponent(
 						}) {
 							Icon(modifier = Modifier.size(25.dp),
 								painter = painterResource(R.drawable.ic_edit), contentDescription = "",
-								tint = colorResource(R.color.grey))
+								tint = AppTheme.colors.colorGrey)
 						}
 					}
 
@@ -168,7 +154,7 @@ fun NoteItemComponent(
 							Row(modifier = Modifier.fillMaxSize(),
 								horizontalArrangement = Arrangement.Center,
 								verticalAlignment = Alignment.CenterVertically) {
-								ProgressIndicatorComponent(25, colorResource(R.color.danger_color))
+								ProgressIndicatorComponent(25, AppTheme.colors.dangerColor)
 							}
 						}
 
@@ -179,7 +165,7 @@ fun NoteItemComponent(
 								Icon(
 									modifier = Modifier.size(25.dp),
 									painter = painterResource(R.drawable.ic_trash), contentDescription = "",
-									tint = colorResource(R.color.danger_color))
+									tint = AppTheme.colors.dangerColor)
 							}
 						}
 					}

@@ -17,9 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
@@ -59,10 +58,8 @@ fun LoadButtonComponent(nextButton: Boolean = true, action: suspend () -> Unit) 
 					}
 				),
 				text = text,
-				color = Color.Gray,
-				fontFamily = getInterFont(),
-				fontSize = 15.sp,
-				fontWeight = FontWeight.Bold
+				color = AppTheme.colors.colorGrey,
+				style = AppTheme.typography.textButton.copy(fontWeight = FontWeight.Bold),
 			)
 		}
 	}
