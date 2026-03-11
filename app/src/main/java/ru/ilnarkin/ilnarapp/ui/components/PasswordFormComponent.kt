@@ -36,7 +36,10 @@ import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
-data class PasswordModel(val oldPassword: String, val newPassword: String)
+data class PasswordModel(
+	val oldPassword: String,
+	val newPassword: String,
+	val confirmedPassword: String)
 
 
 @Composable
@@ -225,7 +228,11 @@ fun PasswordFormComponent(
 
 						if(formIsValid){
 
-							val passwordModel = PasswordModel(oldPassword = oldPassword.value, newPassword = newPassword.value)
+							val passwordModel = PasswordModel(
+								oldPassword = oldPassword.value,
+								newPassword = newPassword.value,
+								confirmedPassword = newPassword.value)
+
 							saving = true
 
 							scope.launch {
