@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.update
 import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.Info
+import ru.ilnarkin.ilnarapp.models.Token
 import ru.ilnarkin.ilnarapp.models.UserInfo
 import ru.ilnarkin.ilnarapp.models.UserLoginData
 import ru.ilnarkin.ilnarapp.services.UserManager
@@ -52,11 +53,9 @@ class UserViewModel(
 	}
 
 
-	suspend fun login(userAuthData: UserLoginData){
+	suspend fun login(userAuthData: UserLoginData): Token?{
 
 		try {
-			_uiState.value = _uiState.value.copy(message = "")
-
 			val result = userRepository.login(userAuthData)
 
 			userManager.saveAuthToken(result.token)
@@ -64,6 +63,8 @@ class UserViewModel(
 			_uiState.update { it.copy(
 				success = true
 			)}
+
+			return result
 		}
 
 		catch (e: ApiException){
@@ -71,6 +72,8 @@ class UserViewModel(
 				success = false,
 				message = e.message ?: DEFAULT_ERROR_MESSAGE
 			)}
+
+			return null
 		}
 
 		catch (_: Exception){
@@ -78,6 +81,8 @@ class UserViewModel(
 				success = false,
 				message = DEFAULT_ERROR_MESSAGE
 			)}
+
+			return null
 		}
 	}
 
@@ -85,7 +90,6 @@ class UserViewModel(
 	suspend fun getUserInfo(): UserInfo?{
 		try {
 		    val userInfo = userRepository.getUserInfo()
-
 			_uiState.update { it.copy(
 				success = true,
 				data = userInfo
