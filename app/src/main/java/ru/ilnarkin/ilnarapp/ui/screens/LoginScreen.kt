@@ -140,6 +140,7 @@ fun LoginScreen(
 					onValueChange = {text ->
 						email.value = text
 						emailIsError = email.value.isEmpty()
+						showMessage = false
 					},
 					colors = inputColor,
 					shape = RoundedCornerShape(10.dp))
@@ -177,6 +178,7 @@ fun LoginScreen(
 					onValueChange = {text ->
 						password.value = text
 						passwordIsError = password.value.isEmpty()
+						showMessage = false
 					},
 					colors = inputColor,
 					shape = RoundedCornerShape(10.dp))
