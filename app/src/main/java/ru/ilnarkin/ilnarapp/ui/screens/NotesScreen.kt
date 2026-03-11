@@ -44,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -400,7 +399,7 @@ fun NotesScreen(
 		) {
 
 			Column {
-				Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
+				Row(Modifier.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)) {
 					Text(
 						text = sheetTitle.value,
 						color = AppTheme.colors.titleColor,
@@ -472,7 +471,7 @@ fun NotesScreen(
 			sheetState = noteFilterFormSheetState,
 		){
 			Column {
-				Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
+				Row(Modifier.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)) {
 					Text(
 						color = AppTheme.colors.titleColor,
 						text = "Фильтр",
