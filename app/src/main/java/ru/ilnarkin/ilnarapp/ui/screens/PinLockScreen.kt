@@ -130,7 +130,7 @@ fun PinLockScreen(
 					horizontalArrangement = Arrangement.Center) {
 					Text("Неверный PIN-код",
 						color = AppTheme.colors.dangerColor,
-						style = AppTheme.typography.errorText)
+						style = AppTheme.typography.authMessageText)
 				}
 			}
 		}
