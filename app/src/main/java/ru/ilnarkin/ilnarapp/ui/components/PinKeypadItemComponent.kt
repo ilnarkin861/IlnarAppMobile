@@ -29,7 +29,7 @@ fun PinKeypadItemComponent(
 			.border(width = if (bordered) 1.dp else 0.dp,
 				color = if (bordered) AppTheme.colors.colorGrey else Color.Transparent,
 				shape = CircleShape
-			).size(70.dp),
+			).size(60.dp),
 		onClick = onClick,
 	) {
 		Box(modifier = Modifier.fillMaxSize().background(AppTheme.colors.appBgColor),
