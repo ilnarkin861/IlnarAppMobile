@@ -33,11 +33,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
@@ -48,14 +46,14 @@ import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.UserInfo
-import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
+import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.EmailFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.PasswordFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
@@ -68,8 +66,6 @@ fun SettingsScreen(
 	) {
 
 	val testPassword = "qwerty1234"
-
-	val font = getInterFont()
 
 	var emailFormDialogShowed by remember { mutableStateOf(false) }
 
@@ -143,13 +139,12 @@ fun SettingsScreen(
 							modifier = Modifier.size(25.dp),
 							painter = painterResource(R.drawable.ic_mail),
 							contentDescription = "Mail",
-							tint = colorResource(R.color.grey)
+							tint = AppTheme.colors.colorGrey
 						)
 						Text(text = "Изменить Email",
 							modifier = Modifier.padding(start = 10.dp),
-							fontFamily = font,
-							fontSize = 16.sp,
-							color = colorResource(R.color.grey))
+							color = AppTheme.colors.colorGrey,
+							style = AppTheme.typography.settingsItemText)
 					}
 
 					Row(modifier = Modifier.size(25.dp),
@@ -157,7 +152,7 @@ fun SettingsScreen(
 						verticalAlignment = Alignment.CenterVertically) {
 
 						if (userInfoLoading){
-							ProgressIndicatorComponent(15, colorResource(R.color.grey).copy(alpha = 0.7f))
+							ProgressIndicatorComponent(15, AppTheme.colors.colorGrey.copy(alpha = 0.7f))
 						}
 
 						else{
@@ -165,7 +160,7 @@ fun SettingsScreen(
 								modifier = Modifier.size(15.dp),
 								painter = painterResource(R.drawable.ic_arrow_right),
 								contentDescription = "Arrow right",
-								tint = colorResource(R.color.grey).copy(alpha = 0.7f)
+								tint = AppTheme.colors.colorGrey.copy(alpha = 0.7f)
 							)
 						}
 					}
@@ -175,7 +170,7 @@ fun SettingsScreen(
 			HorizontalDivider(
 				modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
 				thickness = 1.dp,
-				color = colorResource(R.color.border_color))
+				color = AppTheme.colors.borderColor)
 
 			Row(Modifier.fillMaxWidth().clickable(
 				interactionSource = remember { MutableInteractionSource() },
@@ -190,13 +185,12 @@ fun SettingsScreen(
 							modifier = Modifier.size(25.dp),
 							painter = painterResource(R.drawable.ic_password),
 							contentDescription = "Password",
-							tint = colorResource(R.color.grey)
+							tint = AppTheme.colors.colorGrey
 						)
 						Text(text = "Сменить пароль",
 							modifier = Modifier.padding(start = 10.dp),
-							fontFamily = font,
-							fontSize = 16.sp,
-							color = colorResource(R.color.grey))
+							color = AppTheme.colors.colorGrey,
+							style = AppTheme.typography.settingsItemText)
 					}
 
 					Row(modifier = Modifier.size(25.dp),
@@ -206,7 +200,7 @@ fun SettingsScreen(
 							modifier = Modifier.size(15.dp),
 							painter = painterResource(R.drawable.ic_arrow_right),
 							contentDescription = "Arrow right",
-							tint = colorResource(R.color.grey).copy(alpha = 0.7f)
+							tint = AppTheme.colors.colorGrey.copy(alpha = 0.7f)
 						)
 					}
 				}
@@ -220,7 +214,7 @@ fun SettingsScreen(
 		){data ->
 			Snackbar(
 				snackbarData = data,
-				containerColor = colorResource(R.color.primary_color),
+				containerColor = AppTheme.colors.primaryColor,
 				contentColor = Color.White
 			)
 		}

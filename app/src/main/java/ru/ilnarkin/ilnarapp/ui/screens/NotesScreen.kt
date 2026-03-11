@@ -44,12 +44,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -59,9 +56,8 @@ import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
-import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
+import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
@@ -70,6 +66,7 @@ import ru.ilnarkin.ilnarapp.ui.components.NoteFilterFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
@@ -167,7 +164,7 @@ fun NotesScreen(
 			Box(
 				modifier = Modifier.fillMaxSize(),
 				contentAlignment = Alignment.Center){
-				ProgressIndicatorComponent(60, colorResource(R.color.primary_color))
+				ProgressIndicatorComponent(60, AppTheme.colors.primaryColor)
 			}
 		}
 
@@ -183,7 +180,10 @@ fun NotesScreen(
 								LoadButtonComponent(nextButton = false, action = {
 									noteViewModel.setActionType(ActionType.READ)
 
-									noteViewModel.getNotesList(noteViewModelState.offset - notesLimit, notesLimit, showLoading = false, filter = noteFilterViewModel.uiState.value.noteFilter)
+									noteViewModel.getNotesList(
+										noteViewModelState.offset - notesLimit, notesLimit,
+										showLoading = false,
+										filter = noteFilterViewModel.uiState.value.noteFilter)
 								})
 							}
 						}
@@ -263,7 +263,7 @@ fun NotesScreen(
 		}
 
 		if (!noteViewModelState.loading && noteViewModelState.list.isEmpty()){
-			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
+			Box(modifier = Modifier.background(AppTheme.colors.appBgColor).fillMaxSize(),
 				contentAlignment = Alignment.Center){
 				MessageComponent("Записей нет")
 			}
@@ -281,7 +281,7 @@ fun NotesScreen(
 					if (noteFilterViewModelState.filterApplied){
 						Badge(
 							Modifier.size(12.dp).offset(x = (-1).dp, y = 1.dp),
-							containerColor = colorResource(R.color.danger_color)
+							containerColor = AppTheme.colors.dangerColor
 						)
 					}
 				}
@@ -289,7 +289,7 @@ fun NotesScreen(
 				SmallFloatingActionButton(
 					shape = CircleShape,
 					containerColor = Color.White,
-					contentColor = colorResource(R.color.primary_color),
+					contentColor = AppTheme.colors.primaryColor,
 					onClick = {
 
 						if(floatingButtonsVisible){
@@ -330,7 +330,7 @@ fun NotesScreen(
 
 			FloatingActionButton(
 				modifier = Modifier.alpha(0.6f),
-				containerColor = colorResource(R.color.primary_color),
+				containerColor = AppTheme.colors.primaryColor,
 				contentColor = Color.White,
 				shape = CircleShape,
 				elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
@@ -373,7 +373,7 @@ fun NotesScreen(
 		){data ->
 			Snackbar(
 				snackbarData = data,
-				containerColor = colorResource(R.color.primary_color),
+				containerColor = AppTheme.colors.primaryColor,
 				contentColor = Color.White
 			)
 		}
@@ -386,7 +386,6 @@ fun NotesScreen(
 		showed = noteViewModelState.showAlert || noteTypeViewModelState.showAlert,
 		action = {
 			noteTypeViewModel.dismissAlert()
-
 			noteViewModel.dismissAlert()
 		}
 	)
@@ -403,11 +402,9 @@ fun NotesScreen(
 			Column {
 				Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 					Text(
-						color = colorResource(R.color.title_color),
 						text = sheetTitle.value,
-						fontFamily = getInterFont(),
-						fontSize = 18.sp,
-						fontWeight = FontWeight.Bold
+						color = AppTheme.colors.titleColor,
+						style = AppTheme.typography.modalTitleText
 					)
 				}
 
@@ -416,7 +413,7 @@ fun NotesScreen(
 						modifier = Modifier.fillMaxWidth().height(200.dp),
 						contentAlignment = Alignment.Center
 					) {
-						ProgressIndicatorComponent(50, colorResource(R.color.primary_color))
+						ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)
 					}
 				}
 
@@ -477,11 +474,9 @@ fun NotesScreen(
 			Column {
 				Row(Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
 					Text(
-						color = colorResource(R.color.title_color),
+						color = AppTheme.colors.titleColor,
 						text = "Фильтр",
-						fontFamily = getInterFont(),
-						fontSize = 18.sp,
-						fontWeight = FontWeight.Bold
+						style = AppTheme.typography.modalTitleText
 					)
 				}
 
@@ -535,7 +530,7 @@ fun NotesScreen(
 					modifier = Modifier.fillMaxWidth().height(200.dp),
 					contentAlignment = Alignment.Center
 				) {
-					ProgressIndicatorComponent(50, colorResource(R.color.primary_color))
+					ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)
 				}
 			}
 

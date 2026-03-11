@@ -27,7 +27,7 @@ fun PinKeypadItemComponent(
 		modifier = Modifier.padding(10.dp)
 			.clip(shape = CircleShape)
 			.border(width = if (bordered) 1.dp else 0.dp,
-				color = if (bordered) Color.Gray else Color.Transparent,
+				color = if (bordered) AppTheme.colors.colorGrey else Color.Transparent,
 				shape = CircleShape
 			).size(70.dp),
 		onClick = onClick,

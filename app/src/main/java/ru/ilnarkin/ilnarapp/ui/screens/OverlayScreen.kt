@@ -6,11 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
-import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
@@ -26,5 +25,5 @@ fun OverlayScreen(navController: NavController) {
         }
     }
 
-    Box(Modifier.fillMaxSize().background(colorResource(R.color.app_bg_color)))
+    Box(Modifier.fillMaxSize().background(AppTheme.colors.appBgColor))
 }

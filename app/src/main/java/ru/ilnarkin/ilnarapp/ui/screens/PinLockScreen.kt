@@ -34,22 +34,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.ConfirmComponent
 import ru.ilnarkin.ilnarapp.ui.components.PinKeypadItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
@@ -65,8 +61,6 @@ fun PinLockScreen(
 	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
 
 	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
-
-	val font = getInterFont()
 
 	val inputPin = remember { mutableStateListOf<Int>() }
 	var incorrectPin by remember { mutableStateOf(false) }
@@ -125,7 +119,7 @@ fun PinLockScreen(
 						Box(modifier = Modifier.padding(10.dp)
 							.alpha(if (inputPin.size > it) 1f else 0.5f)
 							.background(
-								color =  Color.DarkGray,
+								color = Color.DarkGray,
 								shape = CircleShape)
 							.size(15.dp)) {  }
 					}
@@ -136,9 +130,8 @@ fun PinLockScreen(
 				Row(modifier = Modifier.fillMaxWidth(),
 					horizontalArrangement = Arrangement.Center) {
 					Text("Неверный PIN-код",
-						color = colorResource(R.color.danger_color),
-						fontFamily = font,
-						fontSize = 16.sp)
+						color = AppTheme.colors.dangerColor,
+						style = AppTheme.typography.errorText)
 				}
 			}
 		}
@@ -162,10 +155,8 @@ fun PinLockScreen(
 						) {
 							Text(
 								it.toString(),
-								color = Color.Gray,
-								fontFamily = font,
-								fontSize = 20.sp,
-								fontWeight = FontWeight.SemiBold
+								color = AppTheme.colors.colorGrey,
+								style = AppTheme.typography.keyPadItemText
 							)
 						}
 					}
@@ -187,10 +178,8 @@ fun PinLockScreen(
 						) {
 							Text(
 								it.toString(),
-								color = Color.Gray,
-								fontFamily = font,
-								fontSize = 20.sp,
-								fontWeight = FontWeight.SemiBold
+								color = AppTheme.colors.colorGrey,
+								style = AppTheme.typography.keyPadItemText
 							)
 						}
 					}
@@ -212,10 +201,8 @@ fun PinLockScreen(
 						) {
 							Text(
 								it.toString(),
-								color = Color.Gray,
-								fontFamily = font,
-								fontSize = 20.sp,
-								fontWeight = FontWeight.SemiBold
+								color = AppTheme.colors.colorGrey,
+								style = AppTheme.typography.keyPadItemText
 							)
 						}
 					}
@@ -235,11 +222,8 @@ fun PinLockScreen(
 
 					Text(
 						"Я забыл\nкод",
-						color = Color.Gray,
-						textAlign = TextAlign.Center,
-						fontFamily = font,
-						fontSize = 14.sp,
-						fontWeight = FontWeight.SemiBold
+						color = AppTheme.colors.colorGrey,
+						style = AppTheme.typography.forgotPinText
 					)
 				}
 
@@ -254,10 +238,8 @@ fun PinLockScreen(
 				) {
 					Text(
 						"0",
-						color = Color.Gray,
-						fontFamily = font,
-						fontSize = 20.sp,
-						fontWeight = FontWeight.SemiBold
+						color = AppTheme.colors.colorGrey,
+						style = AppTheme.typography.keyPadItemText
 					)
 				}
 
@@ -269,7 +251,7 @@ fun PinLockScreen(
 						modifier = Modifier.size(30.dp).alpha(0.5f),
 						painter = painterResource(R.drawable.ic_backspace),
 						contentDescription = "Delete",
-						tint = Color.Gray)
+						tint = AppTheme.colors.colorGrey)
 				}
 			}
 		}
@@ -292,13 +274,12 @@ fun PinLockScreen(
 					Row(modifier = Modifier.fillMaxWidth(),
 						verticalAlignment = Alignment.CenterVertically) {
 
-						ProgressIndicatorComponent(size = 40, color = colorResource(R.color.primary_color))
+						ProgressIndicatorComponent(size = 40, color = AppTheme.colors.primaryColor)
 
 						Text("Проверка PIN-кода",
 							modifier = Modifier.padding(start = 15.dp),
-							color = colorResource(R.color.text_color),
-							fontFamily = font,
-							fontSize = 16.sp)
+							color = AppTheme.colors.textColor,
+							style = AppTheme.typography.pinModalText)
 					}
 				}
 			}

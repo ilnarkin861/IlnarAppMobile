@@ -32,19 +32,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.PinKeypadItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
@@ -59,8 +56,6 @@ fun PinResetScreen(
 	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
 
 	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
-
-	val font = getInterFont()
 
 	val newPinTitle = "Введи новый PIN-код"
 	val confirmPinTitle = "Подтверди PIN-код"
@@ -132,9 +127,8 @@ fun PinResetScreen(
 				modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.Center) {
 				Text(title.value,
-					color = colorResource(R.color.title_color),
-					fontFamily = font,
-					fontSize = 20.sp)
+					color = AppTheme.colors.titleColor,
+					style = AppTheme.typography.pinResetTitle)
 			}
 
 			Row(modifier = Modifier.fillMaxWidth().padding(
@@ -156,9 +150,8 @@ fun PinResetScreen(
 				Row(modifier = Modifier.fillMaxWidth(),
 					horizontalArrangement = Arrangement.Center) {
 					Text("PIN-коды не совпадают",
-						color = colorResource(R.color.danger_color),
-						fontFamily = font,
-						fontSize = 16.sp)
+						color = AppTheme.colors.dangerColor,
+						style = AppTheme.typography.authMessageText)
 				}
 			}
 		}
@@ -182,10 +175,8 @@ fun PinResetScreen(
 						) {
 							Text(
 								it.toString(),
-								color = Color.Gray,
-								fontFamily = font,
-								fontSize = 20.sp,
-								fontWeight = FontWeight.SemiBold
+								color = AppTheme.colors.colorGrey,
+								style = AppTheme.typography.keyPadItemText
 							)
 						}
 					}
@@ -206,10 +197,8 @@ fun PinResetScreen(
 						) {
 							Text(
 								it.toString(),
-								color = Color.Gray,
-								fontFamily = font,
-								fontSize = 20.sp,
-								fontWeight = FontWeight.SemiBold
+								color = AppTheme.colors.colorGrey,
+								style = AppTheme.typography.keyPadItemText
 							)
 						}
 					}
@@ -230,10 +219,8 @@ fun PinResetScreen(
 						) {
 							Text(
 								it.toString(),
-								color = Color.Gray,
-								fontFamily = font,
-								fontSize = 20.sp,
-								fontWeight = FontWeight.SemiBold
+								color = AppTheme.colors.colorGrey,
+								style = AppTheme.typography.keyPadItemText
 							)
 						}
 					}
@@ -253,10 +240,8 @@ fun PinResetScreen(
 				) {
 					Text(
 						"0",
-						color = Color.Gray,
-						fontFamily = font,
-						fontSize = 20.sp,
-						fontWeight = FontWeight.SemiBold
+						color = AppTheme.colors.colorGrey,
+						style = AppTheme.typography.keyPadItemText
 					)
 				}
 
@@ -279,13 +264,12 @@ fun PinResetScreen(
 				Column(modifier = Modifier.background(Color.White).padding(horizontal = 16.dp, vertical = 20.dp)) {
 					Row(modifier = Modifier.fillMaxWidth(),	verticalAlignment = Alignment.CenterVertically) {
 
-						ProgressIndicatorComponent(size = 40, color = colorResource(R.color.primary_color))
+						ProgressIndicatorComponent(size = 40, color = AppTheme.colors.primaryColor)
 
 						Text("Подожди...",
 							modifier = Modifier.padding(start = 15.dp),
-							color = colorResource(R.color.text_color),
-							fontFamily = font,
-							fontSize = 16.sp)
+							color = AppTheme.colors.textColor,
+							style = AppTheme.typography.pinModalText)
 					}
 				}
 			}

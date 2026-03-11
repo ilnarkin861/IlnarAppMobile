@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import ru.ilnarkin.ilnarapp.R
@@ -55,7 +54,7 @@ fun TagCheckboxComponent(
 				modifier = Modifier.size(20.dp)
 					.border(
 						width = 1.dp,
-						color = colorResource(R.color.inputs_border_color),
+						color = AppTheme.colors.inputsBorderColor,
 						shape = RoundedCornerShape(2.dp)),
 				Arrangement.Center,
 				Alignment.CenterVertically
@@ -64,7 +63,7 @@ fun TagCheckboxComponent(
 					Box(
 						Modifier.size(12.dp)
 							.clip(RoundedCornerShape(1.dp))
-							.background(colorResource(R.color.inputs_border_color))
+							.background(AppTheme.colors.inputsBorderColor)
 					)
 				}
 			}

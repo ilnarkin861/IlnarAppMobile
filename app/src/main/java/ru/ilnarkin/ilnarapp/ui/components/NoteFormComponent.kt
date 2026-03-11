@@ -50,13 +50,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.models.Archive
 import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.models.NoteType
@@ -79,8 +76,6 @@ fun NoteFormComponent(
 	hasNextTags: Boolean = true,
 	loadTags: suspend () -> MutableList<Tag>,
 	action: suspend (note: Note) -> Unit) {
-
-	val font = getInterFont()
 
 	val selectableTags = remember { mutableStateListOf<Tag>().apply { addAll(tags) } }
 
@@ -193,10 +188,7 @@ fun NoteFormComponent(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), bottom = 10.dp),
-			textStyle = TextStyle(
-				fontFamily = font,
-				fontSize = 15.sp,
-			),
+			textStyle = AppTheme.typography.formInputText,
 			value = noteTitle.value,
 			singleLine = true,
 			label = { Text("Заголовок") },
@@ -318,10 +310,7 @@ fun NoteFormComponent(
 				value = selectedArchiveTitle,
 				onValueChange = {},
 				readOnly = true,
-				textStyle = TextStyle(
-					fontFamily = font,
-					fontSize = 15.sp,
-				),
+				textStyle = AppTheme.typography.formInputText,
 				colors = inputColors,
 				shape = RoundedCornerShape(10.dp),
 				trailingIcon = {

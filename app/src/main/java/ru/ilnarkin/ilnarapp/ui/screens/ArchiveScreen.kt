@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -51,14 +50,15 @@ import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.Archive
-import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
+import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.ItemFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
 
 
@@ -119,7 +119,7 @@ fun ArchiveScreen(
 	}
 
 
-	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)).background(colorResource(R.color.app_bg_color))) {
+	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)).background(AppTheme.colors.appBgColor)) {
 
 		if (!state.loading && !state.list.isEmpty()){
 			LazyColumn(
@@ -172,7 +172,7 @@ fun ArchiveScreen(
 					}
 
 					if (index != state.list.count() -1){
-						HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.border_color))
+						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 					}
 				}
 
@@ -193,7 +193,7 @@ fun ArchiveScreen(
 		}
 
 		if (!state.loading && state.list.isEmpty()){
-			Box(modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
+			Box(modifier = Modifier.background(AppTheme.colors.appBgColor).fillMaxSize(),
 				contentAlignment = Alignment.Center){
 				MessageComponent("Архивов нет")
 			}
@@ -201,15 +201,15 @@ fun ArchiveScreen(
 
 		if (state.loading){
 			Box(
-				modifier = Modifier.background(colorResource(R.color.app_bg_color)).fillMaxSize(),
+				modifier = Modifier.background(AppTheme.colors.appBgColor).fillMaxSize(),
 				contentAlignment = Alignment.Center){
-				ProgressIndicatorComponent(60, colorResource(R.color.primary_color))
+				ProgressIndicatorComponent(60, AppTheme.colors.primaryColor)
 			}
 		}
 
 
 		FloatingActionButton(
-			containerColor = colorResource(R.color.primary_color),
+			containerColor = AppTheme.colors.primaryColor,
 			contentColor = Color.White,
 			shape = CircleShape,
 			modifier = Modifier
@@ -236,7 +236,7 @@ fun ArchiveScreen(
 		){data ->
 			Snackbar(
 				snackbarData = data,
-				containerColor = colorResource(R.color.primary_color),
+				containerColor = AppTheme.colors.primaryColor,
 				contentColor = Color.White
 			)
 		}

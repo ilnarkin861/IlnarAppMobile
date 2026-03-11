@@ -22,9 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,12 +33,13 @@ import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.screens.ArchiveScreen
 import ru.ilnarkin.ilnarapp.ui.screens.LoginScreen
 import ru.ilnarkin.ilnarapp.ui.screens.NotesScreen
+import ru.ilnarkin.ilnarapp.ui.screens.OverlayScreen
 import ru.ilnarkin.ilnarapp.ui.screens.PinLockScreen
 import ru.ilnarkin.ilnarapp.ui.screens.PinResetScreen
-import ru.ilnarkin.ilnarapp.ui.screens.OverlayScreen
 import ru.ilnarkin.ilnarapp.ui.screens.SettingsScreen
 import ru.ilnarkin.ilnarapp.ui.screens.TagsScreen
 import ru.ilnarkin.ilnarapp.ui.screens.WelcomeScreen
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.ui.theme.IlnarAppTheme
 
 
@@ -58,7 +56,6 @@ class MainActivity : ComponentActivity() {
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
 @Composable
 fun Main(){
 
@@ -68,13 +65,13 @@ fun Main(){
 
 	val currentRoute = navBackStackEntry?.destination?.route
 
-	val borderColor = colorResource(R.color.border_color)
+	val borderColor = AppTheme.colors.borderColor
 
 	Column(Modifier.fillMaxSize()
 		.statusBarsPadding()
 		.navigationBarsPadding()
 		.displayCutoutPadding()
-		.background(colorResource(R.color.app_bg_color))) {
+		.background(AppTheme.colors.appBgColor)) {
 
 		if (currentRoute != null && !currentRoute.contains("welcome")){
 			Row(Modifier.fillMaxWidth()

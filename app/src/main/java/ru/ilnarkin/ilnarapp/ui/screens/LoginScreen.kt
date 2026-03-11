@@ -29,19 +29,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -49,11 +43,11 @@ import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
-import ru.ilnarkin.ilnarapp.helpers.getInterFont
 import ru.ilnarkin.ilnarapp.helpers.validEmail
 import ru.ilnarkin.ilnarapp.models.UserLoginData
-import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
+import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
@@ -63,8 +57,6 @@ fun LoginScreen(
 	userViewModel: UserViewModel = koinViewModel(),
 	errorManager: NetworkErrorManager = koinInject()
 	) {
-
-	val font = getInterFont()
 
 	val scrollState = rememberScrollState()
 
@@ -84,20 +76,26 @@ fun LoginScreen(
 
 	val state by userViewModel.uiState.collectAsStateWithLifecycle()
 
+	val inputColor = OutlinedTextFieldDefaults.colors(
+		unfocusedBorderColor = AppTheme.colors.inputsBorderColor,
+		focusedBorderColor = AppTheme.colors.primaryColor,
+		unfocusedLabelColor = AppTheme.colors.inputsPlaceholderColor,
+		focusedLabelColor = AppTheme.colors.primaryColor,
+		focusedTextColor = AppTheme.colors.textColor,
+		unfocusedTextColor = AppTheme.colors.textColor,
+		errorLabelColor = AppTheme.colors.dangerColor,
+		errorBorderColor = AppTheme.colors.dangerColor
+	)
+
 
 	if (!state.success){
 		LaunchedEffect(Unit) {
 			errorManager.errorEvent.collect { error ->
 
 				when(error){
-					NetworkErrorType.NO_INTERNET -> {
+					NetworkErrorType.NO_INTERNET, NetworkErrorType.SERVER_ERROR -> {
 						showMessage = true
-						message.value = NO_INTERNET_ERROR_MESSAGE
-					}
-
-					NetworkErrorType.SERVER_ERROR -> {
-						showMessage = true
-						message.value = SERVER_ERROR_MESSAGE
+						message.value = if(error == NetworkErrorType.NO_INTERNET) NO_INTERNET_ERROR_MESSAGE else SERVER_ERROR_MESSAGE
 					}
 
 					NetworkErrorType.UNAUTHORIZED -> { }
@@ -110,7 +108,7 @@ fun LoginScreen(
 	Column(Modifier.fillMaxSize()
 		.verticalScroll(scrollState)
 		.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))
-		.background(colorResource(R.color.app_bg_color))){
+		.background(AppTheme.colors.appBgColor)){
 
 		Row(
 			modifier = Modifier.fillMaxWidth().padding(top = 100.dp),
@@ -125,10 +123,8 @@ fun LoginScreen(
 			Row(modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 2.dp),
 				horizontalArrangement = Arrangement.Center) {
 				Text(message.value,
-					color = colorResource(R.color.danger_color),
-					textAlign = TextAlign.Center,
-					fontFamily = font,
-					fontSize = 16.sp)
+					color = AppTheme.colors.dangerColor,
+					style = AppTheme.typography.authMessageText)
 			}
 		}
 
@@ -138,10 +134,7 @@ fun LoginScreen(
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(bottom = 5.dp),
-					textStyle = TextStyle(
-						fontFamily = font,
-						fontSize = 15.sp,
-					),
+					textStyle = AppTheme.typography.formInputText,
 					value = email.value,
 					label = { Text("Email") },
 					isError = emailIsError || (!email.value.isEmpty() && !validEmail(email.value)),
@@ -149,16 +142,7 @@ fun LoginScreen(
 						email.value = text
 						emailIsError = email.value.isEmpty()
 					},
-					colors = OutlinedTextFieldDefaults.colors(
-						unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-						focusedBorderColor = colorResource(R.color.primary_color),
-						unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-						focusedLabelColor = colorResource(R.color.primary_color),
-						focusedTextColor = colorResource(R.color.text_color),
-						unfocusedTextColor = colorResource(R.color.text_color),
-						errorLabelColor = colorResource(R.color.danger_color),
-						errorBorderColor = colorResource(R.color.danger_color)
-					),
+					colors = inputColor,
 					shape = RoundedCornerShape(10.dp))
 			}
 
@@ -166,9 +150,8 @@ fun LoginScreen(
 				Text(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 					text = "Обязательное поле",
-					color = colorResource(R.color.danger_color),
-					fontFamily = font,
-					fontSize = 13.sp
+					color = AppTheme.colors.dangerColor,
+					style = AppTheme.typography.errorText
 				)
 			}
 
@@ -176,9 +159,8 @@ fun LoginScreen(
 				Text(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 					text = "Некорректный email",
-					color = colorResource(R.color.danger_color),
-					fontFamily = font,
-					fontSize = 13.sp
+					color = AppTheme.colors.dangerColor,
+					style = AppTheme.typography.errorText
 				)
 			}
 
@@ -187,10 +169,7 @@ fun LoginScreen(
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(top = 10.dp, bottom = 5.dp),
-					textStyle = TextStyle(
-						fontFamily = font,
-						fontSize = 15.sp,
-					),
+					textStyle = AppTheme.typography.formInputText,
 					visualTransformation = PasswordVisualTransformation(),
 					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
 					value = password.value,
@@ -200,16 +179,7 @@ fun LoginScreen(
 						password.value = text
 						passwordIsError = password.value.isEmpty()
 					},
-					colors = OutlinedTextFieldDefaults.colors(
-						unfocusedBorderColor = colorResource(R.color.inputs_border_color),
-						focusedBorderColor = colorResource(R.color.primary_color),
-						unfocusedLabelColor = colorResource(R.color.inputs_placeholder_color),
-						focusedLabelColor = colorResource(R.color.primary_color),
-						focusedTextColor = colorResource(R.color.text_color),
-						unfocusedTextColor = colorResource(R.color.text_color),
-						errorLabelColor = colorResource(R.color.danger_color),
-						errorBorderColor = colorResource(R.color.danger_color)
-					),
+					colors = inputColor,
 					shape = RoundedCornerShape(10.dp))
 			}
 
@@ -217,9 +187,8 @@ fun LoginScreen(
 				Text(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 					text = "Обязательное поле",
-					color = colorResource(R.color.danger_color),
-					fontFamily = font,
-					fontSize = 13.sp
+					color = AppTheme.colors.dangerColor,
+					style = AppTheme.typography.errorText
 				)
 			}
 
@@ -235,26 +204,20 @@ fun LoginScreen(
 					enabled = !loading,
 					shape = RoundedCornerShape(10.dp),
 					colors = ButtonDefaults.buttonColors(
-						containerColor = colorResource(R.color.primary_color),
-						disabledContainerColor = colorResource(R.color.primary_color).copy(alpha = 0.8f)),
+						containerColor = AppTheme.colors.primaryColor,
+						disabledContainerColor = AppTheme.colors.primaryColor.copy(alpha = 0.8f)),
 					onClick = {
 						emailIsError = email.value.isEmpty()
 						passwordIsError = password.value.isEmpty()
 						emailNotValid = !email.value.isEmpty() && !validEmail(email.value)
 
-
 						if(!emailIsError && !passwordIsError && !emailNotValid){
-
-							loading = true
-
 							scope.launch {
-								async {
-									userViewModel.login(UserLoginData(email = email.value, password = password.value))
-								}.await()
+								loading = true
 
-								loading = false
+								val result = userViewModel.login(UserLoginData(email = email.value, password = password.value))
 
-								if (state.success){
+								if (result != null){
 									navController.navigate(NavRoutes.PinResetScreen.route){
 										popUpTo(NavRoutes.LoginScreen.route) {
 											inclusive = true
@@ -262,12 +225,12 @@ fun LoginScreen(
 									}
 								}
 
-								else {
-									if (state.message.isNotEmpty()){
-										message.value = state.message
-										showMessage = true
-									}
+								else{
+									message.value = userViewModel.uiState.value.message
+									showMessage = true
 								}
+
+								loading = false
 							}
 						}
 					}
@@ -277,15 +240,13 @@ fun LoginScreen(
 							modifier = Modifier.size(20.dp),
 							strokeWidth = 2.dp,
 							color = Color.White,
-							trackColor = Color.Transparent,
+							trackColor = Color.Transparent
 						)
 					}
 					else{
 						Text(
 							text = "Авторизоваться",
-							fontFamily = font,
-							fontSize = 16.sp,
-							fontWeight = FontWeight.SemiBold
+							style = AppTheme.typography.inputButtonText
 						)
 					}
 				}
