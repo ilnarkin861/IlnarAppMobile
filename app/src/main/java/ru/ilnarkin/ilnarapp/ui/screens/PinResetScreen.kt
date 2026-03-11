@@ -32,12 +32,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
-import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.components.PinKeypadItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
@@ -117,9 +115,9 @@ fun PinResetScreen(
 	}
 
 
-	Column(modifier.fillMaxSize().padding(
-		start = dimensionResource(R.dimen.container_horizontal_padding),
-		end = dimensionResource(R.dimen.container_horizontal_padding)).verticalScroll(scrollState),
+	Column(modifier.fillMaxSize()
+		.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
+		.verticalScroll(scrollState),
 		verticalArrangement = Arrangement.SpaceBetween) {
 
 		Column(Modifier.padding(top = 100.dp)) {
@@ -131,8 +129,7 @@ fun PinResetScreen(
 					style = AppTheme.typography.pinResetTitle)
 			}
 
-			Row(modifier = Modifier.fillMaxWidth().padding(
-				top = 20.dp),
+			Row(modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
 				horizontalArrangement = Arrangement.Center) {
 				Row(Modifier.padding(bottom = 40.dp)) {
 					(0 until 4).forEach {

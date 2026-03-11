@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -49,7 +48,7 @@ fun TopBar (navController: NavController) {
 			titleContentColor = AppTheme.colors.primaryColor
 		),
 
-		expandedHeight = dimensionResource(R.dimen.top_bar_height),
+		expandedHeight = AppTheme.dimensions.topBarHeight,
 
 		title = {
 			Text(text = title, style = AppTheme.typography.appBarTitle)

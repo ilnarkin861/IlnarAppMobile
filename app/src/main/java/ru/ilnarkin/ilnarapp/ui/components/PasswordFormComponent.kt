@@ -74,7 +74,7 @@ fun PasswordFormComponent(
 	Column(modifier = Modifier.background(Color.White)) {
 		Column(
 			modifier = Modifier.fillMaxWidth()
-				.padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 40.dp)
+				.padding(top = 30.dp, start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 40.dp)
 		){
 
 			Row(

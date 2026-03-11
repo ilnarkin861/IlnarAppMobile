@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -96,9 +95,9 @@ fun PinLockScreen(
 	}
 
 
-	Column(modifier.fillMaxSize().padding(
-		start = dimensionResource(R.dimen.container_horizontal_padding),
-		end = dimensionResource(R.dimen.container_horizontal_padding)).verticalScroll(scrollState),
+	Column(modifier.fillMaxSize()
+		.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
+		.verticalScroll(scrollState),
 		verticalArrangement = Arrangement.SpaceBetween) {
 
 		Column(Modifier.padding(top = 100.dp)) {

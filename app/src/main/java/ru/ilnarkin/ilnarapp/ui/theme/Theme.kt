@@ -6,7 +6,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
+data class AppDimensions(
+    val topBarHeight: Dp = 75.dp,
+    val containerHorizontalPadding: Dp = 15.dp
+)
 
 data class AppColors(
     val appBgColor: Color,
@@ -25,10 +31,11 @@ data class AppColors(
 
 object AppTheme {
     val colors: AppColors
-        @Composable
-        get() = LocalAppColors.current
+        @Composable get() = LocalAppColors.current
     val typography: AppTypography
         @Composable get() = LocalAppTypography.current
+    val dimensions: AppDimensions
+        @Composable get() = LocalAppDimensions.current
 }
 
 val LocalAppColors = staticCompositionLocalOf {
@@ -48,6 +55,7 @@ val LocalAppColors = staticCompositionLocalOf {
 }
 
 
+val LocalAppDimensions = staticCompositionLocalOf { AppDimensions() }
 val LocalAppTypography = staticCompositionLocalOf { AppTypography() }
 
 
@@ -70,6 +78,8 @@ fun IlnarAppTheme(content: @Composable () -> Unit) {
 
     val typography = AppTypography()
 
+    val dimensions = AppDimensions()
+
     val materialColors = lightColorScheme(
         primary = colors.primaryColor,
         // перенаправьте нужные цвета
@@ -77,7 +87,9 @@ fun IlnarAppTheme(content: @Composable () -> Unit) {
 
     CompositionLocalProvider(
         LocalAppColors provides colors,
-        LocalAppTypography provides typography) {
+        LocalAppTypography provides typography,
+        LocalAppDimensions provides dimensions
+        ) {
         MaterialTheme(
             colorScheme = materialColors,) {
             content()

@@ -16,10 +16,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import java.time.LocalDate
@@ -30,7 +28,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun NoteDetailsComponent(note: Note?) {
 
-	val containerPadding = dimensionResource(R.dimen.container_horizontal_padding)
+	val containerPadding = AppTheme.dimensions.containerHorizontalPadding
 
 
 	Column(Modifier.fillMaxSize()

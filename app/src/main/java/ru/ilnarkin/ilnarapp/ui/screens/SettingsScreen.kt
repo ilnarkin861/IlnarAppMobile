@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -132,7 +131,7 @@ fun SettingsScreen(
 				}
 			)) {
 
-				Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
+				Row(Modifier.fillMaxWidth().padding(horizontal = AppTheme.dimensions.containerHorizontalPadding, vertical = 20.dp),
 					horizontalArrangement = Arrangement.SpaceBetween) {
 					Row(verticalAlignment = Alignment.CenterVertically) {
 						Icon(
@@ -168,7 +167,7 @@ fun SettingsScreen(
 			}
 
 			HorizontalDivider(
-				modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
+				modifier = Modifier.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding),
 				thickness = 1.dp,
 				color = AppTheme.colors.borderColor)
 
@@ -177,7 +176,7 @@ fun SettingsScreen(
 				indication = ripple(),
 				onClick = { passwordFormDialogShowed = true }
 			)) {
-				Row(Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 20.dp),
+				Row(Modifier.fillMaxWidth().padding(horizontal = AppTheme.dimensions.containerHorizontalPadding, vertical = 20.dp),
 					horizontalArrangement = Arrangement.SpaceBetween,
 					verticalAlignment = Alignment.CenterVertically) {
 					Row(verticalAlignment = Alignment.CenterVertically) {

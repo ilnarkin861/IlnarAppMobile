@@ -21,9 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
-import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.models.Tag
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
@@ -46,7 +44,7 @@ fun TagCheckboxComponent(
 	)) {
 
 		Row(
-			modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding), vertical = 15.dp),
+			modifier = Modifier.fillMaxWidth().padding(horizontal = AppTheme.dimensions.containerHorizontalPadding, vertical = 15.dp),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 

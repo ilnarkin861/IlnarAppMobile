@@ -48,7 +48,6 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -138,7 +137,7 @@ fun NoteFormComponent(
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), bottom = 10.dp),
+				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 10.dp),
 			expanded = noteTypeMenuExpanded,
 			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded }
 		) {
@@ -187,7 +186,7 @@ fun NoteFormComponent(
 		OutlinedTextField(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), bottom = 10.dp),
+				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 10.dp),
 			textStyle = AppTheme.typography.formInputText,
 			value = noteTitle.value,
 			singleLine = true,
@@ -201,7 +200,7 @@ fun NoteFormComponent(
 		OutlinedTextField(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), bottom = 10.dp)
+				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 5.dp)
 				.height(250.dp),
 			textStyle = AppTheme.typography.formInputText,
 			value = noteText.value,
@@ -217,7 +216,7 @@ fun NoteFormComponent(
 
 		if (isNoteTextError){
 			Text(
-				modifier = Modifier.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), bottom = 10.dp),
+				modifier = Modifier.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 10.dp),
 				text = "Обязательное поле",
 				color = AppTheme.colors.dangerColor,
 				style = AppTheme.typography.errorText
@@ -228,7 +227,7 @@ fun NoteFormComponent(
 		OutlinedTextField(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), top = 10.dp, bottom = 20.dp),
+				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, top = 10.dp, bottom = 20.dp),
 			readOnly = true,
 			enabled = true,
 			value = formattedDate.value,
@@ -299,7 +298,7 @@ fun NoteFormComponent(
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), bottom = 20.dp),
+				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 20.dp),
 			expanded = archiveMenuExpanded,
 			onExpandedChange = { archiveMenuExpanded = !archiveMenuExpanded }
 		){
@@ -368,7 +367,7 @@ fun NoteFormComponent(
 		) {
 			Row(Modifier
 				.fillMaxWidth()
-				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), bottom = 20.dp)) {
+				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 20.dp)) {
 				Text(
 					text = "Выбрать теги (${selectedTagsCount.intValue})",
 					color = AppTheme.colors.colorGrey,
@@ -396,7 +395,7 @@ fun NoteFormComponent(
 
 				if (index != selectableTags.count() -1){
 					HorizontalDivider(
-						modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding)),
+						modifier = Modifier.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding),
 						thickness = 1.dp,
 						color = AppTheme.colors.borderColor)
 				}
@@ -406,8 +405,8 @@ fun NoteFormComponent(
 		if (hasNextTags){
 			Row(Modifier
 				.fillMaxWidth()
-				.padding(start = dimensionResource(R.dimen.container_horizontal_padding),
-					end = dimensionResource(R.dimen.container_horizontal_padding),
+				.padding(start = AppTheme.dimensions.containerHorizontalPadding,
+					end = AppTheme.dimensions.containerHorizontalPadding,
 					top = 20.dp, bottom = 40.dp)) {
 
 				if (tagsLoading){
@@ -446,7 +445,7 @@ fun NoteFormComponent(
 			Column(
 				Modifier
 					.fillMaxWidth()
-					.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), top = 20.dp)
+					.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, top = 20.dp)
 			) {
 				Row(Modifier
 					.fillMaxWidth()
@@ -490,7 +489,7 @@ fun NoteFormComponent(
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = dimensionResource(R.dimen.container_horizontal_padding), end = dimensionResource(R.dimen.container_horizontal_padding), top = 60.dp, bottom = 80.dp)
+				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, top = 60.dp, bottom = 80.dp)
 		) {
 			Button(
 				modifier = Modifier

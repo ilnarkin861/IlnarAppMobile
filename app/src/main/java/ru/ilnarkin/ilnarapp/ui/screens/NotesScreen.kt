@@ -159,7 +159,7 @@ fun NotesScreen(
 	}
 
 
-	Box(Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))) {
+	Box(Modifier.fillMaxSize().padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)) {
 		if (noteViewModelState.loading){
 			Box(
 				modifier = Modifier.fillMaxSize(),

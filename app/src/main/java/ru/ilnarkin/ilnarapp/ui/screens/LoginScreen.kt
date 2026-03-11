@@ -29,7 +29,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -107,7 +106,7 @@ fun LoginScreen(
 
 	Column(Modifier.fillMaxSize()
 		.verticalScroll(scrollState)
-		.padding(horizontal = dimensionResource(R.dimen.container_horizontal_padding))
+		.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
 		.background(AppTheme.colors.appBgColor)){
 
 		Row(
