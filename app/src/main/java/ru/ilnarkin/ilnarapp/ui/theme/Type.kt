@@ -113,5 +113,37 @@ data class AppTypography(
     val tagCheckboxText: TextStyle = baseStyle.copy(
         fontSize = 16.sp,
         fontWeight = FontWeight.Normal
+    ),
+
+    val authMessageText: TextStyle = baseStyle.copy(
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Normal,
+        textAlign = TextAlign.Center
+    ),
+
+    val keyPadItemText: TextStyle = baseStyle.copy(
+        fontSize = 20.sp,
+        fontWeight = FontWeight.SemiBold
+    ),
+
+    val pinResetTitle: TextStyle = baseStyle.copy(
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Normal
+    ),
+
+    val forgotPinText: TextStyle = baseStyle.copy(
+        fontSize = 14.sp,
+        fontWeight = FontWeight.SemiBold,
+        textAlign = TextAlign.Center
+    ),
+
+    val pinModalText: TextStyle = baseStyle.copy(
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Normal
+    ),
+
+    val settingsItemText: TextStyle = baseStyle.copy(
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Normal
     )
 )
