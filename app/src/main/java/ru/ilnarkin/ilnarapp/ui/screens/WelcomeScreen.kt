@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -29,8 +28,9 @@ import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.enums.NetworkErrorType
 import ru.ilnarkin.ilnarapp.helpers.NO_INTERNET_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
-import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
+import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
+import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
@@ -72,9 +72,11 @@ fun WelcomeScreen(
 		errorJob = launch {
 			errorManager.errorEvent.collect { error ->
 				when(error) {
-					NetworkErrorType.NO_INTERNET -> snackBarHostState.showSnackbar(NO_INTERNET_ERROR_MESSAGE)
+					NetworkErrorType.NO_INTERNET, NetworkErrorType.SERVER_ERROR -> {
+						val message = if (error == NetworkErrorType.NO_INTERNET) NO_INTERNET_ERROR_MESSAGE else SERVER_ERROR_MESSAGE
 
-					NetworkErrorType.SERVER_ERROR -> snackBarHostState.showSnackbar(SERVER_ERROR_MESSAGE)
+						snackBarHostState.showSnackbar(message)
+					}
 
 					NetworkErrorType.UNAUTHORIZED -> {
 
@@ -96,7 +98,7 @@ fun WelcomeScreen(
 
 	Box(modifier = Modifier
 		.fillMaxSize()
-		.background(colorResource(R.color.primary_color)),
+		.background(AppTheme.colors.primaryColor),
 		contentAlignment = Alignment.Center){
 
 		Image(
@@ -110,7 +112,7 @@ fun WelcomeScreen(
 			Snackbar(
 				snackbarData = data,
 				containerColor = Color.White,
-				contentColor = colorResource(R.color.text_color)
+				contentColor = AppTheme.colors.textColor
 			)
 		}
 	}
