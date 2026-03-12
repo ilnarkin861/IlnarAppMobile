@@ -33,13 +33,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import ru.ilnarkin.ilnarapp.models.PasswordModel
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
-
-
-data class PasswordModel(
-	val oldPassword: String,
-	val newPassword: String,
-	val confirmedPassword: String)
 
 
 @Composable
