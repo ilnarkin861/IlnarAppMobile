@@ -37,7 +37,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -64,18 +63,11 @@ fun SettingsScreen(
 	errorManager: NetworkErrorManager = koinInject()
 	) {
 
-	val testPassword = "qwerty1234"
-
 	var emailFormDialogShowed by remember { mutableStateOf(false) }
 
 	var passwordFormDialogShowed by remember { mutableStateOf(false) }
 
 	val scope = rememberCoroutineScope()
-
-	var success by remember { mutableStateOf(true) }
-
-	val alertTitle = remember { mutableStateOf("") }
-	var showAlert by remember { mutableStateOf(false) }
 
 	var userInfoLoading by remember { mutableStateOf(false) }
 
@@ -204,7 +196,6 @@ fun SettingsScreen(
 					}
 				}
 			}
-
 		}
 
 		SnackbarHost(
@@ -217,7 +208,6 @@ fun SettingsScreen(
 				contentColor = Color.White
 			)
 		}
-
 	}
 
 
@@ -262,7 +252,6 @@ fun SettingsScreen(
 
 
 	// Password change form
-
 	if (passwordFormDialogShowed){
 		BasicAlertDialog(
 			onDismissRequest = {},
@@ -278,15 +267,9 @@ fun SettingsScreen(
 				PasswordFormComponent(
 					action = { passwordModel ->
 
-						delay(2000)
+						val result = userViewModel.resetPassword(passwordModel)
 
-						if (passwordModel.oldPassword != testPassword){
-							success = false
-							alertTitle.value = "Неверный старый пароль"
-							showAlert = true
-						}
-
-						else{
+						if (result != null){
 							passwordFormDialogShowed = false
 						}
 					},

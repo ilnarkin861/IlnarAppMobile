@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.update
 import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.Info
+import ru.ilnarkin.ilnarapp.models.PasswordModel
 import ru.ilnarkin.ilnarapp.models.Token
 import ru.ilnarkin.ilnarapp.models.UserInfo
 import ru.ilnarkin.ilnarapp.models.UserLoginData
@@ -90,7 +91,7 @@ class UserViewModel(
 	suspend fun getUserInfo(): UserInfo?{
 		try {
 		    val userInfo = userRepository.getUserInfo()
-			_uiState.update { it.copy(
+			_uiState.update{ it.copy(
 				success = true,
 				data = userInfo
 			)}
@@ -148,6 +149,43 @@ class UserViewModel(
 				success = false,
 				showAlert = true,
 				message = DEFAULT_ERROR_MESSAGE
+			)}
+
+			return null
+		}
+	}
+
+
+	suspend fun resetPassword(passwordModel: PasswordModel): Info?{
+
+		try {
+
+			val result = userRepository.resetPassword(passwordModel)
+
+			_uiState.update { it.copy(
+				success = true,
+				showAlert = true,
+				message = result.messages.joinToString("\n")
+			)}
+
+			return result
+		}
+
+		catch (e: ApiException){
+			_uiState.update { it.copy(
+				success = false,
+				showAlert = true,
+				message = e.message ?: DEFAULT_ERROR_MESSAGE
+			)}
+
+			return null
+		}
+
+		catch (e: Exception){
+			_uiState.update { it.copy(
+				success = false,
+				showAlert = true,
+				message = e.message.toString()
 			)}
 
 			return null
