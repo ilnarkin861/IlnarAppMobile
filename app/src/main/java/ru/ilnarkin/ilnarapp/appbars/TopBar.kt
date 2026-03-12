@@ -61,7 +61,11 @@ fun TopBar (navController: NavController) {
 					contentColor = AppTheme.colors.primaryColor
 				),
 				onClick = {
+					navController.navigate(NavRoutes.PinLockScreen.route) {
+						popUpTo(0) { inclusive = true }
 
+						launchSingleTop = true
+					}
 				}
 			) {
 				Icon(
