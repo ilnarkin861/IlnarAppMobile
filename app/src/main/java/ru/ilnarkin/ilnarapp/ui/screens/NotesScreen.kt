@@ -1,6 +1,7 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +24,7 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SmallFloatingActionButton
@@ -96,8 +98,8 @@ fun NotesScreen(
 
 	val listState = rememberLazyListState()
 
-	var showNoteFormSheet by rememberSaveable { mutableStateOf(false) }
-	val noteFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+	var showNoteForm by rememberSaveable { mutableStateOf(false) }
+	var noteFormLoading by rememberSaveable { mutableStateOf(false) }
 
 	var showNoteDetailsSheet by rememberSaveable { mutableStateOf(false) }
 	val noteDetailsSheetState = rememberModalBottomSheetState()
@@ -117,7 +119,7 @@ fun NotesScreen(
 
 	val noteFilterViewModelState by noteFilterViewModel.uiState.collectAsState()
 
-	var floatingButtonsVisible by rememberSaveable { mutableStateOf(false) }
+	var floatingButtonsEnabled by rememberSaveable { mutableStateOf(false) }
 
 
 	LaunchedEffect(Unit) {
@@ -126,6 +128,8 @@ fun NotesScreen(
 				NetworkErrorType.NO_INTERNET, NetworkErrorType.SERVER_ERROR -> {
 					showNoteDetailsSheet = false
 					noteDetailsLoading = false
+					noteFormLoading = false
+					showNoteForm = false
 					val message = if (error == NetworkErrorType.NO_INTERNET) NO_INTERNET_ERROR_MESSAGE else SERVER_ERROR_MESSAGE
 					snackBarHostState.showSnackbar(message)
 				}
@@ -154,7 +158,7 @@ fun NotesScreen(
 			noteViewModel.getNotesList(0, notesLimit)
 		}
 
-		floatingButtonsVisible = true
+		floatingButtonsEnabled = true
 	}
 
 
@@ -193,7 +197,7 @@ fun NotesScreen(
 					NoteItemComponent(
 						value,
 						viewAction = {
-							floatingButtonsVisible = false
+							floatingButtonsEnabled = false
 
 							showNoteDetailsSheet = true
 
@@ -203,12 +207,10 @@ fun NotesScreen(
 
 							noteDetailsLoading = false
 
-							floatingButtonsVisible = true
+							floatingButtonsEnabled = true
 						},
 
 						editAction = {
-
-							floatingButtonsVisible = false
 
 							val result = noteViewModel.getNoteById(value.id)
 
@@ -223,15 +225,13 @@ fun NotesScreen(
 									noteViewModel.setActionType(ActionType.UPDATE)
 
 									sheetTitle.value = "Изменить запись"
-									showNoteFormSheet = true
+									showNoteForm = true
 								}
-
-								floatingButtonsVisible = true
 							}
 						},
 
 						deleteAction = {
-							floatingButtonsVisible = false
+							floatingButtonsEnabled = false
 
 							val isDeleted = noteViewModel.deleteNote(value.id)
 
@@ -241,7 +241,7 @@ fun NotesScreen(
 								noteViewModel.getNotesList(offset, notesLimit, showLoading = false, filter = noteFilterViewModel.uiState.value.noteFilter)
 							}
 
-							floatingButtonsVisible = true
+							floatingButtonsEnabled = true
 						})
 				}
 
@@ -291,10 +291,10 @@ fun NotesScreen(
 					contentColor = AppTheme.colors.primaryColor,
 					onClick = {
 
-						if(floatingButtonsVisible){
+						if(floatingButtonsEnabled){
 							scope.launch {
 
-								floatingButtonsVisible = false
+								floatingButtonsEnabled = false
 
 								val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
 
@@ -317,7 +317,7 @@ fun NotesScreen(
 									showNoteFilterFormSheet = true
 								}
 
-								floatingButtonsVisible = true
+								floatingButtonsEnabled = true
 							}
 						}
 
@@ -335,10 +335,12 @@ fun NotesScreen(
 				elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
 
 				onClick = {
-					if(floatingButtonsVisible){
+					if(floatingButtonsEnabled){
 						scope.launch {
 
-							floatingButtonsVisible = false
+							showNoteForm = true
+
+							noteFormLoading = true
 
 							val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
 
@@ -351,10 +353,13 @@ fun NotesScreen(
 								noteViewModel.clearNote()
 
 								sheetTitle.value = "Добавить запись"
-								showNoteFormSheet = true
 							}
 
-							floatingButtonsVisible = true
+							else{
+								showNoteForm = false
+							}
+
+							noteFormLoading = false
 						}
 					}
 
@@ -390,16 +395,27 @@ fun NotesScreen(
 	)
 
 
-	// Form sheet
-	if (showNoteFormSheet){
-		ModalBottomSheet(
-			onDismissRequest = { showNoteFormSheet = false },
-			containerColor = Color.White,
-			sheetState = noteFormSheetState,
-		) {
+	// Note form
+	if (showNoteForm){
+		Column(modifier = Modifier.fillMaxSize()
+			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
+			.background(AppTheme.colors.appBgColor)){
 
-			Column {
-				Row(Modifier.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)) {
+			BackHandler {
+				showNoteForm = false
+			}
+
+			if (noteFormLoading){
+				Box(
+					modifier = Modifier.fillMaxSize(),
+					contentAlignment = Alignment.Center
+				) {
+					ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)
+				}
+			}
+
+			else{
+				Row(Modifier.padding(top = 15.dp, bottom = 20.dp).fillMaxWidth()) {
 					Text(
 						text = sheetTitle.value,
 						color = AppTheme.colors.titleColor,
@@ -407,57 +423,52 @@ fun NotesScreen(
 					)
 				}
 
-				if (noteDetailsLoading){
-					Box(
-						modifier = Modifier.fillMaxWidth().height(200.dp),
-						contentAlignment = Alignment.Center
-					) {
-						ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)
-					}
+				Row(Modifier.fillMaxWidth()) {
+					HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 				}
 
-				else{
-					NoteFormComponent(
-						noteViewModelState.data,
-						noteTypes = noteTypeViewModelState.list,
-						archives = archiveViewModelState.list,
-						tags = tagViewModelState.list,
-						hasNextTags = tagViewModelState.pagination?.hasNextPage ?: false,
+				NoteFormComponent(
+					noteViewModelState.data,
+					noteTypes = noteTypeViewModelState.list,
+					archives = archiveViewModelState.list,
+					tags = tagViewModelState.list,
+					hasNextTags = tagViewModelState.pagination?.hasNextPage ?: false,
 
-						loadTags = {
-							val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
-							tags.toMutableList()
-						},
+					loadTags = {
+						val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
+						tags.toMutableList()
+					},
 
-						action = {note ->
+					action = { note ->
 
-							if (noteViewModelState.actionType == ActionType.CREATE){
+						if (noteViewModelState.actionType == ActionType.CREATE){
 
-								val createdNote = noteViewModel.createNote(note)
+							val createdNote = noteViewModel.createNote(note)
 
-								if (createdNote != null){
+							if (createdNote != null){
 
-									if (noteFilterViewModelState.filterApplied){
-										noteFilterViewModel.resetFilter()
-									}
-
-									noteViewModel.getNotesList(0, notesLimit)
+								if (noteFilterViewModelState.filterApplied){
+									noteFilterViewModel.resetFilter()
 								}
+
+								noteViewModel.getNotesList(0, notesLimit)
 							}
-
-							if (noteViewModelState.actionType == ActionType.UPDATE){
-
-								val updatedNote = noteViewModel.updateNote(note)
-
-								if (updatedNote != null){
-									noteViewModel.getNotesList(noteViewModelState.offset, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
-								}
-							}
-
-							showNoteFormSheet = false
 						}
-					)
-				}
+
+						if (noteViewModelState.actionType == ActionType.UPDATE){
+
+							val updatedNote = noteViewModel.updateNote(note)
+
+							if (updatedNote != null){
+								noteViewModel.getNotesList(noteViewModelState.offset, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
+							}
+						}
+
+						showNoteForm = false
+					},
+
+					close = { showNoteForm = false }
+				)
 			}
 		}
 	}
@@ -519,7 +530,7 @@ fun NotesScreen(
 		ModalBottomSheet(
 			onDismissRequest = {
 				showNoteDetailsSheet = false
-				floatingButtonsVisible = true
+				floatingButtonsEnabled = true
 			},
 			containerColor = Color.White,
 			sheetState = noteDetailsSheetState,

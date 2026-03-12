@@ -74,7 +74,8 @@ fun NoteFormComponent(
 	tags: List<Tag>,
 	hasNextTags: Boolean = true,
 	loadTags: suspend () -> MutableList<Tag>,
-	action: suspend (note: Note) -> Unit) {
+	action: suspend (note: Note) -> Unit,
+	close: () -> Unit) {
 
 	val selectableTags = remember { mutableStateListOf<Tag>().apply { addAll(tags) } }
 
@@ -130,14 +131,13 @@ fun NoteFormComponent(
 
 	Column(Modifier
 		.fillMaxSize()
-		.padding(top = 30.dp)
 		.verticalScroll(rememberScrollState())) {
 
 		//Note type dropdown menu
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 10.dp),
+				.padding(top = 15.dp, bottom = 10.dp),
 			expanded = noteTypeMenuExpanded,
 			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded }
 		) {
@@ -186,7 +186,7 @@ fun NoteFormComponent(
 		OutlinedTextField(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 10.dp),
+				.padding(bottom = 10.dp),
 			textStyle = AppTheme.typography.formInputText,
 			value = noteTitle.value,
 			singleLine = true,
@@ -200,7 +200,7 @@ fun NoteFormComponent(
 		OutlinedTextField(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 5.dp)
+				.padding(bottom = 5.dp)
 				.height(250.dp),
 			textStyle = AppTheme.typography.formInputText,
 			value = noteText.value,
@@ -216,7 +216,7 @@ fun NoteFormComponent(
 
 		if (isNoteTextError){
 			Text(
-				modifier = Modifier.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 10.dp),
+				modifier = Modifier.padding(bottom = 10.dp),
 				text = "Обязательное поле",
 				color = AppTheme.colors.dangerColor,
 				style = AppTheme.typography.errorText
@@ -227,7 +227,7 @@ fun NoteFormComponent(
 		OutlinedTextField(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, top = 10.dp, bottom = 20.dp),
+				.padding(top = 10.dp, bottom = 20.dp),
 			readOnly = true,
 			enabled = true,
 			value = formattedDate.value,
@@ -298,7 +298,7 @@ fun NoteFormComponent(
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 20.dp),
+				.padding(bottom = 20.dp),
 			expanded = archiveMenuExpanded,
 			onExpandedChange = { archiveMenuExpanded = !archiveMenuExpanded }
 		){
@@ -367,7 +367,7 @@ fun NoteFormComponent(
 		) {
 			Row(Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 20.dp)) {
+				.padding(bottom = 20.dp)) {
 				Text(
 					text = "Выбрать теги (${selectedTagsCount.intValue})",
 					color = AppTheme.colors.colorGrey,
@@ -395,7 +395,6 @@ fun NoteFormComponent(
 
 				if (index != selectableTags.count() -1){
 					HorizontalDivider(
-						modifier = Modifier.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding),
 						thickness = 1.dp,
 						color = AppTheme.colors.borderColor)
 				}
@@ -405,9 +404,7 @@ fun NoteFormComponent(
 		if (hasNextTags){
 			Row(Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding,
-					end = AppTheme.dimensions.containerHorizontalPadding,
-					top = 20.dp, bottom = 40.dp)) {
+				.padding(top = 20.dp, bottom = 40.dp)) {
 
 				if (tagsLoading){
 					ProgressIndicatorComponent(25, AppTheme.colors.primaryColor)
@@ -445,7 +442,7 @@ fun NoteFormComponent(
 			Column(
 				Modifier
 					.fillMaxWidth()
-					.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, top = 20.dp)
+					.padding(top = 20.dp)
 			) {
 				Row(Modifier
 					.fillMaxWidth()
@@ -489,7 +486,7 @@ fun NoteFormComponent(
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, top = 60.dp, bottom = 80.dp)
+				.padding(top = 60.dp)
 		) {
 			Button(
 				modifier = Modifier
@@ -549,5 +546,25 @@ fun NoteFormComponent(
 				}
 			}
 		}
+
+		if (!saving){
+			Row(
+				modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
+				horizontalArrangement = Arrangement.Center
+			) {
+				Text(
+					modifier = Modifier.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+						onClick = {	close()	}
+					),
+					text = "Закрыть",
+					color = AppTheme.colors.colorGrey,
+					style = AppTheme.typography.textButton
+				)
+			}
+		}
+
+		Row(Modifier.fillMaxWidth().padding(bottom = 80.dp)) {  }
 	}
 }
