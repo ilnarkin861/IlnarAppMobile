@@ -24,8 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,19 +59,19 @@ fun LoginScreen(
 
 	val scrollState = rememberScrollState()
 
-	val email = remember { mutableStateOf("") }
-	var emailIsError by remember { mutableStateOf(false) }
-	var emailNotValid by remember { mutableStateOf(false) }
+	val email = rememberSaveable { mutableStateOf("") }
+	var emailIsError by rememberSaveable { mutableStateOf(false) }
+	var emailNotValid by rememberSaveable { mutableStateOf(false) }
 
-	val password = remember { mutableStateOf("") }
-	var passwordIsError by remember { mutableStateOf(false) }
+	val password = rememberSaveable { mutableStateOf("") }
+	var passwordIsError by rememberSaveable { mutableStateOf(false) }
 
-	var loading by remember { mutableStateOf(false) }
+	var loading by rememberSaveable { mutableStateOf(false) }
 
 	val scope = rememberCoroutineScope()
 
-	val message = remember { mutableStateOf("") }
-	var showMessage by remember { mutableStateOf(false) }
+	val message = rememberSaveable { mutableStateOf("") }
+	var showMessage by rememberSaveable { mutableStateOf(false) }
 
 	val state by userViewModel.uiState.collectAsStateWithLifecycle()
 

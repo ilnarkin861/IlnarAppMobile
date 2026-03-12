@@ -27,7 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,14 +61,14 @@ fun PinLockScreen(
 
 	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
 
-	val inputPin = remember { mutableStateListOf<Int>() }
-	var incorrectPin by remember { mutableStateOf(false) }
+	val inputPin = rememberSaveable { mutableStateListOf<Int>() }
+	var incorrectPin by rememberSaveable { mutableStateOf(false) }
 
-	var showConfirmAlert by remember { mutableStateOf(false) }
+	var showConfirmAlert by rememberSaveable { mutableStateOf(false) }
 
 	val scrollState = rememberScrollState()
 
-	var showLoading by remember { mutableStateOf(false) }
+	var showLoading by rememberSaveable { mutableStateOf(false) }
 
 
 	if (inputPin.size == 4){

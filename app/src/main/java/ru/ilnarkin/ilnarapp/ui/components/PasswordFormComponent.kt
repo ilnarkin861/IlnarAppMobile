@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,20 +45,20 @@ fun PasswordFormComponent(
 ) {
 	val passwordLength = 8
 
-	val oldPassword = remember { mutableStateOf("") }
-	val newPassword = remember { mutableStateOf("") }
-	val confirmPassword = remember { mutableStateOf("") }
+	val oldPassword = rememberSaveable { mutableStateOf("") }
+	val newPassword = rememberSaveable { mutableStateOf("") }
+	val confirmPassword = rememberSaveable { mutableStateOf("") }
 
-	var passwordLengthError by remember { mutableStateOf(false) }
-	var passwordsMatch by remember { mutableStateOf(false) }
+	var passwordLengthError by rememberSaveable { mutableStateOf(false) }
+	var passwordsMatch by rememberSaveable { mutableStateOf(false) }
 
-	var oldPasswordIsError by remember { mutableStateOf(false) }
-	var newPasswordIsError by remember { mutableStateOf(false) }
-	var confirmPasswordIsError by remember { mutableStateOf(false) }
+	var oldPasswordIsError by rememberSaveable { mutableStateOf(false) }
+	var newPasswordIsError by rememberSaveable { mutableStateOf(false) }
+	var confirmPasswordIsError by rememberSaveable { mutableStateOf(false) }
 
 	val scope = rememberCoroutineScope()
 
-	var saving by remember { mutableStateOf(false) }
+	var saving by rememberSaveable { mutableStateOf(false) }
 
 	val inputColors = OutlinedTextFieldDefaults.colors(
 		unfocusedBorderColor = AppTheme.colors.inputsBorderColor,

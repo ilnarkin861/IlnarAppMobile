@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,13 +64,13 @@ fun SettingsScreen(
 	errorManager: NetworkErrorManager = koinInject()
 	) {
 
-	var emailFormDialogShowed by remember { mutableStateOf(false) }
+	var emailFormDialogShowed by rememberSaveable { mutableStateOf(false) }
 
-	var passwordFormDialogShowed by remember { mutableStateOf(false) }
+	var passwordFormDialogShowed by rememberSaveable { mutableStateOf(false) }
 
 	val scope = rememberCoroutineScope()
 
-	var userInfoLoading by remember { mutableStateOf(false) }
+	var userInfoLoading by rememberSaveable { mutableStateOf(false) }
 
 	val state by userViewModel.uiState.collectAsState()
 

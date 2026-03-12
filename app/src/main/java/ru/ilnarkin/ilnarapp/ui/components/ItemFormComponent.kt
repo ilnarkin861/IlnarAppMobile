@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,13 +40,13 @@ fun ItemFormComponent(
 	action: suspend (text: String) -> Unit,
 	close: () -> Unit
 ) {
-	val mutableItemText = remember { mutableStateOf(itemText?: "") }
+	val mutableItemText = rememberSaveable { mutableStateOf(itemText?: "") }
 
-	var itemTextIsError by remember { mutableStateOf(false) }
+	var itemTextIsError by rememberSaveable { mutableStateOf(false) }
 
 	val scope = rememberCoroutineScope()
 
-	var saving by remember { mutableStateOf(false) }
+	var saving by rememberSaveable { mutableStateOf(false) }
 
 
 	Column(modifier = Modifier.background(Color.White)) {

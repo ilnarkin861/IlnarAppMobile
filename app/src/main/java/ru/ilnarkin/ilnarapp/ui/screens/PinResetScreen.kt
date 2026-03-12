@@ -25,7 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,20 +57,20 @@ fun PinResetScreen(
 
 	val newPinTitle = "Введи новый PIN-код"
 	val confirmPinTitle = "Подтверди PIN-код"
-	val title = remember { mutableStateOf(newPinTitle) }
+	val title = rememberSaveable { mutableStateOf(newPinTitle) }
 
-	var newPinEntered by remember { mutableStateOf(false) }
-	var confirmPinEntered by remember { mutableStateOf(false) }
+	var newPinEntered by rememberSaveable { mutableStateOf(false) }
+	var confirmPinEntered by rememberSaveable { mutableStateOf(false) }
 
-	val inputPin = remember { mutableStateListOf<Int>() }
-	var pinCodeError by remember { mutableStateOf(false) }
+	val inputPin = rememberSaveable { mutableStateListOf<Int>() }
+	var pinCodeError by rememberSaveable { mutableStateOf(false) }
 
-	var newPin: String? by remember { mutableStateOf(null) }
-	var confirmPin: String? by remember { mutableStateOf(null) }
+	var newPin: String? by rememberSaveable { mutableStateOf(null) }
+	var confirmPin: String? by rememberSaveable { mutableStateOf(null) }
 
 	val scrollState = rememberScrollState()
 
-	var showLoading by remember { mutableStateOf(false) }
+	var showLoading by rememberSaveable { mutableStateOf(false) }
 
 
 	if (inputPin.size == 4){

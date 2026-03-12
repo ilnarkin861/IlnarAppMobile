@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,13 +41,13 @@ fun EmailFormComponent(
 	close: () -> Unit
 ) {
 
-	val updatedEmail = remember { mutableStateOf(email) }
+	val updatedEmail = rememberSaveable { mutableStateOf(email) }
 
-	var emailIsError by remember { mutableStateOf(false) }
+	var emailIsError by rememberSaveable { mutableStateOf(false) }
 
 	val scope = rememberCoroutineScope()
 
-	var saving by remember { mutableStateOf(false) }
+	var saving by rememberSaveable { mutableStateOf(false) }
 
 
 	Column(modifier = Modifier.background(Color.White)) {
