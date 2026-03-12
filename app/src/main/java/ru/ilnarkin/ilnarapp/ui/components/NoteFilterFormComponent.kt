@@ -82,9 +82,7 @@ fun NoteFilterFormComponent(
 	)
 
 
-	Column(Modifier
-		.fillMaxSize()
-		.verticalScroll(rememberScrollState())) {
+	Column(Modifier.fillMaxSize()) {
 
 
 		//Note type dropdown menu

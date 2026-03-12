@@ -59,8 +59,8 @@ fun ItemFormComponent(
 			){
 				Text(
 					text = label,
-					color = AppTheme.colors.titleColor,
-					style = AppTheme.typography.modalTitleText)
+					color = AppTheme.colors.colorGrey,
+					style = AppTheme.typography.formTitleText)
 			}
 
 			Row(

@@ -87,7 +87,7 @@ fun NoteItemComponent(
 			Row {
 				Text(
 					text = note.title ?: DEFAULT_NOTE_TITLE,
-					style = AppTheme.typography.noteItemTitle,
+					style = AppTheme.typography.noteCardTitle,
 					color = titleColor
 				)
 			}
@@ -98,7 +98,7 @@ fun NoteItemComponent(
 						.ofPattern("d MMMM yyyy, EEEE")
 						.format(LocalDate.parse(note.date)),
 					color = AppTheme.colors.colorGrey,
-					style = AppTheme.typography.noteItemDate)
+					style = AppTheme.typography.noteCardDate)
 			}
 
 			Row { HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)	}
@@ -108,7 +108,7 @@ fun NoteItemComponent(
 					text = note.text,
 					maxLines = 3,
 					overflow = TextOverflow.Ellipsis,
-					style = AppTheme.typography.noteItemText,
+					style = AppTheme.typography.noteCardText,
 					color = AppTheme.colors.textColor)
 			}
 

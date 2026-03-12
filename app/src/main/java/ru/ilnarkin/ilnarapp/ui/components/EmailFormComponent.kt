@@ -59,9 +59,9 @@ fun EmailFormComponent(
 				modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
 			){
 				Text(
-					color = AppTheme.colors.titleColor,
 					text = "Изменить email",
-					style = AppTheme.typography.modalTitleText
+					color = AppTheme.colors.colorGrey,
+					style = AppTheme.typography.formTitleText
 				)
 			}
 

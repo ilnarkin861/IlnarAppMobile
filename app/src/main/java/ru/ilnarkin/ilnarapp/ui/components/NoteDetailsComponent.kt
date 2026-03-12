@@ -30,6 +30,8 @@ fun NoteDetailsComponent(note: Note?) {
 
 	val containerPadding = AppTheme.dimensions.containerHorizontalPadding
 
+	val titleColor = if (note?.title != null) AppTheme.colors.titleColor else AppTheme.colors.titleColor.copy(alpha = 0.4f)
+
 
 	Column(Modifier.fillMaxSize()
 		.padding(start = containerPadding, top = 30.dp, end = containerPadding, bottom = 40.dp)
@@ -37,9 +39,9 @@ fun NoteDetailsComponent(note: Note?) {
 
 		Row {
 			Text(
-				color = AppTheme.colors.titleColor,
+				color = titleColor,
 				text = note?.title ?: "Без названия",
-				style = AppTheme.typography.noteTitle
+				style = AppTheme.typography.noteDetailsTitle
 			)
 		}
 
@@ -48,7 +50,7 @@ fun NoteDetailsComponent(note: Note?) {
 				text = DateTimeFormatter
 					.ofPattern("d MMMM yyyy, EEEE")
 					.format(LocalDate.parse(note!!.date)),
-				style = AppTheme.typography.noteDate,
+				style = AppTheme.typography.noteDetailsDate,
 				color = AppTheme.colors.colorGrey
 			)
 		}
@@ -60,7 +62,7 @@ fun NoteDetailsComponent(note: Note?) {
 		Row {
 			Text(
 				text = note!!.text,
-				style = AppTheme.typography.noteText,
+				style = AppTheme.typography.noteDetailsText,
 				color = AppTheme.colors.textColor
 			)
 		}
@@ -115,7 +117,7 @@ fun NoteDetailsComponent(note: Note?) {
 								shape = RoundedCornerShape(10.dp))
 							.padding(horizontal = 20.dp, vertical = 10.dp),
 						text = tag.title,
-						style = AppTheme.typography.noteTags,
+						style = AppTheme.typography.noteDetailsTags,
 						color = AppTheme.colors.primaryColor)
 				}
 			}

@@ -27,44 +27,39 @@ data class AppTypography(
         fontWeight = FontWeight.Bold
     ),
 
-    val noteItemTitle: TextStyle = baseStyle.copy(
+    val noteCardTitle: TextStyle = baseStyle.copy(
         fontSize = 16.sp,
         fontWeight = FontWeight.SemiBold
     ),
 
-    val noteItemDate: TextStyle = baseStyle.copy(
+    val noteCardDate: TextStyle = baseStyle.copy(
         fontSize = 13.sp,
         fontWeight = FontWeight.Normal
     ),
 
-    val noteItemText: TextStyle = baseStyle.copy(
+    val noteCardText: TextStyle = baseStyle.copy(
         fontSize = 14.sp,
         fontWeight = FontWeight.Normal,
         lineHeight = 1.5.em,
     ),
 
-    val noteTitle: TextStyle = baseStyle.copy(
+    val noteDetailsTitle: TextStyle = baseStyle.copy(
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold
     ),
 
-    val noteDate: TextStyle = baseStyle.copy(
+    val noteDetailsDate: TextStyle = baseStyle.copy(
         fontSize = 14.sp,
         fontWeight = FontWeight.Normal
     ),
 
-    val noteText: TextStyle = baseStyle.copy(
+    val noteDetailsText: TextStyle = baseStyle.copy(
         fontSize = 16.sp,
         fontWeight = FontWeight.Normal,
         lineHeight = 1.5.em,
     ),
 
-    val noteDetailsText: TextStyle = baseStyle.copy(
-        fontSize = 15.sp,
-        fontWeight = FontWeight.Normal
-    ),
-
-    val noteTags: TextStyle = baseStyle.copy(
+    val noteDetailsTags: TextStyle = baseStyle.copy(
         fontSize = 13.sp,
         fontWeight = FontWeight.Normal
     ),
@@ -80,7 +75,7 @@ data class AppTypography(
         textAlign = TextAlign.Center
     ),
 
-    val modalTitleText: TextStyle = baseStyle.copy(
+    val formTitleText: TextStyle = baseStyle.copy(
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold
     ),

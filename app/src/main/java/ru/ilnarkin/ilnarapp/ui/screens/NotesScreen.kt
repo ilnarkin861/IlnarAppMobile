@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -388,13 +390,10 @@ fun NotesScreen(
 
 	// Note form
 	if (showNoteForm){
-		Column(modifier = Modifier.fillMaxSize()
-			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
-			.background(AppTheme.colors.appBgColor)){
 
-			BackHandler {
-				showNoteForm = false
-			}
+		Box(Modifier.fillMaxSize().background(AppTheme.colors.appBgColor)){
+
+			BackHandler { showNoteForm = false }
 
 			if (noteFormLoading){
 				Box(
@@ -406,70 +405,78 @@ fun NotesScreen(
 			}
 
 			else{
-				Row(Modifier.padding(top = 15.dp, bottom = 20.dp).fillMaxWidth()) {
-					Text(
-						text = sheetTitle.value,
-						color = AppTheme.colors.titleColor,
-						style = AppTheme.typography.modalTitleText
+				Column(
+					Modifier
+						.verticalScroll(rememberScrollState())
+						.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
+						.fillMaxSize()
+				){
+					Row(Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 20.dp),
+						horizontalArrangement = Arrangement.Center) {
+						Text(
+							text = sheetTitle.value,
+							color = AppTheme.colors.colorGrey,
+							style = AppTheme.typography.formTitleText
+						)
+					}
+
+					Row(Modifier.fillMaxWidth()) {
+						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
+					}
+
+					NoteFormComponent(
+						noteViewModelState.data,
+						noteTypes = noteTypeViewModelState.list,
+						archives = archiveViewModelState.list,
+						tags = tagViewModelState.list,
+						hasNextTags = tagViewModelState.pagination?.hasNextPage ?: false,
+
+						loadTags = {
+							val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
+							tags.toMutableList()
+						},
+
+						action = { note ->
+
+							if (noteViewModelState.actionType == ActionType.CREATE){
+
+								val createdNote = noteViewModel.createNote(note)
+
+								if (createdNote != null){
+
+									if (noteFilterViewModelState.filterApplied){
+										noteFilterViewModel.resetFilter()
+									}
+
+									noteViewModel.getNotesList(0, notesLimit)
+								}
+							}
+
+							if (noteViewModelState.actionType == ActionType.UPDATE){
+
+								val updatedNote = noteViewModel.updateNote(note)
+
+								if (updatedNote != null){
+									noteViewModel.getNotesList(noteViewModelState.offset, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
+								}
+							}
+
+							showNoteForm = false
+						},
+
+						close = { showNoteForm = false }
 					)
 				}
-
-				Row(Modifier.fillMaxWidth()) {
-					HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
-				}
-
-				NoteFormComponent(
-					noteViewModelState.data,
-					noteTypes = noteTypeViewModelState.list,
-					archives = archiveViewModelState.list,
-					tags = tagViewModelState.list,
-					hasNextTags = tagViewModelState.pagination?.hasNextPage ?: false,
-
-					loadTags = {
-						val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
-						tags.toMutableList()
-					},
-
-					action = { note ->
-
-						if (noteViewModelState.actionType == ActionType.CREATE){
-
-							val createdNote = noteViewModel.createNote(note)
-
-							if (createdNote != null){
-
-								if (noteFilterViewModelState.filterApplied){
-									noteFilterViewModel.resetFilter()
-								}
-
-								noteViewModel.getNotesList(0, notesLimit)
-							}
-						}
-
-						if (noteViewModelState.actionType == ActionType.UPDATE){
-
-							val updatedNote = noteViewModel.updateNote(note)
-
-							if (updatedNote != null){
-								noteViewModel.getNotesList(noteViewModelState.offset, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
-							}
-						}
-
-						showNoteForm = false
-					},
-
-					close = { showNoteForm = false }
-				)
 			}
 		}
 	}
 
 
+
 	// Note filter form
 	if (showNoteFilterForm){
-		Column(modifier = Modifier.fillMaxSize()
-			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
-			.background(AppTheme.colors.appBgColor)){
+		Box(Modifier.fillMaxSize().background(AppTheme.colors.appBgColor)){
+
 			BackHandler { showNoteFilterForm = false }
 
 			if (noteFilterFormLoading){
@@ -482,48 +489,57 @@ fun NotesScreen(
 			}
 
 			else{
-				Row(Modifier.padding(top = 15.dp, bottom = 20.dp).fillMaxWidth()) {
-					Text(
-						text = "Фильтр",
-						color = AppTheme.colors.titleColor,
-						style = AppTheme.typography.modalTitleText
+				Column(
+					Modifier
+						.verticalScroll(rememberScrollState())
+						.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
+						.fillMaxSize()
+				){
+
+					Row(Modifier.padding(top = 15.dp, bottom = 20.dp).fillMaxWidth(),
+						horizontalArrangement = Arrangement.Center) {
+						Text(
+							text = "Фильтр",
+							color = AppTheme.colors.colorGrey,
+							style = AppTheme.typography.formTitleText
+						)
+					}
+
+					Row(Modifier.fillMaxWidth()) {
+						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
+					}
+
+					NoteFilterFormComponent(
+						viewModel = noteFilterViewModel,
+
+						loadTags = {
+							val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
+
+							val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
+
+							noteFilterViewModel.addTags(tags, hasNextTags)
+
+							tags.toMutableList()
+						},
+
+						action = {
+
+							showNoteFilterForm = false
+
+							scope.launch {
+								noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
+							}
+						},
+
+						resetFilter = {
+							showNoteFilterForm = false
+
+							scope.launch {
+								noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
+							}
+						}
 					)
 				}
-
-				Row(Modifier.fillMaxWidth()) {
-					HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
-				}
-
-				NoteFilterFormComponent(
-					viewModel = noteFilterViewModel,
-
-					loadTags = {
-						val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
-
-						val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
-
-						noteFilterViewModel.addTags(tags, hasNextTags)
-
-						tags.toMutableList()
-					},
-
-					action = {
-
-						showNoteFilterForm = false
-
-						scope.launch {
-							noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
-						}
-					},
-
-					resetFilter = {
-						showNoteFilterForm = false
-
-						scope.launch {
-							noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
-						}
-					}
-				)
 			}
 		}
 	}
