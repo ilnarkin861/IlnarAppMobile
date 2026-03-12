@@ -91,8 +91,8 @@ fun NotesScreen(
 	val notesLimit = 10
 	val tagsLimit = 10
 
-	var showNoteFilterFormSheet by rememberSaveable { mutableStateOf(false) }
-	val noteFilterFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+	var showNoteFilterForm by rememberSaveable { mutableStateOf(false) }
+	var noteFilterFormLoading by rememberSaveable { mutableStateOf(false) }
 
 	val scope = rememberCoroutineScope()
 
@@ -118,8 +118,6 @@ fun NotesScreen(
 	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
 
 	val noteFilterViewModelState by noteFilterViewModel.uiState.collectAsState()
-
-	var floatingButtonsEnabled by rememberSaveable { mutableStateOf(false) }
 
 
 	LaunchedEffect(Unit) {
@@ -157,8 +155,6 @@ fun NotesScreen(
 
 			noteViewModel.getNotesList(0, notesLimit)
 		}
-
-		floatingButtonsEnabled = true
 	}
 
 
@@ -197,8 +193,6 @@ fun NotesScreen(
 					NoteItemComponent(
 						value,
 						viewAction = {
-							floatingButtonsEnabled = false
-
 							showNoteDetailsSheet = true
 
 							noteDetailsLoading = true
@@ -206,8 +200,6 @@ fun NotesScreen(
 							noteViewModel.getNoteById(value.id)
 
 							noteDetailsLoading = false
-
-							floatingButtonsEnabled = true
 						},
 
 						editAction = {
@@ -231,17 +223,16 @@ fun NotesScreen(
 						},
 
 						deleteAction = {
-							floatingButtonsEnabled = false
-
 							val isDeleted = noteViewModel.deleteNote(value.id)
 
 							if (isDeleted){
 								val offset = if (noteViewModelState.list.size == 1) noteViewModelState.offset - notesLimit else noteViewModelState.offset
 
-								noteViewModel.getNotesList(offset, notesLimit, showLoading = false, filter = noteFilterViewModel.uiState.value.noteFilter)
+								noteViewModel.getNotesList(offset,
+									notesLimit,
+									showLoading = false,
+									filter = noteFilterViewModel.uiState.value.noteFilter)
 							}
-
-							floatingButtonsEnabled = true
 						})
 				}
 
@@ -252,7 +243,10 @@ fun NotesScreen(
 								LoadButtonComponent(action = {
 									noteViewModel.setActionType(ActionType.READ)
 
-									noteViewModel.getNotesList(noteViewModelState.offset + notesLimit, notesLimit, showLoading = false, filter = noteFilterViewModel.uiState.value.noteFilter)
+									noteViewModel.getNotesList(noteViewModelState.offset + notesLimit,
+										notesLimit,
+										showLoading = false,
+										filter = noteFilterViewModel.uiState.value.noteFilter)
 								})
 							}
 						}
@@ -291,36 +285,36 @@ fun NotesScreen(
 					contentColor = AppTheme.colors.primaryColor,
 					onClick = {
 
-						if(floatingButtonsEnabled){
-							scope.launch {
+						scope.launch {
+							showNoteFilterForm = true
 
-								floatingButtonsEnabled = false
+							noteFilterFormLoading = true
 
-								val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
+							val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
 
-								if (!noteTypes.isEmpty()){
-									if (noteFilterViewModelState.selectableNoteTypes.isEmpty()){
-										noteFilterViewModel.addNoteTypes(noteTypes)
-									}
-
-									if (noteFilterViewModelState.selectableArchives.isEmpty()){
-										val archives = archiveViewModel.getArchivesList(0, 100)
-										noteFilterViewModel.addArchives(archives)
-									}
-
-									if (noteFilterViewModelState.selectableTags.isEmpty()){
-										val tags = tagViewModel.getTagsList(0, tagsLimit)
-										val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
-										noteFilterViewModel.addTags(tags, hasNextTags)
-									}
-
-									showNoteFilterFormSheet = true
+							if (!noteTypes.isEmpty()){
+								if (noteFilterViewModelState.selectableNoteTypes.isEmpty()){
+									noteFilterViewModel.addNoteTypes(noteTypes)
 								}
 
-								floatingButtonsEnabled = true
-							}
-						}
+								if (noteFilterViewModelState.selectableArchives.isEmpty()){
+									val archives = archiveViewModel.getArchivesList(0, 100)
+									noteFilterViewModel.addArchives(archives)
+								}
 
+								if (noteFilterViewModelState.selectableTags.isEmpty()){
+									val tags = tagViewModel.getTagsList(0, tagsLimit)
+									val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
+									noteFilterViewModel.addTags(tags, hasNextTags)
+								}
+							}
+
+							else{
+								showNoteFilterForm = false
+							}
+
+							noteFilterFormLoading = false
+						}
 					}) {
 
 					Icon(painter = painterResource(R.drawable.ic_filter), contentDescription = "Filter")
@@ -335,34 +329,31 @@ fun NotesScreen(
 				elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
 
 				onClick = {
-					if(floatingButtonsEnabled){
-						scope.launch {
+					scope.launch {
 
-							showNoteForm = true
+						showNoteForm = true
 
-							noteFormLoading = true
+						noteFormLoading = true
 
-							val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
+						val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
 
-							if (!noteTypes.isEmpty()){
-								tagViewModel.getTagsList(0, tagsLimit)
-								archiveViewModel.getArchivesList(0, 100)
+						if (!noteTypes.isEmpty()){
+							tagViewModel.getTagsList(0, tagsLimit)
+							archiveViewModel.getArchivesList(0, 100)
 
-								noteViewModel.setActionType(ActionType.CREATE)
+							noteViewModel.setActionType(ActionType.CREATE)
 
-								noteViewModel.clearNote()
+							noteViewModel.clearNote()
 
-								sheetTitle.value = "Добавить запись"
-							}
-
-							else{
-								showNoteForm = false
-							}
-
-							noteFormLoading = false
+							sheetTitle.value = "Добавить запись"
 						}
-					}
 
+						else{
+							showNoteForm = false
+						}
+
+						noteFormLoading = false
+					}
 				}) {
 				Icon(modifier = Modifier.size(25.dp),
 					painter = painterResource(R.drawable.ic_plus),
@@ -474,20 +465,33 @@ fun NotesScreen(
 	}
 
 
-	// Filter form sheet
-	if (showNoteFilterFormSheet){
-		ModalBottomSheet(
-			onDismissRequest = { showNoteFilterFormSheet = false },
-			containerColor = Color.White,
-			sheetState = noteFilterFormSheetState,
-		){
-			Column {
-				Row(Modifier.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)) {
+	// Note filter form
+	if (showNoteFilterForm){
+		Column(modifier = Modifier.fillMaxSize()
+			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
+			.background(AppTheme.colors.appBgColor)){
+			BackHandler { showNoteFilterForm = false }
+
+			if (noteFilterFormLoading){
+				Box(
+					modifier = Modifier.fillMaxSize(),
+					contentAlignment = Alignment.Center
+				) {
+					ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)
+				}
+			}
+
+			else{
+				Row(Modifier.padding(top = 15.dp, bottom = 20.dp).fillMaxWidth()) {
 					Text(
-						color = AppTheme.colors.titleColor,
 						text = "Фильтр",
+						color = AppTheme.colors.titleColor,
 						style = AppTheme.typography.modalTitleText
 					)
+				}
+
+				Row(Modifier.fillMaxWidth()) {
+					HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 				}
 
 				NoteFilterFormComponent(
@@ -505,7 +509,7 @@ fun NotesScreen(
 
 					action = {
 
-						showNoteFilterFormSheet = false
+						showNoteFilterForm = false
 
 						scope.launch {
 							noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
@@ -513,7 +517,7 @@ fun NotesScreen(
 					},
 
 					resetFilter = {
-						showNoteFilterFormSheet = false
+						showNoteFilterForm = false
 
 						scope.launch {
 							noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
@@ -528,10 +532,7 @@ fun NotesScreen(
 	// Details sheet
 	if (showNoteDetailsSheet){
 		ModalBottomSheet(
-			onDismissRequest = {
-				showNoteDetailsSheet = false
-				floatingButtonsEnabled = true
-			},
+			onDismissRequest = { showNoteDetailsSheet = false },
 			containerColor = Color.White,
 			sheetState = noteDetailsSheetState,
 		) {

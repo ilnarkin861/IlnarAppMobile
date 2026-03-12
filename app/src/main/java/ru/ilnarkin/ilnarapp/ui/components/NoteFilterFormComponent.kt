@@ -84,7 +84,6 @@ fun NoteFilterFormComponent(
 
 	Column(Modifier
 		.fillMaxSize()
-		.padding(top = 30.dp)
 		.verticalScroll(rememberScrollState())) {
 
 
@@ -92,9 +91,7 @@ fun NoteFilterFormComponent(
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding,
-					end = AppTheme.dimensions.containerHorizontalPadding,
-					bottom = 20.dp),
+				.padding(top = 15.dp, bottom = 20.dp),
 			expanded = noteTypeMenuExpanded,
 			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded }
 		) {
@@ -144,9 +141,7 @@ fun NoteFilterFormComponent(
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding,
-					end = AppTheme.dimensions.containerHorizontalPadding,
-					bottom = 20.dp),
+				.padding(bottom = 20.dp),
 			expanded = yearsMenuExpanded,
 			onExpandedChange = { yearsMenuExpanded = !yearsMenuExpanded }
 		){
@@ -210,8 +205,7 @@ fun NoteFilterFormComponent(
 			ExposedDropdownMenuBox(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(start = AppTheme.dimensions.containerHorizontalPadding,
-						end = AppTheme.dimensions.containerHorizontalPadding,bottom = 20.dp),
+					.padding(bottom = 20.dp),
 				expanded = monthMenuExpanded,
 				onExpandedChange = { monthMenuExpanded = !monthMenuExpanded }
 			){
@@ -275,8 +269,7 @@ fun NoteFilterFormComponent(
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding,
-					end = AppTheme.dimensions.containerHorizontalPadding,bottom = 20.dp),
+				.padding(bottom = 20.dp),
 			expanded = archiveMenuExpanded,
 			onExpandedChange = { archiveMenuExpanded = !archiveMenuExpanded }
 		){
@@ -344,8 +337,7 @@ fun NoteFilterFormComponent(
 		) {
 			Row(Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding,
-					end = AppTheme.dimensions.containerHorizontalPadding, bottom = 20.dp)) {
+				.padding(bottom = 20.dp)) {
 				Text(
 					text = "Выбрать теги (${viewModelState.selectedTagIds.size})",
 					color = AppTheme.colors.colorGrey,
@@ -374,7 +366,6 @@ fun NoteFilterFormComponent(
 
 				if (index != viewModelState.selectableTags.count() -1){
 					HorizontalDivider(
-						modifier = Modifier.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding),
 						thickness = 1.dp,
 						color = AppTheme.colors.borderColor)
 				}
@@ -384,10 +375,7 @@ fun NoteFilterFormComponent(
 		if (viewModelState.hasNextTags){
 			Row(Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding,
-					end = AppTheme.dimensions.containerHorizontalPadding,
-					top = 20.dp,
-					bottom = 40.dp)) {
+				.padding(top = 20.dp, bottom = 40.dp)) {
 
 				if (tagsLoading){
 					ProgressIndicatorComponent(25, AppTheme.colors.primaryColor)
@@ -424,9 +412,7 @@ fun NoteFilterFormComponent(
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding,
-					end = AppTheme.dimensions.containerHorizontalPadding,
-					top = 60.dp)
+				.padding(top = 60.dp)
 		) {
 			Button(
 				modifier = Modifier
@@ -454,9 +440,7 @@ fun NoteFilterFormComponent(
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = AppTheme.dimensions.containerHorizontalPadding,
-					end = AppTheme.dimensions.containerHorizontalPadding,
-					top = 30.dp, bottom = 80.dp),
+				.padding(top = 30.dp, bottom = 80.dp),
 			horizontalArrangement = Arrangement.Center
 		){
 
