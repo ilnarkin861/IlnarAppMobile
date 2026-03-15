@@ -38,36 +38,35 @@ import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 fun EmailFormComponent(
 	email: String,
 	action: suspend (email: String) -> Unit,
-	close: () -> Unit
-) {
-
-	val updatedEmail = rememberSaveable { mutableStateOf(email) }
-
-	var emailIsError by rememberSaveable { mutableStateOf(false) }
+	close: () -> Unit)
+{
 
 	val scope = rememberCoroutineScope()
-
 	var saving by rememberSaveable { mutableStateOf(false) }
+	val updatedEmail = rememberSaveable { mutableStateOf(email) }
+	var emailIsError by rememberSaveable { mutableStateOf(false) }
 
 
-	Column(modifier = Modifier.background(Color.White)) {
+	Column(modifier = Modifier.background(Color.White))
+	{
 		Column(
-			modifier = Modifier.fillMaxWidth()
-				.padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 40.dp)
-		){
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 40.dp))
+		{
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
-			){
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(bottom = 10.dp))
+			{
 				Text(
 					text = "Изменить email",
 					color = AppTheme.colors.colorGrey,
-					style = AppTheme.typography.formTitleText
-				)
+					style = AppTheme.typography.formTitleText)
 			}
 
-			Row(
-				modifier = Modifier.fillMaxWidth()
-			){
+			Row(modifier = Modifier.fillMaxWidth())
+			{
 				OutlinedTextField(
 					modifier = Modifier.fillMaxWidth(),
 					textStyle = AppTheme.typography.formInputText,
@@ -76,10 +75,8 @@ fun EmailFormComponent(
 					isError = emailIsError || (!updatedEmail.value.isEmpty() && !validEmail(updatedEmail.value)),
 					label = { Text("Изменить email") },
 					onValueChange = {text ->
-
 						updatedEmail.value = text
 						emailIsError = updatedEmail.value.isEmpty() },
-
 					colors = OutlinedTextFieldDefaults.colors(
 						unfocusedBorderColor = AppTheme.colors.inputsBorderColor,
 						focusedBorderColor = AppTheme.colors.primaryColor,
@@ -92,12 +89,12 @@ fun EmailFormComponent(
 			}
 
 			if (emailIsError){
-				Row(modifier = Modifier.padding(top = 5.dp, bottom = 10.dp)) {
+				Row(modifier = Modifier.padding(top = 5.dp, bottom = 10.dp))
+				{
 					Text(
 						text = "Обязательное поле",
 						style = AppTheme.typography.errorText,
-						color = AppTheme.colors.dangerColor
-					)
+						color = AppTheme.colors.dangerColor)
 				}
 			}
 
@@ -106,15 +103,18 @@ fun EmailFormComponent(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 					text = "Некорректный email",
 					style = AppTheme.typography.errorText,
-					color = AppTheme.colors.dangerColor
-				)
+					color = AppTheme.colors.dangerColor)
 			}
 
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(top = 30.dp)
-			){
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 30.dp))
+			{
 				Button(
-					modifier = Modifier.fillMaxWidth().height(60.dp),
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(60.dp),
 					enabled = !saving,
 					shape = RoundedCornerShape(10.dp),
 					colors = ButtonDefaults.buttonColors(
@@ -138,14 +138,15 @@ fun EmailFormComponent(
 					}
 				) {
 					if (saving){
-						Row(modifier = Modifier.fillMaxSize(),
+						Row(
+							modifier = Modifier.fillMaxSize(),
 							horizontalArrangement = Arrangement.Center,
-							verticalAlignment = Alignment.CenterVertically) {
+							verticalAlignment = Alignment.CenterVertically)
+						{
 							CircularProgressIndicator(
 								modifier = Modifier.size(20.dp),
 								strokeWidth = 2.dp,
-								color = Color.White
-							)
+								color = Color.White)
 						}
 					}
 					else{
@@ -159,15 +160,16 @@ fun EmailFormComponent(
 
 			if (!saving){
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(top = 25.dp),
-					horizontalArrangement = Arrangement.Center
-				) {
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(top = 25.dp),
+					horizontalArrangement = Arrangement.Center)
+				{
 					Text(
 						modifier = Modifier.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
-							onClick = {	close()	}
-						),
+							onClick = {	close()	}),
 						text = "Закрыть",
 						color = AppTheme.colors.colorGrey,
 						style = AppTheme.typography.textButton

@@ -7,7 +7,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.isSuccess
 import ru.ilnarkin.ilnarapp.models.Info
-import ru.ilnarkin.ilnarapp.models.PasswordModel
+import ru.ilnarkin.ilnarapp.models.Password
 import ru.ilnarkin.ilnarapp.models.Token
 import ru.ilnarkin.ilnarapp.models.UserInfo
 import ru.ilnarkin.ilnarapp.models.UserLoginData
@@ -33,7 +33,7 @@ class UserRepository(private val httpClient: HttpClient, private val endpoint: S
 	}
 
 
-	suspend fun resetPassword(passwordModel: PasswordModel): Info{
+	suspend fun resetPassword(passwordModel: Password): Info{
 		return httpClient.post("$endpoint/password-reset"){ setBody(passwordModel)}.body()
 	}
 }

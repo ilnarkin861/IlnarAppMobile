@@ -87,39 +87,27 @@ fun NotesScreen(
 	tagViewModel: TagViewModel = koinViewModel(),
 	archiveViewModel: ArchiveViewModel = koinViewModel(),
 	noteFilterViewModel: NoteFilterViewModel = koinViewModel(),
-	errorManager: NetworkErrorManager = koinInject()
-) {
+	errorManager: NetworkErrorManager = koinInject())
+{
 
 	val notesLimit = 10
 	val tagsLimit = 10
-
-	var showNoteFilterForm by rememberSaveable { mutableStateOf(false) }
-	var noteFilterFormLoading by rememberSaveable { mutableStateOf(false) }
-
 	val scope = rememberCoroutineScope()
-
 	val listState = rememberLazyListState()
-
-	var showNoteForm by rememberSaveable { mutableStateOf(false) }
+	val snackBarHostState = remember { SnackbarHostState() }
+	val noteViewModelState by noteViewModel.uiState.collectAsState()
+	val noteTypeViewModelState by noteTypeViewModel.uiState.collectAsState()
+	val tagViewModelState by tagViewModel.uiState.collectAsState()
+	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
+	val noteFilterViewModelState by noteFilterViewModel.uiState.collectAsState()
+	var noteFormVisible by rememberSaveable { mutableStateOf(false) }
 	var noteFormLoading by rememberSaveable { mutableStateOf(false) }
-
+	val noteFormTitle = rememberSaveable { mutableStateOf("") }
 	var showNoteDetailsSheet by rememberSaveable { mutableStateOf(false) }
 	val noteDetailsSheetState = rememberModalBottomSheetState()
 	var noteDetailsLoading by rememberSaveable { mutableStateOf(false) }
-
-	val sheetTitle = rememberSaveable { mutableStateOf("") }
-
-	val snackBarHostState = remember { SnackbarHostState() }
-
-	val noteViewModelState by noteViewModel.uiState.collectAsState()
-
-	val noteTypeViewModelState by noteTypeViewModel.uiState.collectAsState()
-
-	val tagViewModelState by tagViewModel.uiState.collectAsState()
-
-	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
-
-	val noteFilterViewModelState by noteFilterViewModel.uiState.collectAsState()
+	var noteFilterFormVisible by rememberSaveable { mutableStateOf(false) }
+	var noteFilterFormLoading by rememberSaveable { mutableStateOf(false) }
 
 
 	LaunchedEffect(Unit) {
@@ -129,7 +117,7 @@ fun NotesScreen(
 					showNoteDetailsSheet = false
 					noteDetailsLoading = false
 					noteFormLoading = false
-					showNoteForm = false
+					noteFormVisible = false
 					val message = if (error == NetworkErrorType.NO_INTERNET) NO_INTERNET_ERROR_MESSAGE else SERVER_ERROR_MESSAGE
 					snackBarHostState.showSnackbar(message)
 				}
@@ -154,17 +142,21 @@ fun NotesScreen(
 
 	LaunchedEffect(Unit) {
 		if (noteViewModelState.list.isEmpty()){
-
 			noteViewModel.getNotesList(0, notesLimit)
 		}
 	}
 
 
-	Box(Modifier.fillMaxSize().padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)) {
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding))
+	{
 		if (noteViewModelState.loading){
 			Box(
 				modifier = Modifier.fillMaxSize(),
-				contentAlignment = Alignment.Center){
+				contentAlignment = Alignment.Center)
+			{
 				ProgressIndicatorComponent(60, AppTheme.colors.primaryColor)
 			}
 		}
@@ -172,31 +164,32 @@ fun NotesScreen(
 		if (!noteViewModelState.loading && !noteViewModelState.list.isEmpty()){
 			LazyColumn(
 				state = listState,
-				contentPadding = PaddingValues(top = 30.dp)) {
-
+				contentPadding = PaddingValues(top = 30.dp))
+			{
 				noteViewModelState.pagination?.let {
 					if (it.hasPreviousPage){
 						item {
-							Row(Modifier.padding(bottom = 25.dp)) {
-								LoadButtonComponent(nextButton = false, action = {
-									noteViewModel.setActionType(ActionType.READ)
+							Row(modifier = Modifier.padding(bottom = 25.dp))
+							{
+								LoadButtonComponent(
+									nextButton = false,
+									action = {
+										noteViewModel.setActionType(ActionType.READ)
 
-									noteViewModel.getNotesList(
-										noteViewModelState.offset - notesLimit, notesLimit,
-										showLoading = false,
-										filter = noteFilterViewModel.uiState.value.noteFilter)
-								})
+										noteViewModel.getNotesList(
+											noteViewModelState.offset - notesLimit, notesLimit,
+											showLoading = false,
+											filter = noteFilterViewModel.uiState.value.noteFilter)
+									})
 							}
 						}
 					}
 				}
-
 				items(noteViewModelState.list) {value ->
 					NoteItemComponent(
 						value,
 						viewAction = {
 							showNoteDetailsSheet = true
-
 							noteDetailsLoading = true
 
 							noteViewModel.getNoteById(value.id)
@@ -205,7 +198,6 @@ fun NotesScreen(
 						},
 
 						editAction = {
-
 							val result = noteViewModel.getNoteById(value.id)
 
 							if (result != null){
@@ -218,8 +210,8 @@ fun NotesScreen(
 
 									noteViewModel.setActionType(ActionType.UPDATE)
 
-									sheetTitle.value = "Изменить запись"
-									showNoteForm = true
+									noteFormTitle.value = "Изменить запись"
+									noteFormVisible = true
 								}
 							}
 						},
@@ -237,11 +229,11 @@ fun NotesScreen(
 							}
 						})
 				}
-
 				noteViewModelState.pagination?.let {
 					if (it.hasNextPage){
 						item {
-							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
+							Row(modifier = Modifier.padding(top = 25.dp, bottom = 30.dp))
+							{
 								LoadButtonComponent(action = {
 									noteViewModel.setActionType(ActionType.READ)
 
@@ -258,24 +250,31 @@ fun NotesScreen(
 		}
 
 		if (!noteViewModelState.loading && noteViewModelState.list.isEmpty()){
-			Box(modifier = Modifier.background(AppTheme.colors.appBgColor).fillMaxSize(),
-				contentAlignment = Alignment.Center){
+			Box(
+				modifier = Modifier
+					.background(AppTheme.colors.appBgColor)
+					.fillMaxSize(),
+				contentAlignment = Alignment.Center)
+			{
 				MessageComponent("Записей нет")
 			}
 		}
 
-
 		Column(
-			modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
+			modifier = Modifier
+				.align(Alignment.BottomEnd)
+				.padding(20.dp),
 			horizontalAlignment = Alignment.End,
-			verticalArrangement = Arrangement.spacedBy(10.dp)
-		) {
+			verticalArrangement = Arrangement.spacedBy(10.dp))
+		{
 			BadgedBox(
 				modifier = Modifier.align(Alignment.CenterHorizontally),
 				badge = {
 					if (noteFilterViewModelState.filterApplied){
 						Badge(
-							Modifier.size(12.dp).offset(x = (-1).dp, y = 1.dp),
+							modifier = Modifier
+								.size(12.dp)
+								.offset(x = (-1).dp, y = 1.dp),
 							containerColor = AppTheme.colors.dangerColor
 						)
 					}
@@ -288,7 +287,7 @@ fun NotesScreen(
 					onClick = {
 
 						scope.launch {
-							showNoteFilterForm = true
+							noteFilterFormVisible = true
 
 							noteFilterFormLoading = true
 
@@ -312,7 +311,7 @@ fun NotesScreen(
 							}
 
 							else{
-								showNoteFilterForm = false
+								noteFilterFormVisible = false
 							}
 
 							noteFilterFormLoading = false
@@ -332,9 +331,7 @@ fun NotesScreen(
 
 				onClick = {
 					scope.launch {
-
-						showNoteForm = true
-
+						noteFormVisible = true
 						noteFormLoading = true
 
 						val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
@@ -347,27 +344,29 @@ fun NotesScreen(
 
 							noteViewModel.clearNote()
 
-							sheetTitle.value = "Добавить запись"
+							noteFormTitle.value = "Добавить запись"
 						}
 
 						else{
-							showNoteForm = false
+							noteFormVisible = false
 						}
 
 						noteFormLoading = false
 					}
 				}) {
-				Icon(modifier = Modifier.size(25.dp),
+				Icon(
+					modifier = Modifier.size(25.dp),
 					painter = painterResource(R.drawable.ic_plus),
 					contentDescription = "Добавить")
 			}
 		}
 
-
 		SnackbarHost(
-			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter),
-			hostState = snackBarHostState
-		){data ->
+			modifier = Modifier
+				.padding(16.dp)
+				.align(Alignment.BottomCenter),
+			hostState = snackBarHostState)
+		{data ->
 			Snackbar(
 				snackbarData = data,
 				containerColor = AppTheme.colors.primaryColor,
@@ -376,11 +375,10 @@ fun NotesScreen(
 		}
 	}
 
-
 	AlertComponent(
 		success = noteViewModelState.success,
 		message = if (noteViewModelState.showAlert) noteViewModelState.message else noteTypeViewModelState.message,
-		showed = noteViewModelState.showAlert || noteTypeViewModelState.showAlert,
+		visible = noteViewModelState.showAlert || noteTypeViewModelState.showAlert,
 		action = {
 			noteTypeViewModel.dismissAlert()
 			noteViewModel.dismissAlert()
@@ -389,41 +387,45 @@ fun NotesScreen(
 
 
 	// Note form
-	if (showNoteForm){
-
-		Box(Modifier.fillMaxSize().background(AppTheme.colors.appBgColor)){
-
-			BackHandler { showNoteForm = false }
+	if (noteFormVisible){
+		Box(
+			modifier = Modifier
+				.fillMaxSize()
+				.background(AppTheme.colors.appBgColor))
+		{
+			BackHandler { noteFormVisible = false }
 
 			if (noteFormLoading){
 				Box(
 					modifier = Modifier.fillMaxSize(),
-					contentAlignment = Alignment.Center
-				) {
+					contentAlignment = Alignment.Center)
+				{
 					ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)
 				}
 			}
 
 			else{
 				Column(
-					Modifier
+					modifier = Modifier
 						.verticalScroll(rememberScrollState())
 						.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
-						.fillMaxSize()
-				){
-					Row(Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 20.dp),
-						horizontalArrangement = Arrangement.Center) {
+						.fillMaxSize())
+				{
+					Row(
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(top = 15.dp, bottom = 20.dp),
+						horizontalArrangement = Arrangement.Center)
+					{
 						Text(
-							text = sheetTitle.value,
+							text = noteFormTitle.value,
 							color = AppTheme.colors.colorGrey,
-							style = AppTheme.typography.formTitleText
-						)
+							style = AppTheme.typography.formTitleText)
 					}
-
-					Row(Modifier.fillMaxWidth()) {
+					Row(modifier = Modifier.fillMaxWidth())
+					{
 						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 					}
-
 					NoteFormComponent(
 						noteViewModelState.data,
 						noteTypes = noteTypeViewModelState.list,
@@ -461,10 +463,10 @@ fun NotesScreen(
 								}
 							}
 
-							showNoteForm = false
+							noteFormVisible = false
 						},
 
-						close = { showNoteForm = false }
+						close = { noteFormVisible = false }
 					)
 				}
 			}
@@ -472,18 +474,18 @@ fun NotesScreen(
 	}
 
 
-
 	// Note filter form
-	if (showNoteFilterForm){
-		Box(Modifier.fillMaxSize().background(AppTheme.colors.appBgColor)){
+	if (noteFilterFormVisible){
+		Box(Modifier.fillMaxSize().background(AppTheme.colors.appBgColor))
+		{
 
-			BackHandler { showNoteFilterForm = false }
+			BackHandler { noteFilterFormVisible = false }
 
 			if (noteFilterFormLoading){
 				Box(
 					modifier = Modifier.fillMaxSize(),
-					contentAlignment = Alignment.Center
-				) {
+					contentAlignment = Alignment.Center)
+				{
 					ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)
 				}
 			}
@@ -493,19 +495,20 @@ fun NotesScreen(
 					Modifier
 						.verticalScroll(rememberScrollState())
 						.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
-						.fillMaxSize()
-				){
+						.fillMaxSize())
+				{
 
 					Row(Modifier.padding(top = 15.dp, bottom = 20.dp).fillMaxWidth(),
-						horizontalArrangement = Arrangement.Center) {
+						horizontalArrangement = Arrangement.Center)
+					{
 						Text(
 							text = "Фильтр",
 							color = AppTheme.colors.colorGrey,
 							style = AppTheme.typography.formTitleText
 						)
 					}
-
-					Row(Modifier.fillMaxWidth()) {
+					Row(Modifier.fillMaxWidth())
+					{
 						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 					}
 
@@ -524,7 +527,7 @@ fun NotesScreen(
 
 						action = {
 
-							showNoteFilterForm = false
+							noteFilterFormVisible = false
 
 							scope.launch {
 								noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
@@ -532,7 +535,7 @@ fun NotesScreen(
 						},
 
 						resetFilter = {
-							showNoteFilterForm = false
+							noteFilterFormVisible = false
 
 							scope.launch {
 								noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
@@ -550,13 +553,13 @@ fun NotesScreen(
 		ModalBottomSheet(
 			onDismissRequest = { showNoteDetailsSheet = false },
 			containerColor = Color.White,
-			sheetState = noteDetailsSheetState,
-		) {
+			sheetState = noteDetailsSheetState)
+		{
 			if (noteDetailsLoading){
 				Box(
 					modifier = Modifier.fillMaxWidth().height(200.dp),
-					contentAlignment = Alignment.Center
-				) {
+					contentAlignment = Alignment.Center)
+				{
 					ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)
 				}
 			}

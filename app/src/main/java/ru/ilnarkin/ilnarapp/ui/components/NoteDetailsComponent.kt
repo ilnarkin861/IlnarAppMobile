@@ -26,36 +26,38 @@ import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NoteDetailsComponent(note: Note?) {
-
-	val containerPadding = AppTheme.dimensions.containerHorizontalPadding
+fun NoteDetailsComponent(note: Note?)
+{
 
 	val titleColor = if (note?.title != null) AppTheme.colors.titleColor else AppTheme.colors.titleColor.copy(alpha = 0.4f)
+	val containerPadding = AppTheme.dimensions.containerHorizontalPadding
 
 
-	Column(Modifier.fillMaxSize()
-		.padding(start = containerPadding, top = 30.dp, end = containerPadding, bottom = 40.dp)
-		.verticalScroll(rememberScrollState())){
-
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.padding(start = containerPadding, top = 30.dp, end = containerPadding, bottom = 40.dp)
+			.verticalScroll(rememberScrollState()))
+	{
 		Row {
 			Text(
 				color = titleColor,
 				text = note?.title ?: "Без названия",
-				style = AppTheme.typography.noteDetailsTitle
-			)
+				style = AppTheme.typography.noteDetailsTitle)
 		}
 
-		Row(Modifier.padding(top = 10.dp)) {
+		Row(modifier = Modifier.padding(top = 10.dp))
+		{
 			Text(
 				text = DateTimeFormatter
 					.ofPattern("d MMMM yyyy, EEEE")
 					.format(LocalDate.parse(note!!.date)),
 				style = AppTheme.typography.noteDetailsDate,
-				color = AppTheme.colors.colorGrey
-			)
+				color = AppTheme.colors.colorGrey)
 		}
 
-		Row(Modifier.padding(top = 15.dp, bottom = 20.dp)) {
+		Row(modifier = Modifier.padding(top = 15.dp, bottom = 20.dp))
+		{
 			HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 		}
 
@@ -63,41 +65,39 @@ fun NoteDetailsComponent(note: Note?) {
 			Text(
 				text = note!!.text,
 				style = AppTheme.typography.noteDetailsText,
-				color = AppTheme.colors.textColor
-			)
+				color = AppTheme.colors.textColor)
 		}
 
-		Row(Modifier.padding(top = 15.dp, bottom = 20.dp)) {
+		Row(modifier = Modifier.padding(top = 15.dp, bottom = 20.dp))
+		{
 			HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 		}
 
-		Row(Modifier.padding(bottom = 10.dp)) {
+		Row(modifier = Modifier.padding(bottom = 10.dp))
+		{
 			Text(
 				text = "Тип: ",
 				style = AppTheme.typography.noteDetailsText.copy(fontWeight = FontWeight.Bold),
-				color = AppTheme.colors.titleColor,
-			)
+				color = AppTheme.colors.titleColor)
 
 			Text(
 				text = note!!.noteType.title,
 				style = AppTheme.typography.noteDetailsText,
-				color = AppTheme.colors.textColor,
-			)
+				color = AppTheme.colors.textColor)
 		}
 
 		if (note!!.archive != null){
-			Row(Modifier.padding(bottom = 10.dp)) {
+			Row(modifier = Modifier.padding(bottom = 10.dp))
+			{
 				Text(
 					text = "Архив: ",
 					style = AppTheme.typography.noteDetailsText.copy(fontWeight = FontWeight.Bold),
-					color = AppTheme.colors.titleColor,
-				)
+					color = AppTheme.colors.titleColor)
 
 				Text(
 					text = note.archive!!.title,
 					style = AppTheme.typography.noteDetailsText,
-					color = AppTheme.colors.textColor,
-				)
+					color = AppTheme.colors.textColor)
 			}
 		}
 
@@ -105,8 +105,8 @@ fun NoteDetailsComponent(note: Note?) {
 			FlowRow (
 				modifier = Modifier.padding(top = 30.dp),
 				horizontalArrangement = Arrangement.spacedBy(10.dp),
-				verticalArrangement = Arrangement.spacedBy(8.dp)
-			) {
+				verticalArrangement = Arrangement.spacedBy(8.dp))
+			{
 
 				note.tags.forEach { tag ->
 					Text(

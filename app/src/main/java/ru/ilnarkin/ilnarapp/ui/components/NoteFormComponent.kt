@@ -73,19 +73,14 @@ fun NoteFormComponent(
 	hasNextTags: Boolean = true,
 	loadTags: suspend () -> MutableList<Tag>,
 	action: suspend (note: Note) -> Unit,
-	close: () -> Unit) {
-
-	val selectableTags = remember { mutableStateListOf<Tag>().apply { addAll(tags) } }
-
-	var saving by remember { mutableStateOf(false) }
-
-	var tagsLoading by remember { mutableStateOf(false) }
+	close: () -> Unit)
+{
 
 	val scope = rememberCoroutineScope()
-
+	var saving by remember { mutableStateOf(false) }
+	val selectableTags = remember { mutableStateListOf<Tag>().apply { addAll(tags) } }
 	var noteTypeMenuExpanded by remember { mutableStateOf(false) }
 	val selectedNoteType = remember { mutableStateOf(note?.noteType ?: noteTypes[0]) }
-
 	val noteTitle = remember { mutableStateOf(note?.title ?: "") }
 	val noteText = remember { mutableStateOf(note?.text ?: "") }
 	var isNoteTextError by remember { mutableStateOf(false) }
@@ -99,18 +94,15 @@ fun NoteFormComponent(
 		}
 	}
 
-	var showDatePicker by remember { mutableStateOf(false) }
+	var datePickerVisible by remember { mutableStateOf(false) }
 	val datePickerState = rememberDatePickerState()
-
 	val unSelectedArchiveTitle = "Архив не выбран"
 	var selectedArchiveTitle by remember { mutableStateOf(note?.archive?.title ?: unSelectedArchiveTitle) }
 	var archiveMenuExpanded by remember { mutableStateOf(false) }
 	var archiveIsSelected by remember { mutableStateOf(note?.archive ?: false) }
 	var selectedArchive: Archive? by remember { mutableStateOf(note?.archive) }
-
-
+	var tagsLoading by remember { mutableStateOf(false) }
 	val addedTags = remember { note?.tags?.toMutableStateList() ?: mutableStateListOf()}
-
 	val selectedTags = remember { mutableStateListOf<Tag>() }
 	val selectedTagsCount = remember { mutableIntStateOf(0) }
 	val uploadableTags = mutableListOf<Tag>()
@@ -127,7 +119,8 @@ fun NoteFormComponent(
 	)
 
 
-	Column(Modifier.fillMaxSize()) {
+	Column(modifier = Modifier.fillMaxSize())
+	{
 
 		//Note type dropdown menu
 		ExposedDropdownMenuBox(
@@ -135,8 +128,8 @@ fun NoteFormComponent(
 				.fillMaxWidth()
 				.padding(top = 15.dp, bottom = 10.dp),
 			expanded = noteTypeMenuExpanded,
-			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded }
-		) {
+			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded })
+		{
 			OutlinedTextField(
 				modifier = Modifier
 					.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -154,12 +147,11 @@ fun NoteFormComponent(
 						contentDescription = "")
 				}
 			)
-
 			ExposedDropdownMenu(
 				modifier = Modifier.background(Color.White),
 				expanded = noteTypeMenuExpanded,
-				onDismissRequest = { noteTypeMenuExpanded = false}
-			) {
+				onDismissRequest = { noteTypeMenuExpanded = false})
+			{
 				noteTypes.forEach {noteType ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
@@ -191,7 +183,6 @@ fun NoteFormComponent(
 			colors = inputColors,
 			shape = RoundedCornerShape(10.dp))
 
-
 		//Note text field
 		OutlinedTextField(
 			modifier = Modifier
@@ -219,7 +210,7 @@ fun NoteFormComponent(
 			)
 		}
 
-
+		// Date field
 		OutlinedTextField(
 			modifier = Modifier
 				.fillMaxWidth()
@@ -235,7 +226,8 @@ fun NoteFormComponent(
 				unfocusedTextColor = AppTheme.colors.textColor,
 			),
 			trailingIcon = {
-				IconButton(onClick = { showDatePicker = true }) {
+				IconButton(onClick = { datePickerVisible = true })
+				{
 					Icon(
 						modifier = Modifier.size(30.dp),
 						painter = painterResource(R.drawable.ic_calendar),
@@ -247,35 +239,42 @@ fun NoteFormComponent(
 			shape = RoundedCornerShape(10.dp)
 		)
 
-
-		if (showDatePicker) {
+		// Date picker
+		if (datePickerVisible) {
 			DatePickerDialog(
-				onDismissRequest = { showDatePicker = false },
+				onDismissRequest = { datePickerVisible = false },
 				colors = DatePickerDefaults.colors(
 					containerColor = AppTheme.colors.primaryColor
 				),
 				confirmButton = {
-					TextButton(onClick = {
-						datePickerState.selectedDateMillis?.let { millis ->
-							val date = Instant.ofEpochMilli(millis)
-								.atZone(ZoneId.systemDefault())
-								.toLocalDate()
-							noteDate = date
-						}
-						showDatePicker = false
-					}) {
-						Text("Ок", color = Color.White)
+					TextButton(
+						onClick = {
+							datePickerState.selectedDateMillis?.let { millis ->
+								val date = Instant.ofEpochMilli(millis)
+									.atZone(ZoneId.systemDefault())
+									.toLocalDate()
+								noteDate = date
+							}
+							datePickerVisible = false
+						})
+					{
+						Text(text = "Ок", color = Color.White)
 					}
 				},
 				dismissButton = {
-					TextButton(onClick = { showDatePicker = false }) {
-						Text("Закрыть", color = Color.White)
+					TextButton(onClick = { datePickerVisible = false })
+					{
+						Text(text = "Закрыть", color = Color.White)
 					}
-				}
-			) {
+				})
+			{
 				DatePicker(
 					state = datePickerState,
-					title = { Text("Выбрать дату", modifier = Modifier.padding(start = 24.dp, top = 16.dp)) },
+					title = {
+						Text(
+							modifier = Modifier.padding(start = 24.dp, top = 16.dp),
+							text = "Выбрать дату")
+					},
 					colors = DatePickerDefaults.colors(
 						containerColor = Color.White,
 						selectedDayContainerColor = AppTheme.colors.primaryColor,
@@ -289,15 +288,14 @@ fun NoteFormComponent(
 			}
 		}
 
-
 		// Archive dropdown
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(bottom = 20.dp),
 			expanded = archiveMenuExpanded,
-			onExpandedChange = { archiveMenuExpanded = !archiveMenuExpanded }
-		){
+			onExpandedChange = { archiveMenuExpanded = !archiveMenuExpanded })
+		{
 			OutlinedTextField(
 				modifier = Modifier
 					.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -313,28 +311,27 @@ fun NoteFormComponent(
 						painter = if (archiveMenuExpanded) painterResource(R.drawable.ic_arrow_down)
 						else painterResource(R.drawable.ic_arrow_up),
 						contentDescription = "")
-				}
-			)
-
+				})
 			ExposedDropdownMenu(
 				modifier = Modifier.background(Color.White),
 				expanded = archiveMenuExpanded,
-				onDismissRequest = { archiveMenuExpanded = false}
-			) {
+				onDismissRequest = { archiveMenuExpanded = false})
+			{
 				DropdownMenuItem(
 					modifier = Modifier.background(Color.White),
 					colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 					text = {
 						Text(
 							text = unSelectedArchiveTitle,
-							style = AppTheme.typography.formInputText
-							)},
+							style = AppTheme.typography.formInputText)
+					},
 					onClick = {
 						selectedArchiveTitle = unSelectedArchiveTitle
 						archiveIsSelected = false
 						archiveMenuExpanded = false
 					}
 				)
+
 				archives.forEach {archive ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
@@ -342,8 +339,8 @@ fun NoteFormComponent(
 						text = {
 							Text(
 								text = archive.title,
-								style = AppTheme.typography.formInputText
-							)},
+								style = AppTheme.typography.formInputText)
+						},
 						onClick = {
 							selectedArchive = archive
 							selectedArchiveTitle = archive.title
@@ -357,21 +354,24 @@ fun NoteFormComponent(
 
 		//Selectable tags
 		Column(
-			Modifier
+			modifier = Modifier
 				.fillMaxWidth()
-				.padding(top = 20.dp)
-		) {
-			Row(Modifier
-				.fillMaxWidth()
-				.padding(bottom = 20.dp)) {
+				.padding(top = 20.dp))
+		{
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(bottom = 20.dp))
+			{
 				Text(
 					text = "Выбрать теги (${selectedTagsCount.intValue})",
 					color = AppTheme.colors.colorGrey,
-					style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold)
-				)
+					style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold))
 			}
+
 			selectableTags.forEachIndexed { index, tag ->
-				Row(Modifier.fillMaxWidth()) {
+				Row(Modifier.fillMaxWidth())
+				{
 					TagCheckboxComponent(tag, onChecked = {tag ->
 						if (selectedTags.count() == 0){
 							selectedTags.add(tag)
@@ -398,9 +398,11 @@ fun NoteFormComponent(
 		}
 
 		if (hasNextTags){
-			Row(Modifier
-				.fillMaxWidth()
-				.padding(top = 20.dp, bottom = 40.dp)) {
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 20.dp, bottom = 40.dp))
+			{
 
 				if (tagsLoading){
 					ProgressIndicatorComponent(25, AppTheme.colors.primaryColor)
@@ -422,9 +424,7 @@ fun NoteFormComponent(
 										tagsLoading = false
 									}
 								}
-							}
-
-						),
+							}),
 						text = "Загрузить еще",
 						color = AppTheme.colors.primaryColor,
 						style = AppTheme.typography.textButton
@@ -436,37 +436,52 @@ fun NoteFormComponent(
 		//Added tags
 		if (!addedTags.isEmpty()){
 			Column(
-				Modifier
+				modifier = Modifier
 					.fillMaxWidth()
-					.padding(top = 20.dp)
-			) {
-				Row(Modifier
-					.fillMaxWidth()
-					.padding(bottom = 20.dp)) {
+					.padding(top = 20.dp))
+			{
+				Row(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(bottom = 20.dp))
+				{
 					Text(
 						text = "Добавленные теги",
 						color = AppTheme.colors.colorGrey,
-						style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold)
-					)
+						style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold))
 				}
+
 				addedTags.forEachIndexed {index, tag ->
 					Row(
 						modifier = Modifier.fillMaxWidth(),
 						verticalAlignment = Alignment.CenterVertically,
-						horizontalArrangement = Arrangement.SpaceBetween) {
+						horizontalArrangement = Arrangement.SpaceBetween)
+					{
 
-						Text(
-							text = tag.title,
-							color = AppTheme.colors.textColor,
-							style = AppTheme.typography.formInputText
-						)
+						Row(
+							modifier = Modifier
+								.fillMaxWidth()
+								.weight(0.9f))
+						{
+							Text(
+								text = tag.title,
+								color = AppTheme.colors.textColor,
+								style = AppTheme.typography.formInputText)
+						}
 
-						IconButton(onClick = { addedTags.removeAt(index) }) {
-							Icon(
-								modifier = Modifier.size(20.dp),
-								painter = painterResource(
-									R.drawable.ic_trash), contentDescription = "",
-								tint = AppTheme.colors.dangerColor)
+						Row(
+							modifier = Modifier
+								.fillMaxWidth()
+								.weight(0.1f))
+						{
+							IconButton(onClick = { addedTags.removeAt(index) })
+							{
+								Icon(
+									modifier = Modifier.size(20.dp),
+									painter = painterResource(R.drawable.ic_trash),
+									contentDescription = "",
+									tint = AppTheme.colors.dangerColor)
+							}
 						}
 					}
 
@@ -475,15 +490,14 @@ fun NoteFormComponent(
 					}
 				}
 			}
-
 		}
 
 		//Save button
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(top = 60.dp)
-		) {
+				.padding(top = 60.dp))
+		{
 			Button(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -524,15 +538,14 @@ fun NoteFormComponent(
 							}
 						}
 					}
-				}
-			) {
+				})
+			{
 				if (saving){
 					CircularProgressIndicator(
 						modifier = Modifier.size(20.dp),
 						strokeWidth = 2.dp,
 						color = Color.White,
-						trackColor = Color.Transparent,
-					)
+						trackColor = Color.Transparent)
 				}
 				else{
 					Text(
@@ -545,22 +558,25 @@ fun NoteFormComponent(
 
 		if (!saving){
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
-				horizontalArrangement = Arrangement.Center
-			) {
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 15.dp),
+				horizontalArrangement = Arrangement.Center)
+			{
 				Text(
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
-						onClick = {	close()	}
-					),
+						onClick = {	close()	}),
 					text = "Закрыть",
 					color = AppTheme.colors.colorGrey,
-					style = AppTheme.typography.textButton
-				)
+					style = AppTheme.typography.textButton)
 			}
 		}
 
-		Row(Modifier.fillMaxWidth().padding(bottom = 80.dp)) {  }
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(bottom = 80.dp)) {  }
 	}
 }

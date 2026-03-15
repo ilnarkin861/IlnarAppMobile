@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class Pagination(
 	val count: Int,
 	val hasPreviousPage: Boolean,
-	val hasNextPage: Boolean,
+	val hasNextPage: Boolean
 )

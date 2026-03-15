@@ -52,29 +52,23 @@ import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 @Composable
 fun PinLockScreen(
 	navController: NavController,
-	userViewModel: UserViewModel = koinViewModel()
-
-) {
-
-	val orientation = LocalConfiguration.current.orientation
-	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
-
-	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
-
-	val inputPin = rememberSaveable { mutableStateListOf<Int>() }
-	var incorrectPin by rememberSaveable { mutableStateOf(false) }
-
-	var showConfirmAlert by rememberSaveable { mutableStateOf(false) }
+	userViewModel: UserViewModel = koinViewModel())
+{
 
 	val scrollState = rememberScrollState()
-
-	var showLoading by rememberSaveable { mutableStateOf(false) }
+	val orientation = LocalConfiguration.current.orientation
+	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
+	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
+	val inputPin = rememberSaveable { mutableStateListOf<Int>() }
+	var incorrectPin by rememberSaveable { mutableStateOf(false) }
+	var confirmAlertVisible by rememberSaveable { mutableStateOf(false) }
+	var loading by rememberSaveable { mutableStateOf(false) }
 
 
 	if (inputPin.size == 4){
 		LaunchedEffect(true) {
 
-			showLoading = true
+			loading = true
 
 			val pin = userViewModel.getPinCode()
 
@@ -88,32 +82,40 @@ fun PinLockScreen(
 				}
 			}
 
-			showLoading = false
+			loading = false
 
 			inputPin.clear()
 		}
 	}
 
 
-	Column(modifier.fillMaxSize()
+	Column(
+		modifier = modifier.fillMaxSize()
 		.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
 		.verticalScroll(scrollState),
-		verticalArrangement = Arrangement.SpaceBetween) {
+		verticalArrangement = Arrangement.SpaceBetween)
+	{
 
-		Column(Modifier.padding(top = 100.dp)) {
+		Column(modifier = Modifier.padding(top = 100.dp))
+		{
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Center) {
+				horizontalArrangement = Arrangement.Center)
+			{
 				Image(
 					painter = painterResource(R.drawable.ic_pin_lock),
 					contentDescription = "Lock",
 					alpha = 0.4f)
 			}
 
-			Row(modifier = Modifier.fillMaxWidth().padding(
-				top = 20.dp),
-				horizontalArrangement = Arrangement.Center) {
-				Row(Modifier.padding(bottom = 40.dp)) {
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 20.dp),
+				horizontalArrangement = Arrangement.Center)
+			{
+				Row(Modifier.padding(bottom = 40.dp))
+				{
 					(0 until 4).forEach {
 						Box(modifier = Modifier.padding(10.dp)
 							.alpha(if (inputPin.size > it) 1f else 0.5f)
@@ -127,20 +129,27 @@ fun PinLockScreen(
 
 			if (incorrectPin){
 				Row(modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.Center) {
-					Text("Неверный PIN-код",
+					horizontalArrangement = Arrangement.Center)
+				{
+					Text(
+						text = "Неверный PIN-код",
 						color = AppTheme.colors.dangerColor,
 						style = AppTheme.typography.authMessageText)
 				}
 			}
 		}
 
-		Column(modifier = Modifier.fillMaxWidth().padding(
-			top = if(isLandscape) 100.dp else 0.dp,
-			bottom = 50.dp
-		)) {
-			Row(modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Center) {
+		Column(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(
+					top = if(isLandscape) 100.dp else 0.dp,
+					bottom = 50.dp))
+		{
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.Center)
+			{
 				Row {
 					(1..3).forEach {
 						PinKeypadItemComponent(
@@ -151,7 +160,8 @@ fun PinLockScreen(
 									inputPin.add(it)
 								}
 							}
-						) {
+						)
+						{
 							Text(
 								it.toString(),
 								color = AppTheme.colors.colorGrey,
@@ -162,8 +172,10 @@ fun PinLockScreen(
 				}
 			}
 
-			Row(modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Center) {
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.Center)
+			{
 				Row {
 					(4..6).forEach {
 						PinKeypadItemComponent(
@@ -174,7 +186,8 @@ fun PinLockScreen(
 									inputPin.add(it)
 								}
 							}
-						) {
+						)
+						{
 							Text(
 								it.toString(),
 								color = AppTheme.colors.colorGrey,
@@ -185,8 +198,10 @@ fun PinLockScreen(
 				}
 			}
 
-			Row(modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Center) {
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.Center)
+			{
 				Row {
 					(7..9).forEach {
 						PinKeypadItemComponent(
@@ -208,22 +223,22 @@ fun PinLockScreen(
 				}
 			}
 
-			Row(modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Center) {
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.Center)
+			{
 
 				PinKeypadItemComponent(
 					onClick = {
-						showConfirmAlert = true
+						confirmAlertVisible = true
 					},
 
-					bordered = false
-				) {
-
+					bordered = false)
+				{
 					Text(
 						"Я забыл\nкод",
 						color = AppTheme.colors.colorGrey,
-						style = AppTheme.typography.forgotPinText
-					)
+						style = AppTheme.typography.forgotPinText)
 				}
 
 				PinKeypadItemComponent(
@@ -233,21 +248,22 @@ fun PinLockScreen(
 						if(inputPin.size < 4) {
 							inputPin.add(0)
 						}
-					}
-				) {
+					})
+				{
 					Text(
 						"0",
 						color = AppTheme.colors.colorGrey,
-						style = AppTheme.typography.keyPadItemText
-					)
+						style = AppTheme.typography.keyPadItemText)
 				}
 
 				PinKeypadItemComponent(
 					onClick = { if(!inputPin.isEmpty()) inputPin.removeAt(inputPin.lastIndex) },
-					bordered = false
-				) {
+					bordered = false)
+				{
 					Icon(
-						modifier = Modifier.size(30.dp).alpha(0.5f),
+						modifier = Modifier
+							.size(30.dp)
+							.alpha(0.5f),
 						painter = painterResource(R.drawable.ic_backspace),
 						contentDescription = "Delete",
 						tint = AppTheme.colors.colorGrey)
@@ -258,21 +274,26 @@ fun PinLockScreen(
 
 
 
-	if (showLoading){
+	if (loading){
 		BasicAlertDialog(
 			onDismissRequest = {},
 			properties = DialogProperties(
 				dismissOnBackPress = false,
-				dismissOnClickOutside = false
-			)) {
+				dismissOnClickOutside = false))
+		{
 			Surface(
 				shape = MaterialTheme.shapes.small,
-				tonalElevation = AlertDialogDefaults.TonalElevation
-			) {
-				Column(modifier = Modifier.background(Color.White).padding(horizontal = 16.dp, vertical = 20.dp)) {
-					Row(modifier = Modifier.fillMaxWidth(),
-						verticalAlignment = Alignment.CenterVertically) {
-
+				tonalElevation = AlertDialogDefaults.TonalElevation)
+			{
+				Column(
+					modifier = Modifier
+						.background(Color.White)
+						.padding(horizontal = 16.dp, vertical = 20.dp))
+				{
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						verticalAlignment = Alignment.CenterVertically)
+					{
 						ProgressIndicatorComponent(size = 40, color = AppTheme.colors.primaryColor)
 
 						Text("Проверка PIN-кода",
@@ -287,7 +308,7 @@ fun PinLockScreen(
 
 
 	ConfirmComponent(
-		showed = showConfirmAlert,
+		visible = confirmAlertVisible,
 		text = "Чтобы восстановить PIN-код, нужно будет заново зайти в систему. Продолжить?",
 		action = {confirmed ->
 
@@ -302,7 +323,7 @@ fun PinLockScreen(
 				}
 			}
 
-			showConfirmAlert = false
+			confirmAlertVisible = false
 		}
 	)
 }

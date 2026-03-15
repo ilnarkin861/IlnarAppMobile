@@ -4,7 +4,8 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class PasswordModel(
+data class Password(
     val oldPassword: String,
     val newPassword: String,
-    val confirmedPassword: String)
+    val confirmedPassword: String
+)

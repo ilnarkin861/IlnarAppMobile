@@ -61,20 +61,15 @@ import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 fun SettingsScreen(
 	navController: NavController,
 	userViewModel: UserViewModel = koinViewModel(),
-	errorManager: NetworkErrorManager = koinInject()
-	) {
-
-	var emailFormDialogShowed by rememberSaveable { mutableStateOf(false) }
-
-	var passwordFormDialogShowed by rememberSaveable { mutableStateOf(false) }
+	errorManager: NetworkErrorManager = koinInject())
+{
 
 	val scope = rememberCoroutineScope()
-
-	var userInfoLoading by rememberSaveable { mutableStateOf(false) }
-
 	val state by userViewModel.uiState.collectAsState()
-
 	val snackBarHostState = remember { SnackbarHostState() }
+	var emailFormDialogVisible by rememberSaveable { mutableStateOf(false) }
+	var passwordFormDialogVisible by rememberSaveable { mutableStateOf(false) }
+	var userInfoLoading by rememberSaveable { mutableStateOf(false) }
 
 
 	LaunchedEffect(Unit) {
@@ -102,10 +97,17 @@ fun SettingsScreen(
 	}
 
 
-	Box(Modifier.fillMaxSize().padding(top = 30.dp)){
-
-		Column(Modifier.fillMaxWidth()) {
-			Row(Modifier.fillMaxWidth().clickable(
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.padding(top = 30.dp))
+	{
+		Column(modifier = Modifier.fillMaxWidth())
+		{
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = ripple(),
 				onClick = {
@@ -116,32 +118,39 @@ fun SettingsScreen(
 						val userInfo = userViewModel.getUserInfo()
 
 						if (userInfo != null){
-							emailFormDialogShowed = true
+							emailFormDialogVisible = true
 						}
 
 						userInfoLoading = false
 					}
-				}
-			)) {
-
-				Row(Modifier.fillMaxWidth().padding(horizontal = AppTheme.dimensions.containerHorizontalPadding, vertical = 20.dp),
-					horizontalArrangement = Arrangement.SpaceBetween) {
-					Row(verticalAlignment = Alignment.CenterVertically) {
+				}))
+			{
+				Row(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding, vertical = 20.dp),
+					horizontalArrangement = Arrangement.SpaceBetween)
+				{
+					Row(verticalAlignment = Alignment.CenterVertically)
+					{
 						Icon(
 							modifier = Modifier.size(25.dp),
 							painter = painterResource(R.drawable.ic_mail),
 							contentDescription = "Mail",
-							tint = AppTheme.colors.colorGrey
-						)
-						Text(text = "Изменить Email",
+							tint = AppTheme.colors.colorGrey)
+
+						Text(
 							modifier = Modifier.padding(start = 10.dp),
+							text = "Изменить Email",
 							color = AppTheme.colors.colorGrey,
 							style = AppTheme.typography.settingsItemText)
 					}
 
-					Row(modifier = Modifier.size(25.dp),
+					Row(
+						modifier = Modifier.size(25.dp),
 						horizontalArrangement = Arrangement.Center,
-						verticalAlignment = Alignment.CenterVertically) {
+						verticalAlignment = Alignment.CenterVertically)
+					{
 
 						if (userInfoLoading){
 							ProgressIndicatorComponent(15, AppTheme.colors.colorGrey.copy(alpha = 0.7f))
@@ -164,30 +173,41 @@ fun SettingsScreen(
 				thickness = 1.dp,
 				color = AppTheme.colors.borderColor)
 
-			Row(Modifier.fillMaxWidth().clickable(
-				interactionSource = remember { MutableInteractionSource() },
-				indication = ripple(),
-				onClick = { passwordFormDialogShowed = true }
-			)) {
-				Row(Modifier.fillMaxWidth().padding(horizontal = AppTheme.dimensions.containerHorizontalPadding, vertical = 20.dp),
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = ripple(),
+						onClick = { passwordFormDialogVisible = true }))
+			{
+				Row(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding, vertical = 20.dp),
 					horizontalArrangement = Arrangement.SpaceBetween,
-					verticalAlignment = Alignment.CenterVertically) {
-					Row(verticalAlignment = Alignment.CenterVertically) {
+					verticalAlignment = Alignment.CenterVertically)
+				{
+					Row(verticalAlignment = Alignment.CenterVertically)
+					{
 						Icon(
 							modifier = Modifier.size(25.dp),
 							painter = painterResource(R.drawable.ic_password),
 							contentDescription = "Password",
 							tint = AppTheme.colors.colorGrey
 						)
-						Text(text = "Сменить пароль",
+						Text(
 							modifier = Modifier.padding(start = 10.dp),
+							text = "Сменить пароль",
 							color = AppTheme.colors.colorGrey,
 							style = AppTheme.typography.settingsItemText)
 					}
 
-					Row(modifier = Modifier.size(25.dp),
+					Row(
+						modifier = Modifier.size(25.dp),
 						horizontalArrangement = Arrangement.Center,
-						verticalAlignment = Alignment.CenterVertically) {
+						verticalAlignment = Alignment.CenterVertically)
+					{
 						Icon(
 							modifier = Modifier.size(15.dp),
 							painter = painterResource(R.drawable.ic_arrow_right),
@@ -200,9 +220,9 @@ fun SettingsScreen(
 		}
 
 		SnackbarHost(
-			hostState = snackBarHostState,
-			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter)
-		){data ->
+			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter),
+			hostState = snackBarHostState)
+		{data ->
 			Snackbar(
 				snackbarData = data,
 				containerColor = AppTheme.colors.primaryColor,
@@ -215,13 +235,13 @@ fun SettingsScreen(
 	AlertComponent(
 		success = state.success,
 		message = state.message,
-		showed = state.showAlert,
+		visible = state.showAlert,
 		action = { userViewModel.dismissAlert()	}
 	)
 
 
 	// Email change form
-	if (emailFormDialogShowed){
+	if (emailFormDialogVisible){
 		BasicAlertDialog(
 			onDismissRequest = {},
 			properties = DialogProperties(
@@ -241,11 +261,11 @@ fun SettingsScreen(
 						val result = userViewModel.changeEmail(UserInfo(email = email))
 
 						if (result != null){
-							emailFormDialogShowed = false
+							emailFormDialogVisible = false
 						}
 					},
 
-					close = { emailFormDialogShowed = false }
+					close = { emailFormDialogVisible = false }
 				)
 			}
 		}
@@ -253,7 +273,7 @@ fun SettingsScreen(
 
 
 	// Password change form
-	if (passwordFormDialogShowed){
+	if (passwordFormDialogVisible){
 		BasicAlertDialog(
 			onDismissRequest = {},
 			properties = DialogProperties(
@@ -271,11 +291,11 @@ fun SettingsScreen(
 						val result = userViewModel.resetPassword(passwordModel)
 
 						if (result != null){
-							passwordFormDialogShowed = false
+							passwordFormDialogVisible = false
 						}
 					},
 
-					close = { passwordFormDialogShowed = false }
+					close = { passwordFormDialogVisible = false }
 				)
 			}
 		}

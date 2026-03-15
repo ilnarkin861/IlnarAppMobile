@@ -27,71 +27,82 @@ import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 fun ListItemComponent(
     text: String,
     editAction: suspend () -> Unit,
-    deleteAction: suspend () -> Unit) {
-
-    var showConfirmAlert by remember { mutableStateOf(false) }
-
-    var isLoading by remember { mutableStateOf(false) }
-
-    var isDeleting by remember { mutableStateOf(false) }
+    deleteAction: suspend () -> Unit)
+{
 
     val scope = rememberCoroutineScope()
+    var isLoading by remember { mutableStateOf(false) }
+    var isDeleting by remember { mutableStateOf(false) }
+    var confirmAlertVisible by remember { mutableStateOf(false) }
 
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween) {
-
-        Row {
+        horizontalArrangement = Arrangement.SpaceBetween)
+    {
+        Row(modifier = Modifier.weight(0.7f))
+        {
             Text(
                 text = text,
                 color = AppTheme.colors.titleColor,
-                style = AppTheme.typography.listItemText
-            )
+                style = AppTheme.typography.listItemText)
         }
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-
-            Row(Modifier.size(35.dp).alpha(0.6f),
+        Row(
+            modifier = Modifier.weight(0.3f),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            Row(
+                modifier = Modifier
+                    .size(35.dp)
+                    .alpha(0.6f),
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically) {
+                verticalAlignment = Alignment.CenterVertically)
+            {
+
                 if (isLoading){
                     ProgressIndicatorComponent(25, AppTheme.colors.colorGrey)
                 }
 
                 else{
                     IconButton(onClick = {
-
                         scope.launch {
                             isLoading = true
+
                             try {
                                 editAction()
                             } finally {
                                 isLoading = false
                             }
                         }
-
-                    }) {
-                        Icon(modifier = Modifier.size(25.dp).alpha(0.6f),
+                    })
+                    {
+                        Icon(
+                            modifier = Modifier
+                                .size(25.dp)
+                                .alpha(0.6f),
                             painter = painterResource(R.drawable.ic_edit), contentDescription = "",
                             tint = AppTheme.colors.colorGrey)
                     }
                 }
             }
-
-
-            Row(Modifier.size(35.dp).alpha(0.6f),
+            Row(
+                modifier = Modifier
+                    .size(35.dp)
+                    .alpha(0.6f),
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically) {
+                verticalAlignment = Alignment.CenterVertically)
+            {
                 if (isDeleting){
                     ProgressIndicatorComponent(25, AppTheme.colors.dangerColor)
                 }
 
                 else{
                     IconButton(onClick = {
-                        showConfirmAlert = true
-                    }) {
+                        confirmAlertVisible = true
+                    })
+                    {
                         Icon(
                             modifier = Modifier.size(25.dp),
                             painter = painterResource(R.drawable.ic_trash), contentDescription = "",
@@ -103,13 +114,13 @@ fun ListItemComponent(
     }
 
     ConfirmComponent(
-        showed = showConfirmAlert,
+        visible = confirmAlertVisible,
         action = {confirmed ->
 
             if (confirmed){
-
                 scope.launch {
                     isDeleting = true
+
                     try {
                         deleteAction()
                     } finally {
@@ -118,7 +129,7 @@ fun ListItemComponent(
                 }
             }
 
-            showConfirmAlert = false
+            confirmAlertVisible = false
         }
     )
 }

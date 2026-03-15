@@ -6,7 +6,8 @@ import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
-fun MessageComponent(text: String) {
+fun MessageComponent(text: String)
+{
 	Text(
 		text = text,
 		color = AppTheme.colors.primaryColor,

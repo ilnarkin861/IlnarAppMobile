@@ -13,7 +13,8 @@ import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
-fun OverlayScreen(navController: NavController) {
+fun OverlayScreen(navController: NavController)
+{
 
     // Нужен для того, чтобы сразу не показывались appBar'ы
 
@@ -25,5 +26,8 @@ fun OverlayScreen(navController: NavController) {
         }
     }
 
-    Box(Modifier.fillMaxSize().background(AppTheme.colors.appBgColor))
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppTheme.colors.appBgColor))
 }

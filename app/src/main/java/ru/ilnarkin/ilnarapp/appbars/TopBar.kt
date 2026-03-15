@@ -25,10 +25,10 @@ import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar (navController: NavController) {
+fun TopBar (navController: NavController)
+{
 
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
-
 	val route = navBackStackEntry?.destination?.route
 
 	val title = when(route) {
@@ -39,7 +39,6 @@ fun TopBar (navController: NavController) {
 		else -> ""
 	}
 
-
 	TopAppBar(
 		modifier = Modifier.padding(bottom = 2.dp),
 		colors = TopAppBarDefaults.topAppBarColors(
@@ -47,31 +46,25 @@ fun TopBar (navController: NavController) {
 			navigationIconContentColor = AppTheme.colors.primaryColor,
 			titleContentColor = AppTheme.colors.primaryColor
 		),
-
 		expandedHeight = AppTheme.dimensions.topBarHeight,
-
 		title = {
 			Text(text = title, style = AppTheme.typography.appBarTitle)
 		},
-
 		actions = {
 			IconButton(
-				modifier = Modifier.padding(end = 10.dp).size(30.dp),
-				colors = IconButtonDefaults.iconButtonColors(
-					contentColor = AppTheme.colors.primaryColor
-				),
+				modifier = Modifier
+					.padding(end = 10.dp)
+					.size(30.dp),
+				colors = IconButtonDefaults.iconButtonColors(contentColor = AppTheme.colors.primaryColor),
 				onClick = {
 					navController.navigate(NavRoutes.PinLockScreen.route) {
 						popUpTo(0) { inclusive = true }
 
 						launchSingleTop = true
 					}
-				}
-			) {
-				Icon(
-					painter = painterResource(R.drawable.ic_logout),
-					contentDescription = ""
-				)
+				})
+			{
+				Icon(painter = painterResource(R.drawable.ic_logout), contentDescription = "")
 			}
 		}
 	)

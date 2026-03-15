@@ -66,23 +66,17 @@ import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
 fun TagsScreen(
 	navController: NavController,
 	tagViewModel: TagViewModel = koinViewModel(),
-	errorManager: NetworkErrorManager = koinInject()
-	) {
+	errorManager: NetworkErrorManager = koinInject())
+{
+
 	val limit = 15
-
-	val itemId = rememberSaveable { mutableStateOf("") }
-
-	val itemText = rememberSaveable { mutableStateOf("") }
-
-	val listState = rememberLazyListState()
-
-	var modalFormLabel by rememberSaveable { mutableStateOf("") }
-
-	var formDialogShowed by rememberSaveable { mutableStateOf(false) }
-
 	val state by tagViewModel.uiState.collectAsState()
-
 	val snackBarHostState = remember { SnackbarHostState() }
+	val listState = rememberLazyListState()
+	var formDialogVisible by rememberSaveable { mutableStateOf(false) }
+	val itemId = rememberSaveable { mutableStateOf("") }
+	val itemText = rememberSaveable { mutableStateOf("") }
+	var modalFormLabel by rememberSaveable { mutableStateOf("") }
 
 
 	LaunchedEffect(Unit) {
@@ -117,25 +111,28 @@ fun TagsScreen(
 	}
 
 
-	Box(Modifier.fillMaxSize()
-		.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
-		.background(AppTheme.colors.appBgColor)) {
-
+	Box(
+		modifier = Modifier.fillMaxSize()
+			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
+			.background(AppTheme.colors.appBgColor))
+	{
 		if (!state.loading && !state.list.isEmpty()){
 			LazyColumn(
 				state = listState,
-				contentPadding = PaddingValues(top = 30.dp, bottom = 30.dp)
-			) {
-
+				contentPadding = PaddingValues(top = 30.dp, bottom = 30.dp))
+			{
 				state.pagination?.let {
 					if (it.hasPreviousPage){
 						item {
-							Row(Modifier.padding(bottom = 25.dp)) {
-								LoadButtonComponent(nextButton = false, action = {
-									tagViewModel.setActionType(ActionType.READ)
+							Row(modifier = Modifier.padding(bottom = 25.dp))
+							{
+								LoadButtonComponent(
+									nextButton = false,
+									action = {
+										tagViewModel.setActionType(ActionType.READ)
 
-									tagViewModel.getTagsList(state.offset - limit, limit, false)
-								})
+										tagViewModel.getTagsList(state.offset - limit, limit, false)
+									})
 							}
 						}
 					}
@@ -143,7 +140,11 @@ fun TagsScreen(
 
 				itemsIndexed(items = tagViewModel.uiState.value.list){index, item ->
 
-					Row(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
+					Row(
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(vertical = 10.dp))
+					{
 						ListItemComponent(
 							item.title,
 
@@ -155,7 +156,7 @@ fun TagsScreen(
 									itemText.value = tag.title
 									itemId.value = tag.id
 									modalFormLabel = "Изменить тег"
-									formDialogShowed = true
+									formDialogVisible = true
 								}
 							},
 
@@ -179,12 +180,14 @@ fun TagsScreen(
 				state.pagination?.let {
 					if (it.hasNextPage){
 						item {
-							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
-								LoadButtonComponent(action = {
-									tagViewModel.setActionType(ActionType.READ)
+							Row(modifier = Modifier.padding(top = 25.dp, bottom = 30.dp))
+							{
+								LoadButtonComponent(
+									action = {
+										tagViewModel.setActionType(ActionType.READ)
 
-									tagViewModel.getTagsList(state.offset + limit, limit, false)
-								})
+										tagViewModel.getTagsList(state.offset + limit, limit, false)
+									})
 							}
 						}
 					}
@@ -193,47 +196,57 @@ fun TagsScreen(
 		}
 
 		if (!state.loading && state.list.isEmpty()){
-			Box(modifier = Modifier.background(AppTheme.colors.appBgColor).fillMaxSize(),
-				contentAlignment = Alignment.Center){
-				MessageComponent("Тегов нет")
+			Box(
+				modifier = Modifier
+					.background(AppTheme.colors.appBgColor)
+					.fillMaxSize(),
+				contentAlignment = Alignment.Center)
+			{
+				MessageComponent(text = "Тегов нет")
 			}
 		}
 
 		if (state.loading){
 			Box(
-				modifier = Modifier.background(AppTheme.colors.appBgColor).fillMaxSize(),
-				contentAlignment = Alignment.Center){
+				modifier = Modifier
+					.background(AppTheme.colors.appBgColor)
+					.fillMaxSize(),
+				contentAlignment = Alignment.Center)
+			{
 				ProgressIndicatorComponent(60, AppTheme.colors.primaryColor)
 			}
 		}
 
-
 		FloatingActionButton(
-			containerColor = AppTheme.colors.primaryColor,
-			contentColor = Color.White,
-			shape = CircleShape,
 			modifier = Modifier
 				.align(Alignment.BottomEnd)
 				.absolutePadding(bottom = 20.dp, right = 20.dp)
 				.alpha(0.6f),
+			containerColor = AppTheme.colors.primaryColor,
+			contentColor = Color.White,
+			shape = CircleShape,
 			elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
 
 			onClick = {
 				tagViewModel.setActionType(ActionType.CREATE)
 				modalFormLabel = "Добавить тег"
 				itemText.value = ""
-				formDialogShowed = true
-			}) {
+				formDialogVisible = true
+			})
+		{
 			Icon(
 				modifier = Modifier.size(25.dp),
 				painter = painterResource(R.drawable.ic_plus),
-				contentDescription = "Добавить") }
+				contentDescription = "Добавить")
+		}
 
 
 		SnackbarHost(
-			hostState = snackBarHostState,
-			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter)
-		){data ->
+			modifier = Modifier
+				.padding(16.dp)
+				.align(Alignment.BottomCenter),
+			hostState = snackBarHostState)
+		{data ->
 			Snackbar(
 				snackbarData = data,
 				containerColor = AppTheme.colors.primaryColor,
@@ -246,22 +259,22 @@ fun TagsScreen(
 	AlertComponent(
 		success = state.success,
 		message = state.message,
-		showed = state.showAlert,
+		visible = state.showAlert,
 		action = { tagViewModel.dismissAlert()	}
 	)
 
 
-	if (formDialogShowed){
+	if (formDialogVisible){
 		BasicAlertDialog(
 			onDismissRequest = {},
 			properties = DialogProperties(
 				dismissOnBackPress = false,
-				dismissOnClickOutside = false
-			)) {
+				dismissOnClickOutside = false))
+		{
 			Surface(
 				shape = MaterialTheme.shapes.small,
-				tonalElevation = AlertDialogDefaults.TonalElevation
-			) {
+				tonalElevation = AlertDialogDefaults.TonalElevation)
+			{
 				ItemFormComponent(
 					itemText.value,
 					modalFormLabel,
@@ -286,10 +299,10 @@ fun TagsScreen(
 							}
 						}
 
-						formDialogShowed = false
+						formDialogVisible = false
 
 					},
-					close = { formDialogShowed = false }
+					close = { formDialogVisible = false }
 				)
 			}
 		}

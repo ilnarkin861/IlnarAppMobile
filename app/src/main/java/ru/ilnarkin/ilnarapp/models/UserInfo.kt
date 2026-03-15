@@ -4,4 +4,6 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class UserInfo(var email: String) : AppModel
+data class UserInfo(
+    var email: String
+) : AppModel

@@ -4,4 +4,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class Info (var success: Boolean, var messages: MutableList<String>)
+data class Info (
+    var success: Boolean,
+    var messages: MutableList<String>
+)

@@ -60,33 +60,36 @@ class MainActivity : ComponentActivity() {
 fun Main(){
 
 	val navController = rememberNavController()
-
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
-
 	val currentRoute = navBackStackEntry?.destination?.route
-
 	val borderColor = AppTheme.colors.borderColor
 
-	Column(Modifier.fillMaxSize()
-		.statusBarsPadding()
-		.navigationBarsPadding()
-		.displayCutoutPadding()
-		.background(AppTheme.colors.appBgColor)) {
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.statusBarsPadding()
+			.navigationBarsPadding()
+			.displayCutoutPadding()
+			.background(AppTheme.colors.appBgColor))
+	{
 
 		if (currentRoute != null && !currentRoute.contains("welcome")){
-			Row(Modifier.fillMaxWidth()
-				.background(Color.White)
-				.drawBehind {
-					val borderStrokeWidth = 2.dp
-					val strokeWidthPx = borderStrokeWidth.toPx()
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.background(Color.White)
+					.drawBehind {
+						val borderStrokeWidth = 2.dp
+						val strokeWidthPx = borderStrokeWidth.toPx()
 
-					drawLine(
-						color = borderColor,
-						start = Offset(0f, size.height),
-						end = Offset(size.width, size.height),
-						strokeWidth = strokeWidthPx
-					)
-				}) {
+						drawLine(
+							color = borderColor,
+							start = Offset(0f, size.height),
+							end = Offset(size.width, size.height),
+							strokeWidth = strokeWidthPx
+						)
+					})
+			{
 				TopBar(navController)
 			}
 		}
@@ -99,10 +102,8 @@ fun Main(){
 			composable(NavRoutes.TagsScreen.route) { TagsScreen(navController) }
 			composable(NavRoutes.ArchiveScreen.route) { ArchiveScreen(navController) }
 			composable(NavRoutes.SettingsScreen.route) { SettingsScreen(navController) }
-
 			composable(NavRoutes.WelcomeScreen.route) { WelcomeScreen(navController) }
 			composable(NavRoutes.OverlayScreen.route) { OverlayScreen(navController) }
-
 			composable(NavRoutes.LoginScreen.route) { LoginScreen(navController) }
 
 			composable(

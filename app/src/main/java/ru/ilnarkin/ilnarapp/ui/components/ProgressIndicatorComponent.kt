@@ -10,11 +10,11 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun ProgressIndicatorComponent(size: Int, color: Color) {
+fun ProgressIndicatorComponent(size: Int, color: Color)
+{
 	CircularProgressIndicator(
 		modifier = Modifier.size(size.dp),
 		strokeWidth = 2.dp,
 		color = color,
-		trackColor = MaterialTheme.colorScheme.surfaceVariant,
-	)
+		trackColor = MaterialTheme.colorScheme.surfaceVariant)
 }

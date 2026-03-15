@@ -54,26 +54,20 @@ import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 fun LoginScreen(
 	navController: NavController,
 	userViewModel: UserViewModel = koinViewModel(),
-	errorManager: NetworkErrorManager = koinInject()
-	) {
+	errorManager: NetworkErrorManager = koinInject())
+{
 
+	val state by userViewModel.uiState.collectAsStateWithLifecycle()
 	val scrollState = rememberScrollState()
-
 	val email = rememberSaveable { mutableStateOf("") }
 	var emailIsError by rememberSaveable { mutableStateOf(false) }
 	var emailNotValid by rememberSaveable { mutableStateOf(false) }
-
 	val password = rememberSaveable { mutableStateOf("") }
 	var passwordIsError by rememberSaveable { mutableStateOf(false) }
-
 	var loading by rememberSaveable { mutableStateOf(false) }
-
 	val scope = rememberCoroutineScope()
-
 	val message = rememberSaveable { mutableStateOf("") }
-	var showMessage by rememberSaveable { mutableStateOf(false) }
-
-	val state by userViewModel.uiState.collectAsStateWithLifecycle()
+	var messageVisible by rememberSaveable { mutableStateOf(false) }
 
 	val inputColor = OutlinedTextFieldDefaults.colors(
 		unfocusedBorderColor = AppTheme.colors.inputsBorderColor,
@@ -93,7 +87,7 @@ fun LoginScreen(
 
 				when(error){
 					NetworkErrorType.NO_INTERNET, NetworkErrorType.SERVER_ERROR -> {
-						showMessage = true
+						messageVisible = true
 						message.value = if(error == NetworkErrorType.NO_INTERNET) NO_INTERNET_ERROR_MESSAGE else SERVER_ERROR_MESSAGE
 					}
 
@@ -104,31 +98,46 @@ fun LoginScreen(
 	}
 
 
-	Column(Modifier.fillMaxSize()
-		.verticalScroll(scrollState)
-		.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
-		.background(AppTheme.colors.appBgColor)){
-
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.verticalScroll(scrollState)
+			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
+			.background(AppTheme.colors.appBgColor))
+	{
 		Row(
-			modifier = Modifier.fillMaxWidth().padding(top = 100.dp),
-			horizontalArrangement = Arrangement.Center) {
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(top = 100.dp),
+			horizontalArrangement = Arrangement.Center)
+		{
 				Image(
 					painter = painterResource(R.drawable.ic_lock),
 					contentDescription = "Lock",
 					alpha = 0.4f)
 		}
 
-		if (showMessage){
-			Row(modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 2.dp),
-				horizontalArrangement = Arrangement.Center) {
-				Text(message.value,
+		if (messageVisible){
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 15.dp, bottom = 2.dp),
+				horizontalArrangement = Arrangement.Center)
+			{
+				Text(
+					text = message.value,
 					color = AppTheme.colors.dangerColor,
 					style = AppTheme.typography.authMessageText)
 			}
 		}
 
-		Column(Modifier.fillMaxWidth().padding(top = 50.dp)) {
-			Row(Modifier.fillMaxWidth()) {
+		Column(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(top = 50.dp))
+		{
+			Row(modifier = Modifier.fillMaxWidth())
+			{
 				OutlinedTextField(
 					modifier = Modifier
 						.fillMaxWidth()
@@ -140,7 +149,7 @@ fun LoginScreen(
 					onValueChange = {text ->
 						email.value = text
 						emailIsError = email.value.isEmpty()
-						showMessage = false
+						messageVisible = false
 					},
 					colors = inputColor,
 					shape = RoundedCornerShape(10.dp))
@@ -151,8 +160,7 @@ fun LoginScreen(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 					text = "Обязательное поле",
 					color = AppTheme.colors.dangerColor,
-					style = AppTheme.typography.errorText
-				)
+					style = AppTheme.typography.errorText)
 			}
 
 			if (!email.value.isEmpty() && !validEmail(email.value)){
@@ -160,11 +168,11 @@ fun LoginScreen(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 					text = "Некорректный email",
 					color = AppTheme.colors.dangerColor,
-					style = AppTheme.typography.errorText
-				)
+					style = AppTheme.typography.errorText)
 			}
 
-			Row(Modifier.fillMaxWidth()) {
+			Row(modifier = Modifier.fillMaxWidth())
+			{
 				OutlinedTextField(
 					modifier = Modifier
 						.fillMaxWidth()
@@ -178,7 +186,7 @@ fun LoginScreen(
 					onValueChange = {text ->
 						password.value = text
 						passwordIsError = password.value.isEmpty()
-						showMessage = false
+						messageVisible = false
 					},
 					colors = inputColor,
 					shape = RoundedCornerShape(10.dp))
@@ -189,15 +197,14 @@ fun LoginScreen(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 					text = "Обязательное поле",
 					color = AppTheme.colors.dangerColor,
-					style = AppTheme.typography.errorText
-				)
+					style = AppTheme.typography.errorText)
 			}
 
 			Row(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(top = 40.dp, bottom = 80.dp)
-			) {
+					.padding(top = 40.dp, bottom = 80.dp))
+			{
 				Button(
 					modifier = Modifier
 						.fillMaxWidth()
@@ -228,7 +235,7 @@ fun LoginScreen(
 
 								else{
 									message.value = userViewModel.uiState.value.message
-									showMessage = true
+									messageVisible = true
 								}
 
 								loading = false

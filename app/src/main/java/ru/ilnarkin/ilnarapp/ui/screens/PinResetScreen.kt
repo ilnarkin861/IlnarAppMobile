@@ -47,30 +47,23 @@ import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 @Composable
 fun PinResetScreen(
 	navController: NavController,
-	userViewModel: UserViewModel = koinViewModel()
-	) {
-
-	val orientation = LocalConfiguration.current.orientation
-	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
-
-	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
-
-	val newPinTitle = "Введи новый PIN-код"
-	val confirmPinTitle = "Подтверди PIN-код"
-	val title = rememberSaveable { mutableStateOf(newPinTitle) }
-
-	var newPinEntered by rememberSaveable { mutableStateOf(false) }
-	var confirmPinEntered by rememberSaveable { mutableStateOf(false) }
-
-	val inputPin = rememberSaveable { mutableStateListOf<Int>() }
-	var pinCodeError by rememberSaveable { mutableStateOf(false) }
-
-	var newPin: String? by rememberSaveable { mutableStateOf(null) }
-	var confirmPin: String? by rememberSaveable { mutableStateOf(null) }
+	userViewModel: UserViewModel = koinViewModel())
+{
 
 	val scrollState = rememberScrollState()
-
-	var showLoading by rememberSaveable { mutableStateOf(false) }
+	val orientation = LocalConfiguration.current.orientation
+	val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
+	val modifier = if(isLandscape) Modifier.wrapContentHeight() else Modifier
+	var pinCodeError by rememberSaveable { mutableStateOf(false) }
+	var newPinEntered by rememberSaveable { mutableStateOf(false) }
+	var newPin: String? by rememberSaveable { mutableStateOf(null) }
+	val newPinTitle = "Введи новый PIN-код"
+	val title = rememberSaveable { mutableStateOf(newPinTitle) }
+	var confirmPinEntered by rememberSaveable { mutableStateOf(false) }
+	val confirmPinTitle = "Подтверди PIN-код"
+	var confirmPin: String? by rememberSaveable { mutableStateOf(null) }
+	val inputPin = rememberSaveable { mutableStateListOf<Int>() }
+	var loading by rememberSaveable { mutableStateOf(false) }
 
 
 	if (inputPin.size == 4){
@@ -98,11 +91,11 @@ fun PinResetScreen(
 				}
 
 				else{
-					showLoading = true
+					loading = true
 
 					userViewModel.setPinCode(inputPin.joinToString(""))
 
-					showLoading = false
+					loading = false
 
 					navController.navigate(NavRoutes.OverlayScreen.route) {
 						popUpTo(NavRoutes.PinResetScreen.route) { inclusive = true }
@@ -115,51 +108,71 @@ fun PinResetScreen(
 	}
 
 
-	Column(modifier.fillMaxSize()
-		.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
-		.verticalScroll(scrollState),
-		verticalArrangement = Arrangement.SpaceBetween) {
+	Column(
+		modifier = modifier
+			.fillMaxSize()
+			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
+			.verticalScroll(scrollState),
+		verticalArrangement = Arrangement.SpaceBetween)
+	{
 
-		Column(Modifier.padding(top = 100.dp)) {
+		Column(modifier = Modifier.padding(top = 100.dp))
+		{
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Center) {
+				horizontalArrangement = Arrangement.Center)
+			{
 				Text(title.value,
 					color = AppTheme.colors.titleColor,
 					style = AppTheme.typography.pinResetTitle)
 			}
 
-			Row(modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
-				horizontalArrangement = Arrangement.Center) {
-				Row(Modifier.padding(bottom = 40.dp)) {
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 20.dp),
+				horizontalArrangement = Arrangement.Center)
+			{
+				Row(
+					modifier = Modifier.padding(bottom = 40.dp))
+				{
 					(0 until 4).forEach {
-						Box(modifier = Modifier.padding(10.dp)
-							.alpha(if (inputPin.size > it) 1f else 0.5f)
-							.background(
-								color =  Color.DarkGray,
-								shape = CircleShape)
-							.size(15.dp))
+						Box(
+							modifier = Modifier
+								.padding(10.dp)
+								.alpha(if (inputPin.size > it) 1f else 0.5f)
+								.background(
+									color =  Color.DarkGray,
+									shape = CircleShape)
+								.size(15.dp))
 					}
 				}
 			}
 
 			if (pinCodeError){
-				Row(modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.Center) {
-					Text("PIN-коды не совпадают",
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.Center)
+				{
+					Text(
+						text = "PIN-коды не совпадают",
 						color = AppTheme.colors.dangerColor,
 						style = AppTheme.typography.authMessageText)
 				}
 			}
 		}
 
-		Column(modifier = Modifier.fillMaxWidth().padding(
-			top = if(isLandscape) 100.dp else 0.dp,
-			bottom = 50.dp
-		)) {
-
-			Row(modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Center) {
+		Column(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(
+					top = if(isLandscape) 100.dp else 0.dp,
+					bottom = 50.dp))
+		{
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.Center)
+			{
 				Row {
 					(1..3).forEach {
 						PinKeypadItemComponent(
@@ -168,10 +181,10 @@ fun PinResetScreen(
 									pinCodeError = false
 									inputPin.add(it)
 								}
-							}
-						) {
+							})
+						{
 							Text(
-								it.toString(),
+								text = it.toString(),
 								color = AppTheme.colors.colorGrey,
 								style = AppTheme.typography.keyPadItemText
 							)
@@ -180,8 +193,10 @@ fun PinResetScreen(
 				}
 			}
 
-			Row(modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Center) {
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.Center)
+			{
 				Row {
 					(4..6).forEach {
 						PinKeypadItemComponent(
@@ -190,10 +205,10 @@ fun PinResetScreen(
 									pinCodeError = false
 									inputPin.add(it)
 								}
-							}
-						) {
+							})
+						{
 							Text(
-								it.toString(),
+								text = it.toString(),
 								color = AppTheme.colors.colorGrey,
 								style = AppTheme.typography.keyPadItemText
 							)
@@ -202,8 +217,10 @@ fun PinResetScreen(
 				}
 			}
 
-			Row(modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Center) {
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.Center)
+			{
 				Row {
 					(7..9).forEach {
 						PinKeypadItemComponent(
@@ -212,59 +229,64 @@ fun PinResetScreen(
 									pinCodeError = false
 									inputPin.add(it)
 								}
-							}
-						) {
+							})
+						{
 							Text(
-								it.toString(),
+								text = it.toString(),
 								color = AppTheme.colors.colorGrey,
-								style = AppTheme.typography.keyPadItemText
-							)
+								style = AppTheme.typography.keyPadItemText)
 						}
 					}
 				}
 			}
 
-			Row(modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Center) {
-
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.Center)
+			{
 				PinKeypadItemComponent(
 					onClick = {
 						if(inputPin.size < 4) {
 							pinCodeError = false
 							inputPin.add(0)
 						}
-					}
-				) {
+					})
+				{
 					Text(
-						"0",
+						text = "0",
 						color = AppTheme.colors.colorGrey,
-						style = AppTheme.typography.keyPadItemText
-					)
+						style = AppTheme.typography.keyPadItemText)
 				}
 
 			}
 		}
 	}
 
-
-	if (showLoading){
+	if (loading){
 		BasicAlertDialog(
 			onDismissRequest = {},
 			properties = DialogProperties(
 				dismissOnBackPress = false,
-				dismissOnClickOutside = false
-			)) {
+				dismissOnClickOutside = false))
+		{
 			Surface(
 				shape = MaterialTheme.shapes.small,
-				tonalElevation = AlertDialogDefaults.TonalElevation
-			) {
-				Column(modifier = Modifier.background(Color.White).padding(horizontal = 16.dp, vertical = 20.dp)) {
-					Row(modifier = Modifier.fillMaxWidth(),	verticalAlignment = Alignment.CenterVertically) {
-
+				tonalElevation = AlertDialogDefaults.TonalElevation)
+			{
+				Column(
+					modifier = Modifier
+						.background(Color.White)
+						.padding(horizontal = 16.dp, vertical = 20.dp))
+				{
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						verticalAlignment = Alignment.CenterVertically)
+					{
 						ProgressIndicatorComponent(size = 40, color = AppTheme.colors.primaryColor)
 
-						Text("Подожди...",
+						Text(
 							modifier = Modifier.padding(start = 15.dp),
+							text = "Подожди...",
 							color = AppTheme.colors.textColor,
 							style = AppTheme.typography.pinModalText)
 					}

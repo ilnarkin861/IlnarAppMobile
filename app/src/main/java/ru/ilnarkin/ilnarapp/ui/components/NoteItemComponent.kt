@@ -49,22 +49,18 @@ fun NoteItemComponent(
 	note: Note,
 	viewAction: suspend () -> Unit,
 	editAction: suspend () -> Unit,
-	deleteAction: suspend () -> Unit
-	) {
-
-	var saving by remember { mutableStateOf(false) }
-
-	var deleting by remember { mutableStateOf(false) }
+	deleteAction: suspend () -> Unit)
+{
 
 	val scope = rememberCoroutineScope()
-
-	var showConfirmAlert by remember { mutableStateOf(false) }
-
+	var saving by remember { mutableStateOf(false) }
+	var deleting by remember { mutableStateOf(false) }
+	var confirmAlertVisible by remember { mutableStateOf(false) }
 	val titleColor = if (note.title != null) AppTheme.colors.titleColor else AppTheme.colors.titleColor.copy(alpha = 0.4f)
 
 
 	Box(
-		Modifier.fillMaxSize()
+		modifier = Modifier.fillMaxSize()
 			.defaultMinSize(minHeight = 150.dp)
 			.padding(bottom = 15.dp)
 			.clip(RoundedCornerShape(10.dp))
@@ -75,24 +71,25 @@ fun NoteItemComponent(
 				onClick = {
 					scope.launch { viewAction() }
 				}
-			)
-	) {
+			))
+	{
 
-		Column (Modifier.padding(
-			start = 10.dp,
-			top = 15.dp,
-			end = 15.dp,
-			bottom = 20.dp
-		)){
+		Column (
+			modifier = Modifier.padding(
+				start = 10.dp,
+				top = 15.dp,
+				end = 15.dp,
+				bottom = 20.dp))
+		{
 			Row {
 				Text(
 					text = note.title ?: DEFAULT_NOTE_TITLE,
 					style = AppTheme.typography.noteCardTitle,
-					color = titleColor
-				)
+					color = titleColor)
 			}
 
-			Row(Modifier.padding(top = 5.dp, bottom = 20.dp)) {
+			Row(modifier = Modifier.padding(top = 5.dp, bottom = 20.dp))
+			{
 				Text(
 					text = DateTimeFormatter
 						.ofPattern("d MMMM yyyy, EEEE")
@@ -101,9 +98,14 @@ fun NoteItemComponent(
 					style = AppTheme.typography.noteCardDate)
 			}
 
-			Row { HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)	}
+			Row {
+				HorizontalDivider(
+					thickness = 1.dp,
+					color = AppTheme.colors.borderColor)
+			}
 
-			Row(Modifier.padding(vertical = 15.dp)) {
+			Row(modifier = Modifier.padding(vertical = 15.dp))
+			{
 				Text(
 					text = note.text,
 					maxLines = 3,
@@ -112,27 +114,37 @@ fun NoteItemComponent(
 					color = AppTheme.colors.textColor)
 			}
 
-			Row { HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)	}
+			Row {
+				HorizontalDivider(
+					thickness = 1.dp,
+					color = AppTheme.colors.borderColor)
+			}
 
 			Row(
-				Modifier.padding(top = 20.dp).fillMaxWidth(),
-				verticalAlignment = Alignment.CenterVertically,
-				) {
-
-				Row(verticalAlignment = Alignment.CenterVertically){
-
-					Row(Modifier.size(35.dp).alpha(0.6f),
+				modifier = Modifier
+					.padding(top = 20.dp)
+					.fillMaxWidth(),
+				verticalAlignment = Alignment.CenterVertically)
+			{
+				Row(verticalAlignment = Alignment.CenterVertically)
+				{
+					Row(
+						modifier = Modifier
+							.size(35.dp)
+							.alpha(0.6f),
 						horizontalArrangement = Arrangement.Center,
-						verticalAlignment = Alignment.CenterVertically) {
+						verticalAlignment = Alignment.CenterVertically)
+					{
 
 						if (saving){
-							Row(modifier = Modifier.fillMaxSize(),
+							Row(
+								modifier = Modifier.fillMaxSize(),
 								horizontalArrangement = Arrangement.Center,
-								verticalAlignment = Alignment.CenterVertically) {
+								verticalAlignment = Alignment.CenterVertically)
+							{
 								ProgressIndicatorComponent(25, AppTheme.colors.colorGrey)
 							}
 						}
-
 						IconButton(onClick = {
 							scope.launch {
 								saving = true
@@ -142,29 +154,38 @@ fun NoteItemComponent(
 									saving = false
 								}
 							}
-						}) {
+						})
+						{
 							Icon(modifier = Modifier.size(25.dp),
-								painter = painterResource(R.drawable.ic_edit), contentDescription = "",
+								painter = painterResource(R.drawable.ic_edit),
+								contentDescription = "",
 								tint = AppTheme.colors.colorGrey)
 						}
 					}
-
-					Row(Modifier.size(35.dp).alpha(0.6f)) {
+					Row(
+						modifier = Modifier
+							.size(35.dp)
+							.alpha(0.6f))
+					{
 						if (deleting){
-							Row(modifier = Modifier.fillMaxSize(),
+							Row(
+								modifier = Modifier.fillMaxSize(),
 								horizontalArrangement = Arrangement.Center,
-								verticalAlignment = Alignment.CenterVertically) {
+								verticalAlignment = Alignment.CenterVertically)
+							{
 								ProgressIndicatorComponent(25, AppTheme.colors.dangerColor)
 							}
 						}
 
 						else{
 							IconButton(onClick = {
-								showConfirmAlert = true
-							}) {
+								confirmAlertVisible = true
+							})
+							{
 								Icon(
 									modifier = Modifier.size(25.dp),
-									painter = painterResource(R.drawable.ic_trash), contentDescription = "",
+									painter = painterResource(R.drawable.ic_trash),
+									contentDescription = "",
 									tint = AppTheme.colors.dangerColor)
 							}
 						}
@@ -174,9 +195,8 @@ fun NoteItemComponent(
 		}
 	}
 
-
 	ConfirmComponent(
-		showed = showConfirmAlert,
+		visible = confirmAlertVisible,
 		action = {confirmed ->
 
 			if (confirmed){
@@ -192,7 +212,7 @@ fun NoteItemComponent(
 				}
 			}
 
-			showConfirmAlert = false
+			confirmAlertVisible = false
 		}
 	)
 }

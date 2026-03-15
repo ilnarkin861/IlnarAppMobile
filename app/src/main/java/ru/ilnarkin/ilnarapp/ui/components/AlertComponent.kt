@@ -32,27 +32,29 @@ import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 fun AlertComponent(
 	success: Boolean = true,
 	message: String,
-	showed: Boolean = false,
-	action: () -> Unit
-) {
+	visible: Boolean = false,
+	action: () -> Unit)
+{
 
-	if (showed) {
+	if (visible) {
 		BasicAlertDialog(
 			onDismissRequest = { },
 			properties = DialogProperties(
 				dismissOnBackPress = false,
 				dismissOnClickOutside = false
-			)
-		) {
+			))
+		{
 			Surface(
 				shape = MaterialTheme.shapes.small,
-				tonalElevation = AlertDialogDefaults.TonalElevation
-			) {
+				tonalElevation = AlertDialogDefaults.TonalElevation)
+			{
 				Column(modifier = Modifier.background(Color.White)) {
 					Row(
-						modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 10.dp),
-						horizontalArrangement = Arrangement.Center
-					) {
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(top = 15.dp, bottom = 10.dp),
+						horizontalArrangement = Arrangement.Center)
+					{
 						if (!success)
 							Icon(
 								modifier = Modifier.size(70.dp),
@@ -69,26 +71,28 @@ fun AlertComponent(
 					}
 
 					Row(
-						modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 25.dp),
-						horizontalArrangement = Arrangement.Center
-					) {
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(start = 10.dp, end = 10.dp, bottom = 25.dp),
+						horizontalArrangement = Arrangement.Center)
+					{
 						Text(
 							text = message,
 							style = AppTheme.typography.modalText,
-							color = if (!success) AppTheme.colors.dangerColor else AppTheme.colors.primaryColor
-						)
+							color = if (!success) AppTheme.colors.dangerColor else AppTheme.colors.primaryColor)
 					}
 
 					Row(
-						modifier = Modifier.fillMaxWidth().padding(top = 30.dp, bottom = 30.dp),
-						horizontalArrangement = Arrangement.Center
-					) {
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(top = 30.dp, bottom = 30.dp),
+						horizontalArrangement = Arrangement.Center)
+					{
 						Text(
 							modifier = Modifier.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
-								onClick = {	action() }
-							),
+								onClick = {	action() }),
 							text = "Понятно",
 							color = AppTheme.colors.colorGrey,
 							style = AppTheme.typography.textButton

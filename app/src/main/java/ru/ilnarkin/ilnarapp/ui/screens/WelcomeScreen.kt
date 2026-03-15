@@ -38,11 +38,10 @@ import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 fun WelcomeScreen(
 	navController: NavController,
 	userViewModel: UserViewModel = koinViewModel(),
-	errorManager: NetworkErrorManager = koinInject()
-) {
+	errorManager: NetworkErrorManager = koinInject())
+{
 
 	val snackBarHostState = remember { SnackbarHostState() }
-
 	val state by userViewModel.uiState.collectAsState()
 
 
@@ -96,9 +95,10 @@ fun WelcomeScreen(
 	}
 
 
-	Box(modifier = Modifier
-		.fillMaxSize()
-		.background(AppTheme.colors.primaryColor),
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.background(AppTheme.colors.primaryColor),
 		contentAlignment = Alignment.Center){
 
 		Image(
@@ -107,8 +107,8 @@ fun WelcomeScreen(
 
 		SnackbarHost(
 			hostState = snackBarHostState,
-			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter)
-		){data ->
+			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter))
+		{data ->
 			Snackbar(
 				snackbarData = data,
 				containerColor = Color.White,

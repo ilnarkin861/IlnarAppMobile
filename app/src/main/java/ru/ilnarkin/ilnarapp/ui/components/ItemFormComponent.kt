@@ -38,94 +38,100 @@ fun ItemFormComponent(
 	itemText: String?,
 	label: String,
 	action: suspend (text: String) -> Unit,
-	close: () -> Unit
-) {
-	val mutableItemText = rememberSaveable { mutableStateOf(itemText?: "") }
-
-	var itemTextIsError by rememberSaveable { mutableStateOf(false) }
+	close: () -> Unit)
+{
 
 	val scope = rememberCoroutineScope()
-
 	var saving by rememberSaveable { mutableStateOf(false) }
+	val updatedItemText = rememberSaveable { mutableStateOf(itemText?: "") }
+	var itemTextIsError by rememberSaveable { mutableStateOf(false) }
 
 
-	Column(modifier = Modifier.background(Color.White)) {
+	Column(modifier = Modifier.background(Color.White))
+	{
 		Column(
-			modifier = Modifier.fillMaxWidth()
-				.padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 40.dp)
-		){
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 40.dp))
+		{
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
-			){
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(bottom = 10.dp))
+			{
 				Text(
 					text = label,
 					color = AppTheme.colors.colorGrey,
 					style = AppTheme.typography.formTitleText)
 			}
 
-			Row(
-				modifier = Modifier.fillMaxWidth()
-			){
+			Row(modifier = Modifier.fillMaxWidth())
+			{
 				OutlinedTextField(
 					modifier = Modifier.fillMaxWidth(),
 					textStyle = AppTheme.typography.formInputText,
-					value = mutableItemText.value,
+					value = updatedItemText.value,
 					singleLine = true,
 					isError = itemTextIsError,
 					label = { Text(label) },
 					onValueChange = {text ->
-						mutableItemText.value = text
-						itemTextIsError = mutableItemText.value.isEmpty()},
+						updatedItemText.value = text
+						itemTextIsError = updatedItemText.value.isEmpty()},
 					colors = OutlinedTextFieldDefaults.colors(
 						unfocusedBorderColor = AppTheme.colors.inputsBorderColor,
 						focusedBorderColor = AppTheme.colors.primaryColor,
 						unfocusedLabelColor = AppTheme.colors.inputsPlaceholderColor,
 						focusedLabelColor = AppTheme.colors.primaryColor,
 						focusedTextColor = AppTheme.colors.textColor,
-						unfocusedTextColor = AppTheme.colors.textColor
-					),
+						unfocusedTextColor = AppTheme.colors.textColor),
 					shape = RoundedCornerShape(10.dp))
 			}
 
 			if (itemTextIsError){
-				Row(modifier = Modifier.padding(top = 5.dp, bottom = 10.dp)) {
+				Row(modifier = Modifier.padding(top = 5.dp, bottom = 10.dp))
+				{
 					Text(
 						text = "Обязательное поле",
 						color = AppTheme.colors.dangerColor,
-						style = AppTheme.typography.errorText
-					)
+						style = AppTheme.typography.errorText)
 				}
 			}
 
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(top = 30.dp)
-			){
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 30.dp))
+			{
 				Button(
-					modifier = Modifier.fillMaxWidth().height(60.dp),
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(60.dp),
 					enabled = !saving,
 					shape = RoundedCornerShape(10.dp),
 					colors = ButtonDefaults.buttonColors(
 						containerColor = AppTheme.colors.primaryColor,
 						disabledContainerColor = AppTheme.colors.primaryColor.copy(alpha = 0.8f)),
 					onClick = {
-						itemTextIsError = mutableItemText.value.isEmpty()
+						itemTextIsError = updatedItemText.value.isEmpty()
 
 						if(!itemTextIsError){
 							scope.launch {
 								saving = true
 								try {
-									action(mutableItemText.value)
+									action(updatedItemText.value)
 								} finally {
 									saving = false
 								}
 							}
 						}
-					}
-				) {
+					})
+				{
 					if (saving){
-						Row(modifier = Modifier.fillMaxSize(),
+						Row(
+							modifier = Modifier.fillMaxSize(),
 							horizontalArrangement = Arrangement.Center,
-							verticalAlignment = Alignment.CenterVertically) {
+							verticalAlignment = Alignment.CenterVertically)
+						{
 							CircularProgressIndicator(
 								modifier = Modifier.size(20.dp),
 								strokeWidth = 2.dp,
@@ -144,19 +150,19 @@ fun ItemFormComponent(
 
 			if (!saving){
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(top = 25.dp),
-					horizontalArrangement = Arrangement.Center
-				) {
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(top = 25.dp),
+					horizontalArrangement = Arrangement.Center)
+				{
 					Text(
 						modifier = Modifier.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
-							onClick = {	close()	}
-						),
+							onClick = {	close()	}),
 						text = "Закрыть",
 						color = AppTheme.colors.colorGrey,
-						style = AppTheme.typography.textButton
-					)
+						style = AppTheme.typography.textButton)
 				}
 			}
 		}

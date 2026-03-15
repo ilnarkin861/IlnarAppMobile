@@ -21,18 +21,25 @@ import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 fun PinKeypadItemComponent(
 	onClick: () -> Unit,
 	bordered: Boolean = true,
-	content: @Composable () -> Unit
-) {
+	content: @Composable () -> Unit)
+{
+
 	Surface(
-		modifier = Modifier.padding(10.dp)
+		modifier = Modifier
+			.padding(10.dp)
 			.clip(shape = CircleShape)
-			.border(width = if (bordered) 1.dp else 0.dp,
+			.border(
+				width = if (bordered) 1.dp else 0.dp,
 				color = if (bordered) AppTheme.colors.colorGrey else Color.Transparent,
 				shape = CircleShape
 			).size(60.dp),
 		onClick = onClick,
-	) {
-		Box(modifier = Modifier.fillMaxSize().background(AppTheme.colors.appBgColor),
+	)
+	{
+		Box(
+			modifier = Modifier
+				.fillMaxSize()
+				.background(AppTheme.colors.appBgColor),
 			contentAlignment = Alignment.Center) {  content() }
 	}
 }

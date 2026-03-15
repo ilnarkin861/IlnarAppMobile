@@ -51,21 +51,15 @@ fun NoteFilterFormComponent(
 	viewModel: NoteFilterViewModel,
 	loadTags: suspend () -> MutableList<Tag>,
 	action: () -> Unit,
-	resetFilter: () -> Unit
-) {
+	resetFilter: () -> Unit)
+{
 
 	val scope = rememberCoroutineScope()
-
 	val viewModelState by viewModel.uiState.collectAsState()
-
 	var tagsLoading by remember { mutableStateOf(false) }
-
 	var yearsMenuExpanded by remember { mutableStateOf(false) }
-
 	var monthMenuExpanded by remember { mutableStateOf(false) }
-
 	var noteTypeMenuExpanded by remember { mutableStateOf(false) }
-
 	var archiveMenuExpanded by remember { mutableStateOf(false) }
 
 	val inputColors = OutlinedTextFieldDefaults.colors(
@@ -80,8 +74,8 @@ fun NoteFilterFormComponent(
 	)
 
 
-	Column(Modifier.fillMaxSize()) {
-
+	Column(modifier = Modifier.fillMaxSize())
+	{
 
 		//Note type dropdown menu
 		ExposedDropdownMenuBox(
@@ -89,8 +83,8 @@ fun NoteFilterFormComponent(
 				.fillMaxWidth()
 				.padding(top = 15.dp, bottom = 20.dp),
 			expanded = noteTypeMenuExpanded,
-			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded }
-		) {
+			onExpandedChange = { noteTypeMenuExpanded = !noteTypeMenuExpanded })
+		{
 			OutlinedTextField(
 				modifier = Modifier
 					.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -108,12 +102,11 @@ fun NoteFilterFormComponent(
 						contentDescription = "")
 				}
 			)
-
 			ExposedDropdownMenu(
 				modifier = Modifier.background(Color.White),
 				expanded = noteTypeMenuExpanded,
-				onDismissRequest = { noteTypeMenuExpanded = false}
-			) {
+				onDismissRequest = { noteTypeMenuExpanded = false })
+			{
 				viewModelState.selectableNoteTypes.forEach {noteType ->
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
@@ -132,15 +125,14 @@ fun NoteFilterFormComponent(
 			}
 		}
 
-
 		// Year dropdown
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(bottom = 20.dp),
 			expanded = yearsMenuExpanded,
-			onExpandedChange = { yearsMenuExpanded = !yearsMenuExpanded }
-		){
+			onExpandedChange = { yearsMenuExpanded = !yearsMenuExpanded })
+		{
 			OutlinedTextField(
 				modifier = Modifier
 					.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -158,12 +150,11 @@ fun NoteFilterFormComponent(
 						contentDescription = "")
 				}
 			)
-
 			ExposedDropdownMenu(
 				modifier = Modifier.background(Color.White),
 				expanded = yearsMenuExpanded,
-				onDismissRequest = { yearsMenuExpanded = false}
-			) {
+				onDismissRequest = { yearsMenuExpanded = false })
+			{
 				DropdownMenuItem(
 					modifier = Modifier.background(Color.White),
 					colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
@@ -195,7 +186,6 @@ fun NoteFilterFormComponent(
 			}
 		}
 
-
 		// Month dropdown
 		if (viewModelState.yearSelected){
 			ExposedDropdownMenuBox(
@@ -203,8 +193,8 @@ fun NoteFilterFormComponent(
 					.fillMaxWidth()
 					.padding(bottom = 20.dp),
 				expanded = monthMenuExpanded,
-				onExpandedChange = { monthMenuExpanded = !monthMenuExpanded }
-			){
+				onExpandedChange = { monthMenuExpanded = !monthMenuExpanded })
+			{
 				OutlinedTextField(
 					modifier = Modifier
 						.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -222,25 +212,25 @@ fun NoteFilterFormComponent(
 							contentDescription = "")
 					}
 				)
-
 				ExposedDropdownMenu(
 					modifier = Modifier.background(Color.White),
 					expanded = monthMenuExpanded,
-					onDismissRequest = { monthMenuExpanded = false}
-				) {
+					onDismissRequest = { monthMenuExpanded = false })
+				{
 					DropdownMenuItem(
 						modifier = Modifier.background(Color.White),
 						colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 						text = {
 							Text(
 								text = viewModelState.unSelectedMonthTitle,
-								style = AppTheme.typography.formInputText
-							)},
+								style = AppTheme.typography.formInputText)
+						},
 						onClick = {
 							viewModel.selectMonth(null, viewModelState.unSelectedMonthTitle)
 							monthMenuExpanded = false
 						}
 					)
+
 					viewModelState.months.forEachIndexed {index, month ->
 						DropdownMenuItem(
 							modifier = Modifier.background(Color.White),
@@ -248,8 +238,8 @@ fun NoteFilterFormComponent(
 							text = {
 								Text(
 									text = month,
-									style = AppTheme.typography.formInputText
-								)},
+									style = AppTheme.typography.formInputText)
+							},
 							onClick = {
 								viewModel.selectMonth(index + 1, month)
 								monthMenuExpanded = false
@@ -260,15 +250,14 @@ fun NoteFilterFormComponent(
 			}
 		}
 
-
 		// Archive dropdown
 		ExposedDropdownMenuBox(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(bottom = 20.dp),
 			expanded = archiveMenuExpanded,
-			onExpandedChange = { archiveMenuExpanded = !archiveMenuExpanded }
-		){
+			onExpandedChange = { archiveMenuExpanded = !archiveMenuExpanded })
+		{
 			OutlinedTextField(
 				modifier = Modifier
 					.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -286,20 +275,19 @@ fun NoteFilterFormComponent(
 						contentDescription = "")
 				}
 			)
-
 			ExposedDropdownMenu(
 				modifier = Modifier.background(Color.White),
 				expanded = archiveMenuExpanded,
-				onDismissRequest = { archiveMenuExpanded = false}
-			) {
+				onDismissRequest = { archiveMenuExpanded = false})
+			{
 				DropdownMenuItem(
 					modifier = Modifier.background(Color.White),
 					colors = MenuDefaults.itemColors(textColor = AppTheme.colors.textColor),
 					text = {
 						Text(
 							text = viewModelState.unSelectedArchiveTitle,
-							style = AppTheme.typography.formInputText
-						)},
+							style = AppTheme.typography.formInputText)
+					},
 					onClick = {
 						viewModel.selectArchive(null, viewModelState.unSelectedArchiveTitle)
 						archiveMenuExpanded = false
@@ -313,8 +301,8 @@ fun NoteFilterFormComponent(
 						text = {
 							Text(
 								text = archive.title,
-								style = AppTheme.typography.formInputText
-							)},
+								style = AppTheme.typography.formInputText)
+						},
 						onClick = {
 							viewModel.selectArchive(archive.id, archive.title)
 							archiveMenuExpanded = false
@@ -324,25 +312,26 @@ fun NoteFilterFormComponent(
 			}
 		}
 
-
 		//Selectable tags
 		Column(
-			Modifier
+			modifier = Modifier
 				.fillMaxWidth()
-				.padding(top = 20.dp)
-		) {
-			Row(Modifier
-				.fillMaxWidth()
-				.padding(bottom = 20.dp)) {
+				.padding(top = 20.dp))
+		{
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(bottom = 20.dp))
+			{
 				Text(
 					text = "Выбрать теги (${viewModelState.selectedTagIds.size})",
 					color = AppTheme.colors.colorGrey,
-					style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold)
-				)
+					style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold))
 			}
+
 			viewModelState.selectableTags.forEachIndexed { index, tag ->
-				Row(Modifier
-					.fillMaxWidth()) {
+				Row(modifier = Modifier.fillMaxWidth())
+				{
 					TagCheckboxComponent(
 						tag,
 						isChecked = viewModelState.selectedTagIds.find { it == tag.id } != null,
@@ -369,9 +358,11 @@ fun NoteFilterFormComponent(
 		}
 
 		if (viewModelState.hasNextTags){
-			Row(Modifier
-				.fillMaxWidth()
-				.padding(top = 20.dp, bottom = 40.dp)) {
+			Row(
+				modifier =  Modifier
+					.fillMaxWidth()
+					.padding(top = 20.dp, bottom = 40.dp))
+			{
 
 				if (tagsLoading){
 					ProgressIndicatorComponent(25, AppTheme.colors.primaryColor)
@@ -403,13 +394,12 @@ fun NoteFilterFormComponent(
 			}
 		}
 
-
 		// Filter button
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(top = 60.dp)
-		) {
+				.padding(top = 60.dp))
+		{
 			Button(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -422,8 +412,8 @@ fun NoteFilterFormComponent(
 					viewModel.applyFilter()
 
 					action()
-				}
-			) {
+				})
+			{
 				Text(
 					text = "Применить",
 					style = AppTheme.typography.inputButtonText
@@ -431,15 +421,13 @@ fun NoteFilterFormComponent(
 			}
 		}
 
-
 		// Reset button
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(top = 30.dp, bottom = 80.dp),
-			horizontalArrangement = Arrangement.Center
-		){
-
+			horizontalArrangement = Arrangement.Center)
+		{
 			if (viewModelState.filterApplied){
 				Text(
 					modifier = Modifier.clickable(

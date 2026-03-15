@@ -66,24 +66,17 @@ import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
 fun ArchiveScreen(
 	navController: NavController,
 	archiveViewModel: ArchiveViewModel = koinViewModel(),
-	errorManager: NetworkErrorManager = koinInject()
-) {
+	errorManager: NetworkErrorManager = koinInject())
+{
 
 	val limit = 100
-
-	val listState = rememberLazyListState()
-
-	var modalFormLabel by rememberSaveable { mutableStateOf("") }
-
-	var formDialogShowed by rememberSaveable { mutableStateOf(false) }
-
 	val state by archiveViewModel.uiState.collectAsState()
-
-	val itemId = rememberSaveable { mutableStateOf("") }
-
-	val itemText = rememberSaveable { mutableStateOf("") }
-
 	val snackBarHostState = remember { SnackbarHostState() }
+	val listState = rememberLazyListState()
+	var modalFormLabel by rememberSaveable { mutableStateOf("") }
+	var formDialogVisible by rememberSaveable { mutableStateOf(false) }
+	val itemId = rememberSaveable { mutableStateOf("") }
+	val itemText = rememberSaveable { mutableStateOf("") }
 
 
 	LaunchedEffect(Unit) {
@@ -118,18 +111,24 @@ fun ArchiveScreen(
 	}
 
 
-	Box(Modifier.fillMaxSize().padding(horizontal = AppTheme.dimensions.containerHorizontalPadding).background(AppTheme.colors.appBgColor)) {
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
+			.background(AppTheme.colors.appBgColor))
+	{
 
 		if (!state.loading && !state.list.isEmpty()){
 			LazyColumn(
 				state = listState,
-				contentPadding = PaddingValues(top = 30.dp, bottom = 30.dp)
-			) {
+				contentPadding = PaddingValues(top = 30.dp, bottom = 30.dp))
+			{
 
 				state.pagination?.let {
 					if (it.hasPreviousPage){
 						item {
-							Row(Modifier.padding(bottom = 25.dp)) {
+							Row(Modifier.padding(bottom = 25.dp)
+							) {
 								LoadButtonComponent(nextButton = false, action = {
 									archiveViewModel.setActionType(ActionType.READ)
 
@@ -141,8 +140,11 @@ fun ArchiveScreen(
 				}
 
 				itemsIndexed(state.list){index, item ->
-
-					Row(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
+					Row(
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(vertical = 10.dp))
+					{
 						ListItemComponent(
 							item.title,
 
@@ -154,7 +156,7 @@ fun ArchiveScreen(
 									itemText.value = archive.title
 									itemId.value = archive.id
 									modalFormLabel = "Изменить архив"
-									formDialogShowed = true
+									formDialogVisible = true
 								}
 							},
 
@@ -178,7 +180,8 @@ fun ArchiveScreen(
 				state.pagination?.let {
 					if (it.hasNextPage){
 						item {
-							Row(Modifier.padding(top = 25.dp, bottom = 30.dp)) {
+							Row(modifier = Modifier.padding(top = 25.dp, bottom = 30.dp))
+							{
 								LoadButtonComponent(action = {
 									archiveViewModel.setActionType(ActionType.READ)
 
@@ -192,47 +195,57 @@ fun ArchiveScreen(
 		}
 
 		if (!state.loading && state.list.isEmpty()){
-			Box(modifier = Modifier.background(AppTheme.colors.appBgColor).fillMaxSize(),
-				contentAlignment = Alignment.Center){
+			Box(
+				modifier = Modifier
+					.background(AppTheme.colors.appBgColor)
+					.fillMaxSize(),
+				contentAlignment = Alignment.Center)
+			{
 				MessageComponent("Архивов нет")
 			}
 		}
 
 		if (state.loading){
 			Box(
-				modifier = Modifier.background(AppTheme.colors.appBgColor).fillMaxSize(),
-				contentAlignment = Alignment.Center){
+				modifier = Modifier
+					.background(AppTheme.colors.appBgColor)
+					.fillMaxSize(),
+				contentAlignment = Alignment.Center)
+			{
 				ProgressIndicatorComponent(60, AppTheme.colors.primaryColor)
 			}
 		}
 
-
 		FloatingActionButton(
-			containerColor = AppTheme.colors.primaryColor,
-			contentColor = Color.White,
-			shape = CircleShape,
 			modifier = Modifier
 				.align(Alignment.BottomEnd)
 				.absolutePadding(bottom = 20.dp, right = 20.dp)
 				.alpha(0.6f),
-			elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+			containerColor = AppTheme.colors.primaryColor,
+			contentColor = Color.White,
+			shape = CircleShape,
+			elevation = FloatingActionButtonDefaults
+				.elevation(0.dp, 0.dp, 0.dp, 0.dp),
 
 			onClick = {
 				archiveViewModel.setActionType(ActionType.CREATE)
 				modalFormLabel = "Добавить архив"
 				itemText.value = ""
-				formDialogShowed = true
-			}) {
+				formDialogVisible = true
+			})
+		{
 			Icon(
 				modifier = Modifier.size(25.dp),
 				painter = painterResource(R.drawable.ic_plus),
-				contentDescription = "Добавить") }
-
+				contentDescription = "Добавить")
+		}
 
 		SnackbarHost(
-			hostState = snackBarHostState,
-			modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter)
-		){data ->
+			modifier = Modifier
+				.padding(16.dp)
+				.align(Alignment.BottomCenter),
+			hostState = snackBarHostState)
+		{data ->
 			Snackbar(
 				snackbarData = data,
 				containerColor = AppTheme.colors.primaryColor,
@@ -245,23 +258,23 @@ fun ArchiveScreen(
 	AlertComponent(
 		success = state.success,
 		message = state.message,
-		showed = state.showAlert,
+		visible = state.showAlert,
 		action = { archiveViewModel.dismissAlert()	}
 	)
 
 
-	if (formDialogShowed){
+	if (formDialogVisible){
 		BasicAlertDialog(
 			onDismissRequest = {},
 			properties = DialogProperties(
 				dismissOnBackPress = false,
 				dismissOnClickOutside = false
-			)
-		) {
+			))
+		{
 			Surface(
 				shape = MaterialTheme.shapes.small,
-				tonalElevation = AlertDialogDefaults.TonalElevation
-			) {
+				tonalElevation = AlertDialogDefaults.TonalElevation)
+			{
 				ItemFormComponent(
 					itemText.value,
 					modalFormLabel,
@@ -285,10 +298,10 @@ fun ArchiveScreen(
 							}
 						}
 
-						formDialogShowed = false
+						formDialogVisible = false
 
 					},
-					close = { formDialogShowed = false }
+					close = { formDialogVisible = false }
 				)
 			}
 		}

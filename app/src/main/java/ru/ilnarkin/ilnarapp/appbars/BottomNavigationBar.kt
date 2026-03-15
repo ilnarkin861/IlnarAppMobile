@@ -22,12 +22,11 @@ import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(navController: NavController)
+{
 
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
-
 	val currentRoute = navBackStackEntry?.destination?.route
-
 	val borderColor = AppTheme.colors.borderColor
 
 	val colors = NavigationBarItemDefaults.colors(
@@ -40,24 +39,25 @@ fun BottomNavigationBar(navController: NavController) {
 
 	NavigationBar(
 		modifier = Modifier.drawBehind {
-			val borderStrokeWidth = 2.dp
-			val strokeWidthPx = borderStrokeWidth.toPx()
-			drawLine(
-				color = borderColor,
-				start = Offset(x = 0f, y = 0f),
-				end = Offset(x = size.width, y = 0f),
-				strokeWidth = strokeWidthPx
-			)
+				val borderStrokeWidth = 2.dp
+				val strokeWidthPx = borderStrokeWidth.toPx()
+				drawLine(
+					color = borderColor,
+					start = Offset(x = 0f, y = 0f),
+					end = Offset(x = size.width, y = 0f),
+					strokeWidth = strokeWidthPx
+				)
 		},
-		containerColor = Color.White,
-	) {
+		containerColor = Color.White)
+	{
 		NavigationBarItem(
 			selected = currentRoute == NavRoutes.NotesScreen.route,
 			colors = colors,
-			icon = { Icon(painter = painterResource(R.drawable.ic_notes), contentDescription = "") },
-			label = { Text(
-				text = stringResource(R.string.notes_title),
-				style = AppTheme.typography.navBarItemTitle)
+			icon = {
+				Icon(painter = painterResource(R.drawable.ic_notes), contentDescription = "")
+			},
+			label = {
+				Text(text = stringResource(R.string.notes_title), style = AppTheme.typography.navBarItemTitle)
 			},
 			onClick = {
 				if (currentRoute != NavRoutes.NotesScreen.route){
@@ -72,15 +72,16 @@ fun BottomNavigationBar(navController: NavController) {
 						}
 					}
 				}
-			})
-
+			}
+		)
 		NavigationBarItem(
 			selected = currentRoute == NavRoutes.TagsScreen.route,
 			colors = colors,
-			icon = { Icon(painter = painterResource(R.drawable.ic_hashtag), contentDescription = "") },
-			label = { Text(
-				text = stringResource(R.string.tags_title),
-				style = AppTheme.typography.navBarItemTitle)
+			icon = {
+				Icon(painter = painterResource(R.drawable.ic_hashtag), contentDescription = "")
+			},
+			label = {
+				Text(text = stringResource(R.string.tags_title),	style = AppTheme.typography.navBarItemTitle)
 			},
 			onClick = {
 				if (currentRoute != NavRoutes.TagsScreen.route){
@@ -97,14 +98,14 @@ fun BottomNavigationBar(navController: NavController) {
 				}
 			}
 		)
-
 		NavigationBarItem(
 			selected = currentRoute == NavRoutes.ArchiveScreen.route,
 			colors = colors,
-			icon = { Icon(painter = painterResource(R.drawable.ic_archive), contentDescription = "") },
-			label = { Text(
-				text = stringResource(R.string.archives_title),
-				style = AppTheme.typography.navBarItemTitle)
+			icon = {
+				Icon(painter = painterResource(R.drawable.ic_archive), contentDescription = "")
+			},
+			label = {
+				Text(text = stringResource(R.string.archives_title), style = AppTheme.typography.navBarItemTitle)
 			},
 			onClick = {
 				if (currentRoute != NavRoutes.ArchiveScreen.route){
@@ -121,14 +122,14 @@ fun BottomNavigationBar(navController: NavController) {
 				}
 			}
 		)
-
 		NavigationBarItem(
 			selected = currentRoute == NavRoutes.SettingsScreen.route,
 			colors = colors,
-			icon = { Icon(painter = painterResource(R.drawable.ic_user_settings), contentDescription = "") },
-			label = { Text(
-				text = stringResource(R.string.settings_title),
-				style = AppTheme.typography.navBarItemTitle)
+			icon = {
+				Icon(painter = painterResource(R.drawable.ic_user_settings), contentDescription = "")
+			},
+			label = {
+				Text(text = stringResource(R.string.settings_title),style = AppTheme.typography.navBarItemTitle)
 			},
 			onClick = {
 				if (currentRoute != NavRoutes.SettingsScreen.route){

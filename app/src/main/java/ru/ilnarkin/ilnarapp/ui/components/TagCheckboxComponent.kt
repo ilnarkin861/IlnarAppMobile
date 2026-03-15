@@ -30,24 +30,29 @@ import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 fun TagCheckboxComponent(
 	tag: Tag,
 	isChecked: Boolean = false,
-	onChecked: (tag: Tag) -> Unit
-) {
+	onChecked: (tag: Tag) -> Unit)
+{
+
 	var checked by remember { mutableStateOf(isChecked) }
 
-	Row(Modifier.fillMaxWidth().clickable(
-		interactionSource = remember { MutableInteractionSource() },
-		indication = ripple(),
-		onClick = {
-			checked = !checked
-			onChecked(tag)
-		}
-	)) {
 
+	Row(
+		modifier = Modifier
+			.fillMaxWidth()
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = ripple(),
+				onClick = {
+					checked = !checked
+					onChecked(tag)
+				}))
+	{
 		Row(
-			modifier = Modifier.fillMaxWidth().padding(horizontal = AppTheme.dimensions.containerHorizontalPadding, vertical = 15.dp),
-			verticalAlignment = Alignment.CenterVertically
-		) {
-
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding, vertical = 15.dp),
+			verticalAlignment = Alignment.CenterVertically)
+		{
 			Row(
 				modifier = Modifier.size(20.dp)
 					.border(
@@ -56,22 +61,21 @@ fun TagCheckboxComponent(
 						shape = RoundedCornerShape(2.dp)),
 				Arrangement.Center,
 				Alignment.CenterVertically
-			) {
+			)
+			{
+
 				if (checked){
 					Box(
-						Modifier.size(12.dp)
+						modifier = Modifier.size(12.dp)
 							.clip(RoundedCornerShape(1.dp))
-							.background(AppTheme.colors.inputsBorderColor)
-					)
+							.background(AppTheme.colors.inputsBorderColor))
 				}
 			}
-
 			Text(
 				modifier = Modifier.padding(start = 10.dp),
 				text = tag.title,
 				color = AppTheme.colors.textColor,
-				style = AppTheme.typography.tagCheckboxText
-			)
+				style = AppTheme.typography.tagCheckboxText)
 		}
 	}
 }

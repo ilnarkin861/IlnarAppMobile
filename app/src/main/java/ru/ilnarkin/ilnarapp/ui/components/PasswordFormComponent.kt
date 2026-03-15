@@ -34,31 +34,27 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import ru.ilnarkin.ilnarapp.models.PasswordModel
+import ru.ilnarkin.ilnarapp.models.Password
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 
 
 @Composable
 fun PasswordFormComponent(
-	action: suspend (passwordModel: PasswordModel) -> Unit,
-	close: () -> Unit
-) {
-	val passwordLength = 8
+	action: suspend (passwordModel: Password) -> Unit,
+	close: () -> Unit)
+{
 
+	val passwordLength = 8
+	val scope = rememberCoroutineScope()
+	var saving by rememberSaveable { mutableStateOf(false) }
 	val oldPassword = rememberSaveable { mutableStateOf("") }
 	val newPassword = rememberSaveable { mutableStateOf("") }
-	val confirmPassword = rememberSaveable { mutableStateOf("") }
-
+	val confirmedPassword = rememberSaveable { mutableStateOf("") }
 	var passwordLengthError by rememberSaveable { mutableStateOf(false) }
 	var passwordsMatch by rememberSaveable { mutableStateOf(false) }
-
 	var oldPasswordIsError by rememberSaveable { mutableStateOf(false) }
 	var newPasswordIsError by rememberSaveable { mutableStateOf(false) }
-	var confirmPasswordIsError by rememberSaveable { mutableStateOf(false) }
-
-	val scope = rememberCoroutineScope()
-
-	var saving by rememberSaveable { mutableStateOf(false) }
+	var confirmedPasswordIsError by rememberSaveable { mutableStateOf(false) }
 
 	val inputColors = OutlinedTextFieldDefaults.colors(
 		unfocusedBorderColor = AppTheme.colors.inputsBorderColor,
@@ -66,30 +62,34 @@ fun PasswordFormComponent(
 		unfocusedLabelColor = AppTheme.colors.inputsPlaceholderColor,
 		focusedLabelColor = AppTheme.colors.primaryColor,
 		focusedTextColor = AppTheme.colors.textColor,
-		unfocusedTextColor = AppTheme.colors.textColor
-	)
+		unfocusedTextColor = AppTheme.colors.textColor)
 
 
-	Column(modifier = Modifier.background(Color.White)) {
+	Column(modifier = Modifier.background(Color.White))
+	{
 		Column(
-			modifier = Modifier.fillMaxWidth()
-				.padding(top = 30.dp, start = AppTheme.dimensions.containerHorizontalPadding, end = AppTheme.dimensions.containerHorizontalPadding, bottom = 40.dp)
-		){
-
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(
+					top = 30.dp,
+					start = AppTheme.dimensions.containerHorizontalPadding,
+					end = AppTheme.dimensions.containerHorizontalPadding,
+					bottom = 40.dp))
+		{
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
-			){
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(bottom = 10.dp))
+			{
 				Text(
 					text = "Изменить пароль",
 					color = AppTheme.colors.colorGrey,
-					style = AppTheme.typography.formTitleText
-				)
+					style = AppTheme.typography.formTitleText)
 			}
 
 			// Old password field
-			Row(
-				modifier = Modifier.fillMaxWidth()
-			){
+			Row(modifier = Modifier.fillMaxWidth())
+			{
 				OutlinedTextField(
 					modifier = Modifier.fillMaxWidth(),
 					textStyle = AppTheme.typography.formInputText,
@@ -108,21 +108,22 @@ fun PasswordFormComponent(
 					shape = RoundedCornerShape(10.dp))
 			}
 
-
 			if (oldPasswordIsError){
-				Row(modifier = Modifier.padding(top = 5.dp)) {
+				Row(modifier = Modifier.padding(top = 5.dp))
+				{
 					Text(
 						text = "Обязательное поле",
 						color = AppTheme.colors.dangerColor,
-						style = AppTheme.typography.errorText
-					)
+						style = AppTheme.typography.errorText)
 				}
 			}
 
 			// New password field
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
-			){
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 20.dp))
+			{
 				OutlinedTextField(
 					modifier = Modifier.fillMaxWidth(),
 					textStyle = AppTheme.typography.formInputText,
@@ -142,7 +143,9 @@ fun PasswordFormComponent(
 			}
 
 			if (newPasswordIsError){
-				Row(modifier = Modifier.padding(top = 5.dp)) {
+				Row(
+					modifier = Modifier.padding(top = 5.dp))
+				{
 					Text(
 						text = "Обязательное поле",
 						color = AppTheme.colors.dangerColor,
@@ -156,57 +159,61 @@ fun PasswordFormComponent(
 					modifier = Modifier.padding(top = 5.dp),
 					text = "Длина пароля не должна быть меньше $passwordLength символов",
 					color = AppTheme.colors.dangerColor,
-					style = AppTheme.typography.errorText
-				)
+					style = AppTheme.typography.errorText)
 			}
 
 			// Confirm password field
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
-			){
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 20.dp))
+			{
 				OutlinedTextField(
 					modifier = Modifier.fillMaxWidth(),
 					textStyle = AppTheme.typography.formInputText,
 					visualTransformation = PasswordVisualTransformation(),
 					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-					value = confirmPassword.value,
+					value = confirmedPassword.value,
 					singleLine = true,
-					isError = confirmPasswordIsError || !confirmPassword.value.isEmpty() && !passwordsMatch,
+					isError = confirmedPasswordIsError || !confirmedPassword.value.isEmpty() && !passwordsMatch,
 					label = { Text("Подтверди пароль") },
 					onValueChange = {text ->
 
-						confirmPassword.value = text
-						confirmPasswordIsError = confirmPassword.value.isEmpty()
-						passwordsMatch = newPassword.value == confirmPassword.value
+						confirmedPassword.value = text
+						confirmedPasswordIsError = confirmedPassword.value.isEmpty()
+						passwordsMatch = newPassword.value == confirmedPassword.value
 					},
 					colors = inputColors,
 					shape = RoundedCornerShape(10.dp))
 			}
 
-			if (confirmPasswordIsError){
-				Row(modifier = Modifier.padding(top = 5.dp, bottom = 10.dp)) {
+			if (confirmedPasswordIsError){
+				Row(modifier = Modifier.padding(top = 5.dp, bottom = 10.dp))
+				{
 					Text(
 						text = "Обязательное поле",
 						color = AppTheme.colors.dangerColor,
-						style = AppTheme.typography.errorText
-					)
+						style = AppTheme.typography.errorText)
 				}
 			}
 
-			if (!confirmPassword.value.isEmpty() && !passwordsMatch){
+			if (!confirmedPassword.value.isEmpty() && !passwordsMatch){
 				Text(
 					modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
 					text = "Пароли не совпадают",
 					color = AppTheme.colors.dangerColor,
-					style = AppTheme.typography.errorText
-				)
+					style = AppTheme.typography.errorText)
 			}
 
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(top = 30.dp)
-			){
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 30.dp))
+			{
 				Button(
-					modifier = Modifier.fillMaxWidth().height(60.dp),
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(60.dp),
 					enabled = !saving,
 					shape = RoundedCornerShape(10.dp),
 					colors = ButtonDefaults.buttonColors(
@@ -215,16 +222,16 @@ fun PasswordFormComponent(
 					onClick = {
 						oldPasswordIsError = oldPassword.value.isEmpty()
 						newPasswordIsError = newPassword.value.isEmpty()
-						confirmPasswordIsError = confirmPassword.value.isEmpty()
+						confirmedPasswordIsError = confirmedPassword.value.isEmpty()
 						passwordLengthError = newPassword.value.length < passwordLength
-						passwordsMatch = !confirmPassword.value.isEmpty() && (newPassword.value == confirmPassword.value)
+						passwordsMatch = !confirmedPassword.value.isEmpty() && (newPassword.value == confirmedPassword.value)
 
-						val formIsValid = !oldPasswordIsError && !newPasswordIsError && !confirmPasswordIsError
+						val formIsValid = !oldPasswordIsError && !newPasswordIsError && !confirmedPasswordIsError
 								&& !passwordLengthError && passwordsMatch
 
 						if(formIsValid){
 
-							val passwordModel = PasswordModel(
+							val passwordModel = Password(
 								oldPassword = oldPassword.value,
 								newPassword = newPassword.value,
 								confirmedPassword = newPassword.value)
@@ -236,35 +243,37 @@ fun PasswordFormComponent(
 									action(passwordModel) }.await()
 							}.invokeOnCompletion { saving = false }
 						}
-					}
-				) {
+					})
+				{
 
 					if (saving){
-						Row(modifier = Modifier.fillMaxSize(),
+						Row(
+							modifier = Modifier.fillMaxSize(),
 							horizontalArrangement = Arrangement.Center,
-							verticalAlignment = Alignment.CenterVertically) {
+							verticalAlignment = Alignment.CenterVertically)
+						{
 							CircularProgressIndicator(
 								modifier = Modifier.size(20.dp),
 								strokeWidth = 2.dp,
-								color = Color.White
-							)
+								color = Color.White)
 						}
 					}
 
 					else{
 						Text(
 							text = "Изменить",
-							style = AppTheme.typography.inputButtonText
-						)
+							style = AppTheme.typography.inputButtonText)
 					}
 				}
 			}
 
 			if (!saving){
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(top = 25.dp),
-					horizontalArrangement = Arrangement.Center
-				) {
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(top = 25.dp),
+					horizontalArrangement = Arrangement.Center)
+				{
 					Text(
 						modifier = Modifier.clickable(
 							interactionSource = remember { MutableInteractionSource() },
