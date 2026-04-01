@@ -1,16 +1,17 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialogDefaults
@@ -33,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -41,6 +43,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.yield
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
@@ -54,7 +62,6 @@ import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.ItemFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ListItemComponent
-import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
@@ -68,8 +75,6 @@ fun TagsScreen(
 	tagViewModel: TagViewModel = koinViewModel(),
 	errorManager: NetworkErrorManager = koinInject())
 {
-
-	val limit = 15
 	val state by tagViewModel.uiState.collectAsState()
 	val snackBarHostState = remember { SnackbarHostState() }
 	val listState = rememberLazyListState()
@@ -77,6 +82,38 @@ fun TagsScreen(
 	val itemId = rememberSaveable { mutableStateOf("") }
 	val itemText = rememberSaveable { mutableStateOf("") }
 	var modalFormLabel by rememberSaveable { mutableStateOf("") }
+	val lazyPagingItems = tagViewModel.tagsFlow.collectAsLazyPagingItems()
+	val loadState = lazyPagingItems.loadState
+	val isInitialLoading = loadState.refresh is LoadState.Loading
+	val isPaginationLoading = loadState.append is LoadState.Loading
+	val isEmptyTags = loadState.refresh is LoadState.NotLoading && lazyPagingItems.itemCount == 0
+	var pendingScrollToId by remember { mutableStateOf<String?>(null) }
+
+
+
+	LaunchedEffect(pendingScrollToId) {
+		val idToFind = pendingScrollToId ?: return@LaunchedEffect
+
+		snapshotFlow { lazyPagingItems.loadState.refresh }
+			.filter { it is LoadState.NotLoading }
+			.first()
+
+		snapshotFlow {
+			lazyPagingItems.itemSnapshotList.items.any { it.id == idToFind }
+		}
+			.filter { it }
+			.first()
+
+		yield()
+
+		val index = lazyPagingItems.itemSnapshotList.items.indexOfFirst { it.id == idToFind }
+
+		if (index != -1) {
+			listState.animateScrollToItem(index)
+		}
+
+		pendingScrollToId = null
+	}
 
 
 	LaunchedEffect(Unit) {
@@ -104,98 +141,12 @@ fun TagsScreen(
 	}
 
 
-	LaunchedEffect(Unit) {
-		if (state.list.isEmpty()){
-			tagViewModel.getTagsList(state.offset, limit)
-		}
-	}
-
-
 	Box(
 		modifier = Modifier.fillMaxSize()
 			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
 			.background(AppTheme.colors.appBgColor))
 	{
-		if (!state.loading && !state.list.isEmpty()){
-			LazyColumn(
-				state = listState,
-				contentPadding = PaddingValues(top = 30.dp, bottom = 30.dp))
-			{
-				state.pagination?.let {
-					if (it.hasPreviousPage){
-						item {
-							Row(modifier = Modifier.padding(bottom = 25.dp))
-							{
-								LoadButtonComponent(
-									nextButton = false,
-									action = {
-										tagViewModel.setActionType(ActionType.READ)
-
-										tagViewModel.getTagsList(state.offset - limit, limit, false)
-									})
-							}
-						}
-					}
-				}
-
-				itemsIndexed(items = tagViewModel.uiState.value.list){index, item ->
-
-					Row(
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(vertical = 10.dp))
-					{
-						ListItemComponent(
-							item.title,
-
-							editAction = {
-								val tag = tagViewModel.getTagById(item.id)
-
-								if (tag != null) {
-									tagViewModel.setActionType(ActionType.UPDATE)
-									itemText.value = tag.title
-									itemId.value = tag.id
-									modalFormLabel = "Изменить тег"
-									formDialogVisible = true
-								}
-							},
-
-							deleteAction = {
-								val isDeleted = tagViewModel.deleteTag(item.id)
-
-								if (isDeleted){
-									val offset = if (state.list.size == 1) state.offset - limit else state.offset
-
-									tagViewModel.getTagsList(offset, limit, false)
-								}
-							}
-						)
-					}
-
-					if (index != state.list.count() -1){
-						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
-					}
-				}
-
-				state.pagination?.let {
-					if (it.hasNextPage){
-						item {
-							Row(modifier = Modifier.padding(top = 25.dp, bottom = 30.dp))
-							{
-								LoadButtonComponent(
-									action = {
-										tagViewModel.setActionType(ActionType.READ)
-
-										tagViewModel.getTagsList(state.offset + limit, limit, false)
-									})
-							}
-						}
-					}
-				}
-			}
-		}
-
-		if (!state.loading && state.list.isEmpty()){
+		if (isEmptyTags){
 			Box(
 				modifier = Modifier
 					.background(AppTheme.colors.appBgColor)
@@ -206,16 +157,84 @@ fun TagsScreen(
 			}
 		}
 
-		if (state.loading){
+		if (isInitialLoading){
 			Box(
-				modifier = Modifier
-					.background(AppTheme.colors.appBgColor)
-					.fillMaxSize(),
+				modifier = Modifier.fillMaxSize(),
 				contentAlignment = Alignment.Center)
 			{
 				ProgressIndicatorComponent(60, AppTheme.colors.primaryColor)
 			}
 		}
+
+		else{
+			LazyColumn(
+				state = listState,
+				contentPadding = PaddingValues(top = 30.dp, bottom = 30.dp))
+			{
+				items(
+					count = lazyPagingItems.itemCount,
+					key = lazyPagingItems.itemKey { it.id }){index ->
+
+					Row(
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(vertical = 10.dp))
+					{
+
+						lazyPagingItems[index]?.let {
+							ListItemComponent(
+								it.title,
+
+								editAction = {
+									val tag = tagViewModel.getTagById(it.id)
+
+									if (tag != null) {
+										tagViewModel.setActionType(ActionType.UPDATE)
+										itemText.value = tag.title
+										itemId.value = tag.id
+										modalFormLabel = "Изменить тег"
+										formDialogVisible = true
+									}
+								},
+
+								deleteAction = {
+									val isDeleted = tagViewModel.deleteTag(it.id)
+
+									if (isDeleted){
+										tagViewModel.refreshData()
+									}
+								}
+							)
+						}
+					}
+
+					if (index != lazyPagingItems.itemCount-1){
+						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
+					}
+				}
+
+				if (isPaginationLoading) {
+					item {
+						Row(
+							modifier = Modifier
+								.padding(vertical = 20.dp)
+								.fillMaxWidth()
+								.height(25.dp),
+							horizontalArrangement = Arrangement.Center)
+						{
+							ProgressIndicatorComponent(25, AppTheme.colors.colorGrey)
+						}
+					}
+				}
+
+				item {
+					Row(
+						modifier = Modifier.padding(bottom = 50.dp)
+					) {  }
+				}
+			}
+		}
+
 
 		FloatingActionButton(
 			modifier = Modifier
@@ -286,7 +305,18 @@ fun TagsScreen(
 							val createdTag = tagViewModel.createTag(Tag(title = text))
 
 							if (createdTag != null){
-								tagViewModel.getTagsList(0, limit)
+
+								tagViewModel.refreshData()
+
+								snapshotFlow { lazyPagingItems.loadState.refresh }
+									.filter { it is LoadState.Loading }
+									.first()
+
+								snapshotFlow { lazyPagingItems.loadState.refresh }
+									.filter { it is LoadState.NotLoading }
+									.first()
+
+								listState.animateScrollToItem(0)
 							}
 						}
 
@@ -295,7 +325,9 @@ fun TagsScreen(
 							val updatedTag = tagViewModel.updateTag(Tag(id = itemId.value, title = text))
 
 							if (updatedTag != null){
-								tagViewModel.getTagsList(state.offset, limit)
+								tagViewModel.refreshData()
+
+								pendingScrollToId = updatedTag.id
 							}
 						}
 

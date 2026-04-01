@@ -1,6 +1,11 @@
 package ru.ilnarkin.ilnarapp.viewModels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,6 +15,7 @@ import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.AppPagination
 import ru.ilnarkin.ilnarapp.models.Tag
+import ru.ilnarkin.ilnarapp.pagingSources.TagPagingSource
 import ru.ilnarkin.ilnarapp.repositories.TagRepository
 import ru.ilnarkin.ilnarapp.ui.AppUiState
 
@@ -18,6 +24,22 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 	private val _uiState = MutableStateFlow(AppUiState<Tag>())
 	val uiState: StateFlow<AppUiState<Tag>> = _uiState.asStateFlow()
+	var currentPagingSource: TagPagingSource? = null
+
+
+	@OptIn(ExperimentalCoroutinesApi::class)
+	val tagsFlow = Pager(
+		config = PagingConfig(
+			pageSize = 15,
+			enablePlaceholders = false,
+			initialLoadSize = 15,
+			prefetchDistance = 1
+		),
+		pagingSourceFactory = {
+			TagPagingSource(tagRepository).also { currentPagingSource = it }
+		}
+
+	).flow.cachedIn(viewModelScope)
 
 
 	suspend fun getTagsList(offset: Int, limit: Int, showLoading: Boolean = true): List<Tag>{
@@ -183,5 +205,10 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 	fun dismissAlert() {
 		_uiState.update { it.copy(showAlert = false) }
+	}
+
+
+	fun refreshData() {
+		currentPagingSource?.invalidate()
 	}
 }
