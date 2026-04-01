@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -44,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -51,7 +51,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.ilnarkin.ilnarapp.R
@@ -62,7 +68,6 @@ import ru.ilnarkin.ilnarapp.helpers.SERVER_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
-import ru.ilnarkin.ilnarapp.ui.components.LoadButtonComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFilterFormComponent
@@ -89,8 +94,6 @@ fun NotesScreen(
 	noteFilterViewModel: NoteFilterViewModel = koinViewModel(),
 	errorManager: NetworkErrorManager = koinInject())
 {
-
-	val notesLimit = 10
 	val tagsLimit = 10
 	val scope = rememberCoroutineScope()
 	val listState = rememberLazyListState()
@@ -108,6 +111,38 @@ fun NotesScreen(
 	var noteDetailsLoading by rememberSaveable { mutableStateOf(false) }
 	var noteFilterFormVisible by rememberSaveable { mutableStateOf(false) }
 	var noteFilterFormLoading by rememberSaveable { mutableStateOf(false) }
+	val lazyPagingItems = noteViewModel.notesFlow.collectAsLazyPagingItems()
+	val loadState = lazyPagingItems.loadState
+	val isInitialLoading = loadState.refresh is LoadState.Loading
+	val isPaginationLoading = loadState.append is LoadState.Loading
+	val isEmptyNotes = loadState.refresh is LoadState.NotLoading && lazyPagingItems.itemCount == 0
+	var pendingScrollToId by remember { mutableStateOf<String?>(null) }
+
+
+
+	LaunchedEffect(pendingScrollToId) {
+		val idToFind = pendingScrollToId ?: return@LaunchedEffect
+
+		snapshotFlow { lazyPagingItems.loadState.refresh }
+			.filter { it is LoadState.NotLoading }
+			.first()
+
+		snapshotFlow {
+			lazyPagingItems.itemSnapshotList.items.any { it.id == idToFind }
+		}
+			.filter { it }
+			.first()
+
+		yield()
+
+		val index = lazyPagingItems.itemSnapshotList.items.indexOfFirst { it.id == idToFind }
+
+		if (index != -1) {
+			listState.animateScrollToItem(index)
+		}
+
+		pendingScrollToId = null
+	}
 
 
 	LaunchedEffect(Unit) {
@@ -140,19 +175,24 @@ fun NotesScreen(
 	}
 
 
-	LaunchedEffect(Unit) {
-		if (noteViewModelState.list.isEmpty()){
-			noteViewModel.getNotesList(0, notesLimit)
-		}
-	}
-
-
 	Box(
 		modifier = Modifier
 			.fillMaxSize()
 			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding))
 	{
-		if (noteViewModelState.loading){
+
+		if (isEmptyNotes){
+			Box(
+				modifier = Modifier
+					.background(AppTheme.colors.appBgColor)
+					.fillMaxSize(),
+				contentAlignment = Alignment.Center)
+			{
+				MessageComponent(text = "Записей нет")
+			}
+		}
+
+		if (isInitialLoading){
 			Box(
 				modifier = Modifier.fillMaxSize(),
 				contentAlignment = Alignment.Center)
@@ -161,104 +201,70 @@ fun NotesScreen(
 			}
 		}
 
-		if (!noteViewModelState.loading && !noteViewModelState.list.isEmpty()){
+		else{
 			LazyColumn(
 				state = listState,
 				contentPadding = PaddingValues(top = 30.dp))
 			{
-				noteViewModelState.pagination?.let {
-					if (it.hasPreviousPage){
-						item {
-							Row(modifier = Modifier.padding(bottom = 25.dp))
-							{
-								LoadButtonComponent(
-									nextButton = false,
-									action = {
-										noteViewModel.setActionType(ActionType.READ)
+				items(count = lazyPagingItems.itemCount,
+					key = lazyPagingItems.itemKey { it.id }) {index ->
+					lazyPagingItems[index]?.let {
+						NoteItemComponent(
+							it,
+							viewAction = {
+								showNoteDetailsSheet = true
+								noteDetailsLoading = true
 
-										noteViewModel.getNotesList(
-											noteViewModelState.offset - notesLimit, notesLimit,
-											showLoading = false,
-											filter = noteFilterViewModel.uiState.value.noteFilter)
-									})
-							}
-						}
-					}
-				}
-				items(noteViewModelState.list) {value ->
-					NoteItemComponent(
-						value,
-						viewAction = {
-							showNoteDetailsSheet = true
-							noteDetailsLoading = true
+								lazyPagingItems[index]?.let { it1 -> noteViewModel.getNoteById(it1.id) }
 
-							noteViewModel.getNoteById(value.id)
+								noteDetailsLoading = false
+							},
 
-							noteDetailsLoading = false
-						},
+							editAction = {
+								val result = lazyPagingItems[index]?.let { it1 -> noteViewModel.getNoteById(it1.id) }
 
-						editAction = {
-							val result = noteViewModel.getNoteById(value.id)
+								if (result != null){
 
-							if (result != null){
+									val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
 
-								val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
+									if (!noteTypes.isEmpty()){
+										tagViewModel.getTagsList(0, tagsLimit)
+										archiveViewModel.getArchivesList(0, 100)
 
-								if (!noteTypes.isEmpty()){
-									tagViewModel.getTagsList(0, tagsLimit)
-									archiveViewModel.getArchivesList(0, 100)
+										noteViewModel.setActionType(ActionType.UPDATE)
 
-									noteViewModel.setActionType(ActionType.UPDATE)
-
-									noteFormTitle.value = "Изменить запись"
-									noteFormVisible = true
+										noteFormTitle.value = "Изменить запись"
+										noteFormVisible = true
+									}
 								}
-							}
-						},
+							},
 
-						deleteAction = {
-							val isDeleted = noteViewModel.deleteNote(value.id)
+							deleteAction = {
+								val isDeleted = lazyPagingItems[index]?.let { it1 -> noteViewModel.deleteNote(it1.id) }
 
-							if (isDeleted){
-								val offset = if (noteViewModelState.list.size == 1) noteViewModelState.offset - notesLimit else noteViewModelState.offset
-
-								noteViewModel.getNotesList(offset,
-									notesLimit,
-									showLoading = false,
-									filter = noteFilterViewModel.uiState.value.noteFilter)
-							}
-						})
+								if (isDeleted == true){
+									noteViewModel.refreshData()
+								}
+							})
+					}
 				}
-				noteViewModelState.pagination?.let {
-					if (it.hasNextPage){
-						item {
-							Row(modifier = Modifier.padding(top = 25.dp, bottom = 30.dp))
-							{
-								LoadButtonComponent(action = {
-									noteViewModel.setActionType(ActionType.READ)
 
-									noteViewModel.getNotesList(noteViewModelState.offset + notesLimit,
-										notesLimit,
-										showLoading = false,
-										filter = noteFilterViewModel.uiState.value.noteFilter)
-								})
-							}
+				if (isPaginationLoading){
+					item {
+						Row(
+							modifier = Modifier
+								.padding(vertical = 15.dp)
+								.fillMaxWidth()
+								.height(25.dp),
+							horizontalArrangement = Arrangement.Center)
+						{
+							ProgressIndicatorComponent(25, AppTheme.colors.colorGrey)
 						}
 					}
 				}
 			}
 		}
 
-		if (!noteViewModelState.loading && noteViewModelState.list.isEmpty()){
-			Box(
-				modifier = Modifier
-					.background(AppTheme.colors.appBgColor)
-					.fillMaxSize(),
-				contentAlignment = Alignment.Center)
-			{
-				MessageComponent("Записей нет")
-			}
-		}
 
 		Column(
 			modifier = Modifier
@@ -450,7 +456,19 @@ fun NotesScreen(
 										noteFilterViewModel.resetFilter()
 									}
 
-									noteViewModel.getNotesList(0, notesLimit)
+									noteViewModel.updateFilter(null)
+
+									noteViewModel.refreshData()
+
+									snapshotFlow { lazyPagingItems.loadState.refresh }
+										.filter { it is LoadState.Loading }
+										.first()
+
+									snapshotFlow { lazyPagingItems.loadState.refresh }
+										.filter { it is LoadState.NotLoading }
+										.first()
+
+									listState.animateScrollToItem(0)
 								}
 							}
 
@@ -459,7 +477,9 @@ fun NotesScreen(
 								val updatedNote = noteViewModel.updateNote(note)
 
 								if (updatedNote != null){
-									noteViewModel.getNotesList(noteViewModelState.offset, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
+									noteViewModel.refreshData()
+
+									pendingScrollToId = updatedNote.id
 								}
 							}
 
@@ -526,20 +546,19 @@ fun NotesScreen(
 						},
 
 						action = {
-
 							noteFilterFormVisible = false
 
-							scope.launch {
-								noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
-							}
+							noteViewModel.updateFilter(noteFilterViewModel.uiState.value.noteFilter)
+
+							lazyPagingItems.refresh()
 						},
 
 						resetFilter = {
 							noteFilterFormVisible = false
 
-							scope.launch {
-								noteViewModel.getNotesList(0, notesLimit, noteFilterViewModel.uiState.value.noteFilter)
-							}
+							noteViewModel.updateFilter(null)
+
+							lazyPagingItems.refresh()
 						}
 					)
 				}

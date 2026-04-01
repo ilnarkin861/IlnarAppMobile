@@ -1,16 +1,22 @@
 package ru.ilnarkin.ilnarapp.viewModels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import ru.ilnarkin.ilnarapp.enums.ActionType
 import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
-import ru.ilnarkin.ilnarapp.models.AppPagination
 import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.models.NoteFilter
+import ru.ilnarkin.ilnarapp.pagingSources.NotePagingSource
 import ru.ilnarkin.ilnarapp.repositories.NoteRepository
 import ru.ilnarkin.ilnarapp.ui.AppUiState
 
@@ -19,52 +25,26 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 
 	private val _uiState = MutableStateFlow(AppUiState<Note>())
 	val uiState: StateFlow<AppUiState<Note>> = _uiState.asStateFlow()
+	var currentPagingSource: NotePagingSource? = null
+	private val _filter = MutableStateFlow<NoteFilter?>(null)
 
 
-	suspend fun getNotesList(offset: Int, limit: Int, filter: NoteFilter? = null, showLoading: Boolean = true): List<Note>{
-
-		try {
-			val notesOffset = if (offset <= 0) 0 else offset
-
-			if (showLoading){
-				_uiState.update { it.copy(
-					loading = true
-				)}
+	@OptIn(ExperimentalCoroutinesApi::class)
+	val notesFlow = _filter.flatMapLatest { currentFilter ->
+		Pager(
+			config = PagingConfig(
+				pageSize = 10,
+				enablePlaceholders = false,
+				initialLoadSize = 10,
+				prefetchDistance = 1
+			),
+			pagingSourceFactory = {
+				NotePagingSource(noteRepository, currentFilter).also {
+					currentPagingSource = it
+				}
 			}
-
-			val filterParams = mutableListOf<Pair<String, String>>().apply {
-				filter?.noteTypeId?.let { add("noteTypeId" to it) }
-				filter?.archiveId?.let { add("archiveId" to it) }
-				filter?.year?.let { add("year" to it.toString()) }
-				filter?.month?.let { add("month" to it.toString()) }
-				filter?.tagIds?.forEach { id -> add("tagIds" to id) }
-			}
-
-			val result = noteRepository.getList<AppPagination<Note>>(notesOffset, limit, filterParams)
-
-			_uiState.update { it.copy(
-				loading = false,
-				offset = notesOffset,
-				pagination = result.pagination,
-				list = result.data)
-			}
-
-			return result.data
-
-		}
-
-		catch (_: Exception){
-			_uiState.update { it.copy(
-				loading = false,
-				success = false,
-				list = emptyList(),
-				showAlert = true,
-				message = DEFAULT_ERROR_MESSAGE
-			)}
-
-			return emptyList()
-		}
-	}
+		).flow
+	}.cachedIn(viewModelScope)
 
 
 	suspend fun getNoteById(id: String): Note?{
@@ -207,5 +187,15 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel(){
 
 	fun dismissAlert() {
 		_uiState.update { it.copy(showAlert = false) }
+	}
+
+
+	fun updateFilter(newFilter: NoteFilter?) {
+		_filter.value = newFilter
+	}
+
+
+	fun refreshData() {
+		currentPagingSource?.invalidate()
 	}
 }
