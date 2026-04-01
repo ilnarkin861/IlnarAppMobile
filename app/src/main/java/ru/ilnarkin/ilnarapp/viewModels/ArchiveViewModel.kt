@@ -1,6 +1,11 @@
 package ru.ilnarkin.ilnarapp.viewModels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,6 +15,8 @@ import ru.ilnarkin.ilnarapp.exceptions.ApiException
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_ERROR_MESSAGE
 import ru.ilnarkin.ilnarapp.models.AppPagination
 import ru.ilnarkin.ilnarapp.models.Archive
+import ru.ilnarkin.ilnarapp.pagingSources.ArchivePagingSource
+import ru.ilnarkin.ilnarapp.pagingSources.TagPagingSource
 import ru.ilnarkin.ilnarapp.repositories.ArchiveRepository
 import ru.ilnarkin.ilnarapp.ui.AppUiState
 
@@ -18,7 +25,22 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 
 	private val _uiState = MutableStateFlow(AppUiState<Archive>())
 	val uiState: StateFlow<AppUiState<Archive>> = _uiState.asStateFlow()
+	var currentPagingSource: ArchivePagingSource? = null
 
+
+	@OptIn(ExperimentalCoroutinesApi::class)
+	val archivesFlow = Pager(
+		config = PagingConfig(
+			pageSize = 50,
+			enablePlaceholders = false,
+			initialLoadSize = 50,
+			prefetchDistance = 1
+		),
+		pagingSourceFactory = {
+			ArchivePagingSource(archiveRepository).also { currentPagingSource = it }
+		}
+
+	).flow.cachedIn(viewModelScope)
 
 	suspend fun getArchivesList(offset: Int, limit: Int, showLoading: Boolean = true): List<Archive>{
 
@@ -199,5 +221,10 @@ class ArchiveViewModel(private val archiveRepository: ArchiveRepository) : ViewM
 
 	fun dismissAlert() {
 		_uiState.update { it.copy(showAlert = false) }
+	}
+
+
+	fun refreshData() {
+		currentPagingSource?.invalidate()
 	}
 }
