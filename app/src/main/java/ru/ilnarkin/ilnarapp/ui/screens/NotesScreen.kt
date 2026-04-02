@@ -69,9 +69,9 @@ import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
+import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFilterFormComponent
-import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
@@ -101,7 +101,6 @@ fun NotesScreen(
 	val noteViewModelState by noteViewModel.uiState.collectAsState()
 	val noteTypeViewModelState by noteTypeViewModel.uiState.collectAsState()
 	val tagViewModelState by tagViewModel.uiState.collectAsState()
-	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
 	val noteFilterViewModelState by noteFilterViewModel.uiState.collectAsState()
 	var noteFormVisible by rememberSaveable { mutableStateOf(false) }
 	var noteFormLoading by rememberSaveable { mutableStateOf(false) }
@@ -224,18 +223,12 @@ fun NotesScreen(
 								val result = lazyPagingItems[index]?.let { it1 -> noteViewModel.getNoteById(it1.id) }
 
 								if (result != null){
+									noteViewModel.setActionType(ActionType.UPDATE)
 
-									val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
+									noteFormTitle.value = "Изменить запись"
 
-									if (!noteTypes.isEmpty()){
-										tagViewModel.getTagsList(0, tagsLimit)
-										archiveViewModel.getArchivesList(0, 100)
+									noteFormVisible = true
 
-										noteViewModel.setActionType(ActionType.UPDATE)
-
-										noteFormTitle.value = "Изменить запись"
-										noteFormVisible = true
-									}
 								}
 							},
 
@@ -337,27 +330,13 @@ fun NotesScreen(
 
 				onClick = {
 					scope.launch {
+						noteViewModel.setActionType(ActionType.CREATE)
+
+						noteViewModel.clearNote()
+
+						noteFormTitle.value = "Добавить запись"
+
 						noteFormVisible = true
-						noteFormLoading = true
-
-						val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
-
-						if (!noteTypes.isEmpty()){
-							tagViewModel.getTagsList(0, tagsLimit)
-							archiveViewModel.getArchivesList(0, 100)
-
-							noteViewModel.setActionType(ActionType.CREATE)
-
-							noteViewModel.clearNote()
-
-							noteFormTitle.value = "Добавить запись"
-						}
-
-						else{
-							noteFormVisible = false
-						}
-
-						noteFormLoading = false
 					}
 				}) {
 				Icon(
@@ -394,109 +373,62 @@ fun NotesScreen(
 
 	// Note form
 	if (noteFormVisible){
-		Box(
-			modifier = Modifier
-				.fillMaxSize()
-				.background(AppTheme.colors.appBgColor))
-		{
-			BackHandler { noteFormVisible = false }
+		NoteFormComponent(
+			note = noteViewModelState.data,
+			action = {note ->
 
-			if (noteFormLoading){
-				Box(
-					modifier = Modifier.fillMaxSize(),
-					contentAlignment = Alignment.Center)
-				{
-					ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)
-				}
-			}
+				if (noteViewModelState.actionType == ActionType.CREATE){
 
-			else{
-				Column(
-					modifier = Modifier
-						.verticalScroll(rememberScrollState())
-						.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
-						.fillMaxSize())
-				{
-					Row(
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(top = 15.dp, bottom = 20.dp),
-						horizontalArrangement = Arrangement.Center)
-					{
-						Text(
-							text = noteFormTitle.value,
-							color = AppTheme.colors.colorGrey,
-							style = AppTheme.typography.formTitleText)
+					val createdNote = noteViewModel.createNote(note)
+
+					if (createdNote != null){
+
+						if (noteFilterViewModelState.filterApplied){
+							noteFilterViewModel.resetFilter()
+						}
+
+						noteViewModel.updateFilter(null)
+
+						noteViewModel.refreshData()
+
+						snapshotFlow { lazyPagingItems.loadState.refresh }
+							.filter { it is LoadState.Loading }
+							.first()
+
+						snapshotFlow { lazyPagingItems.loadState.refresh }
+							.filter { it is LoadState.NotLoading }
+							.first()
+
+						listState.animateScrollToItem(0)
 					}
-					Row(modifier = Modifier.fillMaxWidth())
-					{
-						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
-					}
-					NoteFormComponent(
-						noteViewModelState.data,
-						noteTypes = noteTypeViewModelState.list,
-						archives = archiveViewModelState.list,
-						tags = tagViewModelState.list,
-						hasNextTags = tagViewModelState.pagination?.hasNextPage ?: false,
-
-						loadTags = {
-							val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
-							tags.toMutableList()
-						},
-
-						action = { note ->
-
-							if (noteViewModelState.actionType == ActionType.CREATE){
-
-								val createdNote = noteViewModel.createNote(note)
-
-								if (createdNote != null){
-
-									if (noteFilterViewModelState.filterApplied){
-										noteFilterViewModel.resetFilter()
-									}
-
-									noteViewModel.updateFilter(null)
-
-									noteViewModel.refreshData()
-
-									snapshotFlow { lazyPagingItems.loadState.refresh }
-										.filter { it is LoadState.Loading }
-										.first()
-
-									snapshotFlow { lazyPagingItems.loadState.refresh }
-										.filter { it is LoadState.NotLoading }
-										.first()
-
-									listState.animateScrollToItem(0)
-								}
-							}
-
-							if (noteViewModelState.actionType == ActionType.UPDATE){
-
-								val updatedNote = noteViewModel.updateNote(note)
-
-								if (updatedNote != null){
-									noteViewModel.refreshData()
-
-									pendingScrollToId = updatedNote.id
-								}
-							}
-
-							noteFormVisible = false
-						},
-
-						close = { noteFormVisible = false }
-					)
 				}
-			}
-		}
+
+				if (noteViewModelState.actionType == ActionType.UPDATE){
+
+					val updatedNote = noteViewModel.updateNote(note)
+
+					if (updatedNote != null){
+
+						noteViewModel.refreshData()
+
+						pendingScrollToId = updatedNote.id
+					}
+				}
+
+				noteFormVisible = false
+			},
+
+			close = { noteFormVisible = false }
+		)
 	}
 
 
 	// Note filter form
 	if (noteFilterFormVisible){
-		Box(Modifier.fillMaxSize().background(AppTheme.colors.appBgColor))
+		Box(
+			modifier = Modifier
+				.fillMaxSize()
+				.background(AppTheme.colors.appBgColor))
 		{
 
 			BackHandler { noteFilterFormVisible = false }
@@ -512,13 +444,16 @@ fun NotesScreen(
 
 			else{
 				Column(
-					Modifier
+					modifier = Modifier
 						.verticalScroll(rememberScrollState())
 						.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
 						.fillMaxSize())
 				{
 
-					Row(Modifier.padding(top = 15.dp, bottom = 20.dp).fillMaxWidth(),
+					Row(
+						modifier = Modifier
+							.padding(top = 15.dp, bottom = 20.dp)
+							.fillMaxWidth(),
 						horizontalArrangement = Arrangement.Center)
 					{
 						Text(
@@ -527,7 +462,7 @@ fun NotesScreen(
 							style = AppTheme.typography.formTitleText
 						)
 					}
-					Row(Modifier.fillMaxWidth())
+					Row(modifier = Modifier.fillMaxWidth())
 					{
 						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
 					}
@@ -576,7 +511,9 @@ fun NotesScreen(
 		{
 			if (noteDetailsLoading){
 				Box(
-					modifier = Modifier.fillMaxWidth().height(200.dp),
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(200.dp),
 					contentAlignment = Alignment.Center)
 				{
 					ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)

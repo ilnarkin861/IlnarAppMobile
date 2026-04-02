@@ -18,6 +18,8 @@ import ru.ilnarkin.ilnarapp.models.Tag
 import ru.ilnarkin.ilnarapp.pagingSources.TagPagingSource
 import ru.ilnarkin.ilnarapp.repositories.TagRepository
 import ru.ilnarkin.ilnarapp.ui.AppUiState
+import kotlin.collections.any
+import kotlin.collections.count
 
 
 class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
@@ -25,6 +27,9 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 	private val _uiState = MutableStateFlow(AppUiState<Tag>())
 	val uiState: StateFlow<AppUiState<Tag>> = _uiState.asStateFlow()
 	var currentPagingSource: TagPagingSource? = null
+
+	private val selectedTags = MutableStateFlow(mutableListOf<Tag>())
+
 
 
 	@OptIn(ExperimentalCoroutinesApi::class)
@@ -57,13 +62,18 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 			val result = tagRepository.getList<AppPagination<Tag>>(tagsOffset, limit, null)
 
-			_uiState.update { it.copy(
-				loading = false,
-				success = true,
-				list = result.data,
-				offset = tagsOffset,
-				pagination = result.pagination
-			)}
+			_uiState.update { currentState ->
+
+				val updatedList = currentState.list + result.data
+
+				currentState.copy(
+					loading = false,
+					success = true,
+					list = updatedList,
+					offset = tagsOffset,
+					pagination = result.pagination
+				)
+			}
 
 			return result.data
 
@@ -210,5 +220,30 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 	fun refreshData() {
 		currentPagingSource?.invalidate()
+	}
+
+
+	fun getSelectedTags(): MutableList<Tag>{
+		return selectedTags.value
+	}
+
+
+	fun clearSelectedTags(){
+		selectedTags.value.clear()
+	}
+
+
+	fun selectTag(tag: Tag){
+		if (selectedTags.value.count() == 0){
+			selectedTags.value.add(tag)
+		}
+
+		else{
+			if (selectedTags.value.any{it.id == tag.id}){
+				selectedTags.value.remove(tag)
+			}
+
+			else selectedTags.value.add(tag)
+		}
 	}
 }
