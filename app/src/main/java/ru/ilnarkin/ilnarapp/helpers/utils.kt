@@ -8,7 +8,7 @@ import ru.ilnarkin.ilnarapp.R
 
 
 const val API_URL = "http://192.168.1.11:8080"
-const val DEFAULT_NOTE_TITLE = "Без названия"
+const val DEFAULT_NOTE_TITLE = "Я хз как назвать"
 const val DEFAULT_ERROR_MESSAGE = "Что-то пошло не так. Попробуй еще"
 const val NO_INTERNET_ERROR_MESSAGE = "Проверь интернет соединение"
 const val SERVER_ERROR_MESSAGE = "Сервер недоступен"
