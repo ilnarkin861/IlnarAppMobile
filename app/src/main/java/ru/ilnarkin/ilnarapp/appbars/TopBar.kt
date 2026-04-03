@@ -10,14 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
@@ -29,20 +26,8 @@ import ru.ilnarkin.ilnarapp.viewModels.TopBarViewModel
 @Composable
 fun TopBar (navController: NavController)
 {
-
-	val navBackStackEntry by navController.currentBackStackEntryAsState()
-	val route = navBackStackEntry?.destination?.route
-
 	val topBarViewModel: TopBarViewModel = koinViewModel()
 	val uiState = topBarViewModel.uiState
-
-	val routeTitle = when(route) {
-		NavRoutes.NotesScreen.route -> stringResource(R.string.notes_title)
-		NavRoutes.TagsScreen.route -> stringResource(R.string.tags_title)
-		NavRoutes.ArchiveScreen.route -> stringResource(R.string.archives_title)
-		NavRoutes.SettingsScreen.route -> stringResource(R.string.settings_title)
-		else -> ""
-	}
 
 	val title = uiState.title
 
