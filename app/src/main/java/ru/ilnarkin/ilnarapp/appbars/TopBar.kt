@@ -28,8 +28,8 @@ fun TopBar (navController: NavController)
 {
 	val topBarViewModel: TopBarViewModel = koinViewModel()
 	val uiState = topBarViewModel.uiState
-
 	val title = uiState.title
+
 
 	TopAppBar(
 		modifier = Modifier.padding(bottom = 2.dp),
