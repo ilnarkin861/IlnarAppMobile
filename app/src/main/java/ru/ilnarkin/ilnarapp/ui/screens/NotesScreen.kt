@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.LoadState
@@ -69,9 +70,9 @@ import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.services.NetworkErrorManager
 import ru.ilnarkin.ilnarapp.ui.components.AlertComponent
 import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
-import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteDetailsComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteFilterFormComponent
+import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
@@ -80,6 +81,7 @@ import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteViewModel
 import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
+import ru.ilnarkin.ilnarapp.viewModels.TopBarViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,9 +93,13 @@ fun NotesScreen(
 	noteTypeViewModel: NoteTypeViewModel = koinViewModel(),
 	tagViewModel: TagViewModel = koinViewModel(),
 	archiveViewModel: ArchiveViewModel = koinViewModel(),
+	topBarViewModel: TopBarViewModel = koinViewModel(),
 	noteFilterViewModel: NoteFilterViewModel = koinViewModel(),
 	errorManager: NetworkErrorManager = koinInject())
 {
+	val title = stringResource(R.string.notes_title)
+	val noteCreateTitle = stringResource(R.string.note_create_title)
+	val noteUpdateTitle = stringResource(R.string.note_update_title)
 	val tagsLimit = 10
 	val scope = rememberCoroutineScope()
 	val listState = rememberLazyListState()
@@ -104,7 +110,6 @@ fun NotesScreen(
 	val noteFilterViewModelState by noteFilterViewModel.uiState.collectAsState()
 	var noteFormVisible by rememberSaveable { mutableStateOf(false) }
 	var noteFormLoading by rememberSaveable { mutableStateOf(false) }
-	val noteFormTitle = rememberSaveable { mutableStateOf("") }
 	var showNoteDetailsSheet by rememberSaveable { mutableStateOf(false) }
 	val noteDetailsSheetState = rememberModalBottomSheetState()
 	var noteDetailsLoading by rememberSaveable { mutableStateOf(false) }
@@ -116,6 +121,7 @@ fun NotesScreen(
 	val isPaginationLoading = loadState.append is LoadState.Loading
 	val isEmptyNotes = loadState.refresh is LoadState.NotLoading && lazyPagingItems.itemCount == 0
 	var pendingScrollToId by remember { mutableStateOf<String?>(null) }
+	var saving by rememberSaveable { mutableStateOf(false) }
 
 
 
@@ -152,6 +158,7 @@ fun NotesScreen(
 					noteDetailsLoading = false
 					noteFormLoading = false
 					noteFormVisible = false
+					saving = false
 					val message = if (error == NetworkErrorType.NO_INTERNET) NO_INTERNET_ERROR_MESSAGE else SERVER_ERROR_MESSAGE
 					snackBarHostState.showSnackbar(message)
 				}
@@ -170,6 +177,17 @@ fun NotesScreen(
 					return@collect
 				}
 			}
+		}
+	}
+
+
+	LaunchedEffect(noteFormVisible) {
+		if (!noteFormVisible){
+			topBarViewModel.update(
+				title = title,
+				showBack = false,
+				onBack = {}
+			)
 		}
 	}
 
@@ -225,10 +243,18 @@ fun NotesScreen(
 								if (result != null){
 									noteViewModel.setActionType(ActionType.UPDATE)
 
-									noteFormTitle.value = "Изменить запись"
+									topBarViewModel.update(
+										title = noteUpdateTitle,
+										showBack = true,
+										onBack = {
+											if (!saving){
+												noteFormVisible = false
+												topBarViewModel.reset()
+											}
+										}
+									)
 
 									noteFormVisible = true
-
 								}
 							},
 
@@ -315,8 +341,8 @@ fun NotesScreen(
 
 							noteFilterFormLoading = false
 						}
-					}) {
-
+					})
+				{
 					Icon(painter = painterResource(R.drawable.ic_filter), contentDescription = "Filter")
 				}
 			}
@@ -329,15 +355,22 @@ fun NotesScreen(
 				elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
 
 				onClick = {
-					scope.launch {
-						noteViewModel.setActionType(ActionType.CREATE)
 
-						noteViewModel.clearNote()
+					topBarViewModel.update(
+						title = noteCreateTitle,
+						showBack = true,
+						onBack = {
+							if (!saving){
+								noteFormVisible = false
+								topBarViewModel.reset()
+							}
+						})
 
-						noteFormTitle.value = "Добавить запись"
+					noteViewModel.setActionType(ActionType.CREATE)
 
-						noteFormVisible = true
-					}
+					noteViewModel.clearNote()
+
+					noteFormVisible = true
 				}) {
 				Icon(
 					modifier = Modifier.size(25.dp),
@@ -367,6 +400,7 @@ fun NotesScreen(
 		action = {
 			noteTypeViewModel.dismissAlert()
 			noteViewModel.dismissAlert()
+			saving = false
 		}
 	)
 
@@ -376,6 +410,8 @@ fun NotesScreen(
 		NoteFormComponent(
 			note = noteViewModelState.data,
 			action = {note ->
+
+				saving = true
 
 				if (noteViewModelState.actionType == ActionType.CREATE){
 
@@ -415,10 +451,15 @@ fun NotesScreen(
 					}
 				}
 
+				saving = false
+
 				noteFormVisible = false
 			},
 
-			close = { noteFormVisible = false }
+			close = {
+				noteFormVisible = false
+				topBarViewModel.reset()
+			}
 		)
 	}
 

@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
@@ -53,6 +54,7 @@ import ru.ilnarkin.ilnarapp.ui.components.EmailFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.PasswordFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
+import ru.ilnarkin.ilnarapp.viewModels.TopBarViewModel
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
@@ -61,15 +63,26 @@ import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 fun SettingsScreen(
 	navController: NavController,
 	userViewModel: UserViewModel = koinViewModel(),
+	topBarViewModel: TopBarViewModel = koinViewModel(),
 	errorManager: NetworkErrorManager = koinInject())
 {
-
+	val title = stringResource(R.string.settings_title)
 	val scope = rememberCoroutineScope()
 	val state by userViewModel.uiState.collectAsState()
 	val snackBarHostState = remember { SnackbarHostState() }
 	var emailFormDialogVisible by rememberSaveable { mutableStateOf(false) }
 	var passwordFormDialogVisible by rememberSaveable { mutableStateOf(false) }
 	var userInfoLoading by rememberSaveable { mutableStateOf(false) }
+
+
+
+	LaunchedEffect(Unit) {
+		topBarViewModel.update(
+			title = title,
+			showBack = false,
+			onBack = {}
+		)
+	}
 
 
 	LaunchedEffect(Unit) {

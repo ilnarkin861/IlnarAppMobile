@@ -20,6 +20,7 @@ import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteViewModel
 import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
+import ru.ilnarkin.ilnarapp.viewModels.TopBarViewModel
 import ru.ilnarkin.ilnarapp.viewModels.UserViewModel
 
 
@@ -37,9 +38,11 @@ val appModule = module {
 	viewModel { NoteViewModel(get()) }
 	viewModel { NoteFilterViewModel() }
 
+
 	single { TagRepository(get()) }
 	single { ArchiveRepository(get()) }
 	single { NoteTypeRepository(get()) }
 	single { NoteRepository(get()) }
 	single { UserRepository(get(), "$API_URL/$USER_ENDPOINT") }
+	single { TopBarViewModel() }
 }

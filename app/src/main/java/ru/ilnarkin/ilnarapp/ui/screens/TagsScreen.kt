@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
@@ -66,6 +67,7 @@ import ru.ilnarkin.ilnarapp.ui.components.MessageComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
+import ru.ilnarkin.ilnarapp.viewModels.TopBarViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,8 +75,10 @@ import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
 fun TagsScreen(
 	navController: NavController,
 	tagViewModel: TagViewModel = koinViewModel(),
+	topBarViewModel: TopBarViewModel = koinViewModel(),
 	errorManager: NetworkErrorManager = koinInject())
 {
+	val title = stringResource(R.string.tags_title)
 	val state by tagViewModel.uiState.collectAsState()
 	val snackBarHostState = remember { SnackbarHostState() }
 	val listState = rememberLazyListState()
@@ -89,6 +93,15 @@ fun TagsScreen(
 	val isEmptyTags = loadState.refresh is LoadState.NotLoading && lazyPagingItems.itemCount == 0
 	var pendingScrollToId by remember { mutableStateOf<String?>(null) }
 
+
+
+	LaunchedEffect(Unit) {
+		topBarViewModel.update(
+			title = title,
+			showBack = false,
+			onBack = {}
+		)
+	}
 
 
 	LaunchedEffect(pendingScrollToId) {

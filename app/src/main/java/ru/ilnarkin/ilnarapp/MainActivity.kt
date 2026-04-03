@@ -95,9 +95,11 @@ fun Main(){
 		}
 
 		NavHost(
+			modifier = Modifier
+				.fillMaxSize()
+				.weight(1f),
 			navController = navController,
-			startDestination = NavRoutes.WelcomeScreen.route,
-			modifier = Modifier.fillMaxSize().weight(1f)) {
+			startDestination = NavRoutes.WelcomeScreen.route) {
 			composable(NavRoutes.NotesScreen.route) { NotesScreen(navController) }
 			composable(NavRoutes.TagsScreen.route) { TagsScreen(navController) }
 			composable(NavRoutes.ArchiveScreen.route) { ArchiveScreen(navController) }

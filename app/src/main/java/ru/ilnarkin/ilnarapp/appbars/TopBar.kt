@@ -18,9 +18,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.routes.NavRoutes
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
+import ru.ilnarkin.ilnarapp.viewModels.TopBarViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,13 +33,18 @@ fun TopBar (navController: NavController)
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
 	val route = navBackStackEntry?.destination?.route
 
-	val title = when(route) {
+	val topBarViewModel: TopBarViewModel = koinViewModel()
+	val uiState = topBarViewModel.uiState
+
+	val routeTitle = when(route) {
 		NavRoutes.NotesScreen.route -> stringResource(R.string.notes_title)
 		NavRoutes.TagsScreen.route -> stringResource(R.string.tags_title)
 		NavRoutes.ArchiveScreen.route -> stringResource(R.string.archives_title)
 		NavRoutes.SettingsScreen.route -> stringResource(R.string.settings_title)
 		else -> ""
 	}
+
+	val title = uiState.title
 
 	TopAppBar(
 		modifier = Modifier.padding(bottom = 2.dp),
@@ -47,8 +54,20 @@ fun TopBar (navController: NavController)
 			titleContentColor = AppTheme.colors.primaryColor
 		),
 		expandedHeight = AppTheme.dimensions.topBarHeight,
+		navigationIcon = {
+			if (uiState.showBackButton){
+				IconButton(onClick = uiState.onBackClick) {
+					Icon(
+						modifier = Modifier.size(24.dp),
+						painter = painterResource(R.drawable.ic_arrow_back),
+						contentDescription = null)
+				}
+			}
+		},
 		title = {
-			Text(text = title, style = AppTheme.typography.appBarTitle)
+			Text(
+				text = title,
+				style = AppTheme.typography.appBarTitle)
 		},
 		actions = {
 			IconButton(
@@ -64,7 +83,9 @@ fun TopBar (navController: NavController)
 					}
 				})
 			{
-				Icon(painter = painterResource(R.drawable.ic_logout), contentDescription = "")
+				Icon(
+					painter = painterResource(R.drawable.ic_logout),
+					contentDescription = "")
 			}
 		}
 	)
