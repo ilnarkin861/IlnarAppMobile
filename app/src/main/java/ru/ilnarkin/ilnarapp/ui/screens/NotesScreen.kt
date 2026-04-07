@@ -1,7 +1,6 @@
 package ru.ilnarkin.ilnarapp.ui.screens
 
 import android.os.Build
-import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,22 +16,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -76,11 +71,8 @@ import ru.ilnarkin.ilnarapp.ui.components.NoteFormComponent
 import ru.ilnarkin.ilnarapp.ui.components.NoteItemComponent
 import ru.ilnarkin.ilnarapp.ui.components.ProgressIndicatorComponent
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
-import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
-import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteViewModel
-import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
 import ru.ilnarkin.ilnarapp.viewModels.TopBarViewModel
 
 
@@ -90,9 +82,6 @@ import ru.ilnarkin.ilnarapp.viewModels.TopBarViewModel
 fun NotesScreen(
 	navController: NavController,
 	noteViewModel: NoteViewModel = koinViewModel(),
-	noteTypeViewModel: NoteTypeViewModel = koinViewModel(),
-	tagViewModel: TagViewModel = koinViewModel(),
-	archiveViewModel: ArchiveViewModel = koinViewModel(),
 	topBarViewModel: TopBarViewModel = koinViewModel(),
 	noteFilterViewModel: NoteFilterViewModel = koinViewModel(),
 	errorManager: NetworkErrorManager = koinInject())
@@ -100,13 +89,11 @@ fun NotesScreen(
 	val title = stringResource(R.string.notes_title)
 	val noteCreateTitle = stringResource(R.string.note_create_title)
 	val noteUpdateTitle = stringResource(R.string.note_update_title)
-	val tagsLimit = 10
+	val noteFilterTitle = stringResource(R.string.note_filter_title)
 	val scope = rememberCoroutineScope()
 	val listState = rememberLazyListState()
 	val snackBarHostState = remember { SnackbarHostState() }
 	val noteViewModelState by noteViewModel.uiState.collectAsState()
-	val noteTypeViewModelState by noteTypeViewModel.uiState.collectAsState()
-	val tagViewModelState by tagViewModel.uiState.collectAsState()
 	val noteFilterViewModelState by noteFilterViewModel.uiState.collectAsState()
 	var noteFormVisible by rememberSaveable { mutableStateOf(false) }
 	var noteFormLoading by rememberSaveable { mutableStateOf(false) }
@@ -114,7 +101,6 @@ fun NotesScreen(
 	val noteDetailsSheetState = rememberModalBottomSheetState()
 	var noteDetailsLoading by rememberSaveable { mutableStateOf(false) }
 	var noteFilterFormVisible by rememberSaveable { mutableStateOf(false) }
-	var noteFilterFormLoading by rememberSaveable { mutableStateOf(false) }
 	val lazyPagingItems = noteViewModel.notesFlow.collectAsLazyPagingItems()
 	val loadState = lazyPagingItems.loadState
 	val isInitialLoading = loadState.refresh is LoadState.Loading
@@ -164,8 +150,6 @@ fun NotesScreen(
 				}
 
 				NetworkErrorType.UNAUTHORIZED -> {
-					noteTypeViewModel.dismissAlert()
-
 					noteViewModel.dismissAlert()
 
 					navController.navigate(NavRoutes.LoginScreen.route) {
@@ -181,8 +165,8 @@ fun NotesScreen(
 	}
 
 
-	LaunchedEffect(noteFormVisible) {
-		if (!noteFormVisible){
+	LaunchedEffect(noteFormVisible, noteFilterFormVisible) {
+		if (!noteFormVisible && !noteFilterFormVisible){
 			topBarViewModel.update(
 				title = title,
 				showBack = false,
@@ -314,32 +298,15 @@ fun NotesScreen(
 						scope.launch {
 							noteFilterFormVisible = true
 
-							noteFilterFormLoading = true
-
-							val noteTypes = noteTypeViewModel.getNoteTypesList(0, 10)
-
-							if (!noteTypes.isEmpty()){
-								if (noteFilterViewModelState.selectableNoteTypes.isEmpty()){
-									noteFilterViewModel.addNoteTypes(noteTypes)
+							topBarViewModel.update(
+								title = noteFilterTitle,
+								showBack = true,
+								onBack = {
+									noteFilterFormVisible = false
+									topBarViewModel.reset()
 								}
+							)
 
-								if (noteFilterViewModelState.selectableArchives.isEmpty()){
-									val archives = archiveViewModel.getArchivesList(0, 100)
-									noteFilterViewModel.addArchives(archives)
-								}
-
-								if (noteFilterViewModelState.selectableTags.isEmpty()){
-									val tags = tagViewModel.getTagsList(0, tagsLimit)
-									val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
-									noteFilterViewModel.addTags(tags, hasNextTags)
-								}
-							}
-
-							else{
-								noteFilterFormVisible = false
-							}
-
-							noteFilterFormLoading = false
 						}
 					})
 				{
@@ -395,10 +362,9 @@ fun NotesScreen(
 
 	AlertComponent(
 		success = noteViewModelState.success,
-		message = if (noteViewModelState.showAlert) noteViewModelState.message else noteTypeViewModelState.message,
-		visible = noteViewModelState.showAlert || noteTypeViewModelState.showAlert,
+		message = noteViewModelState.message,
+		visible = noteViewModelState.showAlert,
 		action = {
-			noteTypeViewModel.dismissAlert()
 			noteViewModel.dismissAlert()
 			saving = false
 		}
@@ -466,80 +432,24 @@ fun NotesScreen(
 
 	// Note filter form
 	if (noteFilterFormVisible){
-		Box(
-			modifier = Modifier
-				.fillMaxSize()
-				.background(AppTheme.colors.appBgColor))
-		{
+		NoteFilterFormComponent(
+			noteFilterViewModel = noteFilterViewModel,
+			action = {
+				noteFilterFormVisible = false
 
-			BackHandler { noteFilterFormVisible = false }
+				noteViewModel.updateFilter(noteFilterViewModel.uiState.value.noteFilter)
 
-			if (noteFilterFormLoading){
-				Box(
-					modifier = Modifier.fillMaxSize(),
-					contentAlignment = Alignment.Center)
-				{
-					ProgressIndicatorComponent(50, AppTheme.colors.primaryColor)
-				}
-			}
+				lazyPagingItems.refresh()
+			},
+			reset = {
+				noteFilterFormVisible = false
 
-			else{
-				Column(
-					modifier = Modifier
-						.verticalScroll(rememberScrollState())
-						.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding)
-						.fillMaxSize())
-				{
+				noteViewModel.updateFilter(null)
 
-					Row(
-						modifier = Modifier
-							.padding(top = 15.dp, bottom = 20.dp)
-							.fillMaxWidth(),
-						horizontalArrangement = Arrangement.Center)
-					{
-						Text(
-							text = "Фильтр",
-							color = AppTheme.colors.colorGrey,
-							style = AppTheme.typography.formTitleText
-						)
-					}
-					Row(modifier = Modifier.fillMaxWidth())
-					{
-						HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
-					}
-
-					NoteFilterFormComponent(
-						viewModel = noteFilterViewModel,
-
-						loadTags = {
-							val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
-
-							val hasNextTags = tagViewModel.uiState.value.pagination?.hasNextPage ?: false
-
-							noteFilterViewModel.addTags(tags, hasNextTags)
-
-							tags.toMutableList()
-						},
-
-						action = {
-							noteFilterFormVisible = false
-
-							noteViewModel.updateFilter(noteFilterViewModel.uiState.value.noteFilter)
-
-							lazyPagingItems.refresh()
-						},
-
-						resetFilter = {
-							noteFilterFormVisible = false
-
-							noteViewModel.updateFilter(null)
-
-							lazyPagingItems.refresh()
-						}
-					)
-				}
-			}
-		}
+				lazyPagingItems.refresh()
+			},
+			close = { noteFilterFormVisible = false }
+		)
 	}
 
 
