@@ -27,7 +27,7 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 	private val _uiState = MutableStateFlow(AppUiState<Tag>())
 	val uiState: StateFlow<AppUiState<Tag>> = _uiState.asStateFlow()
 	var currentPagingSource: TagPagingSource? = null
-
+	private val selectableTags = mutableListOf<Tag>()
 	private val selectedTags = MutableStateFlow(mutableListOf<Tag>())
 
 
@@ -245,5 +245,15 @@ class TagViewModel(private val tagRepository: TagRepository) : ViewModel() {
 
 			else selectedTags.value.add(tag)
 		}
+	}
+
+
+	fun addSelectableTags(tags: List<Tag>){
+		selectableTags.addAll(tags)
+	}
+
+
+	fun getSelectableTags(): MutableList<Tag>{
+		return selectableTags
 	}
 }

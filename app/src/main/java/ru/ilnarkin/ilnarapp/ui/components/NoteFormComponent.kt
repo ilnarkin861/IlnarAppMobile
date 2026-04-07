@@ -42,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -117,7 +118,7 @@ fun NoteFormComponent(
 	var selectedArchive: Archive? by remember { mutableStateOf(note?.archive) }
 	var tagsLoading by rememberSaveable { mutableStateOf(false) }
 	val addedTags = remember { note?.tags?.toMutableStateList() ?: mutableStateListOf()}
-	val selectedTags = remember { mutableStateListOf<Tag>() }
+	var selectedTagsCount by remember { mutableIntStateOf(tagViewModel.getSelectedTags().count()) }
 	val uploadableTags = mutableListOf<Tag>()
 
 	val inputColors = OutlinedTextFieldDefaults.colors(
@@ -143,8 +144,11 @@ fun NoteFormComponent(
 				archiveViewModel.getArchivesList(0, 100)
 			}
 
-			if (tagViewModelState.list.isEmpty()){
-				tagViewModel.getTagsList(0, tagsLimit)
+			val isEmpty = tagViewModel.getSelectableTags().isEmpty()
+
+			if (isEmpty){
+				val tags = tagViewModel.getTagsList(0, tagsLimit)
+				tagViewModel.addSelectableTags(tags)
 			}
 
 			if (note == null && noteTypeViewModelState.list.isNotEmpty()){
@@ -385,12 +389,12 @@ fun NoteFormComponent(
 						.padding(bottom = 20.dp))
 				{
 					Text(
-						text = "Выбрать теги (${selectedTags.count()})",
+						text = "Выбрать теги (${selectedTagsCount})",
 						color = AppTheme.colors.colorGrey,
 						style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold))
 				}
 
-				tagViewModelState.list.forEachIndexed { index, tag ->
+				tagViewModel.getSelectableTags().forEachIndexed { index, tag ->
 					Row(Modifier.fillMaxWidth())
 					{
 						TagCheckboxComponent(
@@ -398,6 +402,7 @@ fun NoteFormComponent(
 							isChecked = tagViewModel.getSelectedTags().find { it.id == tag.id } != null,
 							onChecked = {tag ->
 								tagViewModel.selectTag(tag)
+								selectedTagsCount = tagViewModel.getSelectedTags().count()
 							})
 					}
 
@@ -431,7 +436,7 @@ fun NoteFormComponent(
 											try {
 												val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
 
-												selectableTags.addAll(tags)
+												tagViewModel.addSelectableTags(tags)
 											} finally {
 												tagsLoading = false
 											}
