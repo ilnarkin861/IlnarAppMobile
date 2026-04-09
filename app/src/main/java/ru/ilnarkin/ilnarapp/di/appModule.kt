@@ -8,14 +8,17 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import ru.ilnarkin.ilnarapp.helpers.API_URL
+import ru.ilnarkin.ilnarapp.helpers.FILES_ENDPOINT
 import ru.ilnarkin.ilnarapp.helpers.PREFS_NAME
 import ru.ilnarkin.ilnarapp.helpers.USER_ENDPOINT
 import ru.ilnarkin.ilnarapp.repositories.ArchiveRepository
+import ru.ilnarkin.ilnarapp.repositories.FileRepository
 import ru.ilnarkin.ilnarapp.repositories.NoteRepository
 import ru.ilnarkin.ilnarapp.repositories.NoteTypeRepository
 import ru.ilnarkin.ilnarapp.repositories.TagRepository
 import ru.ilnarkin.ilnarapp.repositories.UserRepository
 import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
+import ru.ilnarkin.ilnarapp.viewModels.FileViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteFilterViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteViewModel
@@ -37,6 +40,7 @@ val appModule = module {
 	viewModel { NoteTypeViewModel(get()) }
 	viewModel { NoteViewModel(get()) }
 	viewModel { NoteFilterViewModel() }
+	viewModel { FileViewModel(get()) }
 
 
 	single { TagRepository(get()) }
@@ -44,5 +48,6 @@ val appModule = module {
 	single { NoteTypeRepository(get()) }
 	single { NoteRepository(get()) }
 	single { UserRepository(get(), "$API_URL/$USER_ENDPOINT") }
+	single { FileRepository(get(), "$API_URL/$FILES_ENDPOINT") }
 	single { TopBarViewModel() }
 }
