@@ -44,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -384,17 +383,6 @@ fun NoteFilterFormComponent(
 					.fillMaxWidth()
 					.padding(top = 20.dp))
 			{
-				Row(
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(bottom = 20.dp))
-				{
-					Text(
-						text = "Выбрать теги (${filterViewModelState.selectedTagIds.size})",
-						color = AppTheme.colors.colorGrey,
-						style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold))
-				}
-
 				filterViewModelState.selectableTags.forEachIndexed { index, tag ->
 					Row(modifier = Modifier.fillMaxWidth())
 					{
