@@ -20,6 +20,7 @@ const val NOTES_ENDPOINT = "notes"
 const val TAGS_ENDPOINT = "tags"
 const val ARCHIVES_ENDPOINT = "archives"
 const val USER_ENDPOINT = "user"
+const val FILES_ENDPOINT = "files"
 
 
 fun getInterFont(): FontFamily{
