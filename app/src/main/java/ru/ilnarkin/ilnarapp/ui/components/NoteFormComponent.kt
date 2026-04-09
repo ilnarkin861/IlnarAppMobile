@@ -52,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -87,7 +88,6 @@ fun NoteFormComponent(
 	val scope = rememberCoroutineScope()
 	var saving by rememberSaveable { mutableStateOf(false) }
 	var loading by rememberSaveable { mutableStateOf(true) }
-	val selectableTags = remember { mutableStateListOf<Tag>() }
 	val noteTypeViewModelState by noteTypeViewModel.uiState.collectAsState()
 	val archiveViewModelState by archiveViewModel.uiState.collectAsState()
 	val tagViewModelState by tagViewModel.uiState.collectAsState()
@@ -381,21 +381,25 @@ fun NoteFormComponent(
 			Column(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(top = 20.dp))
+					.padding(top = 20.dp, bottom = 25.dp))
 			{
 				Row(
 					modifier = Modifier
 						.fillMaxWidth()
-						.padding(bottom = 20.dp))
+						.padding(bottom = 10.dp)
+						.clip(RoundedCornerShape(4.dp))
+						.background(color = AppTheme.colors.colorGrey))
 				{
 					Text(
+						modifier = Modifier
+							.padding(all = 10.dp),
 						text = "Выбрать теги (${selectedTagsCount})",
-						color = AppTheme.colors.colorGrey,
+						color = Color.White,
 						style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold))
 				}
 
-				tagViewModel.getSelectableTags().forEachIndexed { index, tag ->
-					Row(Modifier.fillMaxWidth())
+				tagViewModel.getSelectableTags().forEachIndexed {index, tag ->
+					Row(modifier = Modifier.fillMaxWidth())
 					{
 						TagCheckboxComponent(
 							tag,
@@ -406,46 +410,47 @@ fun NoteFormComponent(
 							})
 					}
 
-					if (index != selectableTags.count() -1){
+					if (index != tagViewModel.getSelectableTags().count() -1){
 						HorizontalDivider(
 							thickness = 1.dp,
 							color = AppTheme.colors.borderColor)
 					}
 				}
-			}
 
-			tagViewModelState.pagination?.let {
-				if (it.hasNextPage){
-					Row(
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(top = 20.dp, bottom = 40.dp))
-					{
-						if (tagsLoading){
-							ProgressIndicatorComponent(25, AppTheme.colors.primaryColor)
-						}
 
-						else{
-							Text(
-								modifier = Modifier.clickable(
-									interactionSource = remember { MutableInteractionSource() },
-									indication = null,
-									onClick = {
-										scope.launch {
-											tagsLoading = true
-											try {
-												val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
+				tagViewModelState.pagination?.let {
+					if (it.hasNextPage){
+						Row(
+							modifier = Modifier
+								.fillMaxWidth()
+								.padding(top = 20.dp))
+						{
+							if (tagsLoading){
+								ProgressIndicatorComponent(25, AppTheme.colors.primaryColor)
+							}
 
-												tagViewModel.addSelectableTags(tags)
-											} finally {
-												tagsLoading = false
+							else{
+								Text(
+									modifier = Modifier.clickable(
+										interactionSource = remember { MutableInteractionSource() },
+										indication = null,
+										onClick = {
+											scope.launch {
+												tagsLoading = true
+												try {
+													val tags = tagViewModel.getTagsList(tagViewModelState.offset + tagsLimit, tagsLimit)
+
+													tagViewModel.addSelectableTags(tags)
+												} finally {
+													tagsLoading = false
+												}
 											}
-										}
-									}),
-								text = "Загрузить еще",
-								color = AppTheme.colors.primaryColor,
-								style = AppTheme.typography.textButton
-							)
+										}),
+									text = "Загрузить еще",
+									color = AppTheme.colors.primaryColor,
+									style = AppTheme.typography.textButton
+								)
+							}
 						}
 					}
 				}
@@ -456,16 +461,20 @@ fun NoteFormComponent(
 				Column(
 					modifier = Modifier
 						.fillMaxWidth()
-						.padding(top = 20.dp))
+						.padding(top = 40.dp, bottom = 25.dp))
 				{
 					Row(
 						modifier = Modifier
 							.fillMaxWidth()
-							.padding(bottom = 20.dp))
+							.padding(bottom = 10.dp)
+							.clip(RoundedCornerShape(4.dp))
+							.background(color = AppTheme.colors.colorGrey))
 					{
 						Text(
+							modifier = Modifier
+								.padding(all = 10.dp),
 							text = "Добавленные теги",
-							color = AppTheme.colors.colorGrey,
+							color = Color.White,
 							style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold))
 					}
 
@@ -511,11 +520,63 @@ fun NoteFormComponent(
 			}
 
 
+
+			//Images
+			Column(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 40.dp))
+			{
+				Row(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(bottom = 10.dp)
+						.clip(RoundedCornerShape(4.dp))
+						.background(color = AppTheme.colors.colorGrey))
+				{
+					Text(
+						modifier = Modifier
+							.padding(all = 10.dp),
+						text = "Изображения",
+						color = Color.White,
+						style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold))
+				}
+
+				Row(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(top = 40.dp),
+					horizontalArrangement = Arrangement.Center)
+				{
+					IconButton(
+						onClick = { /* Handle click */ },
+						modifier = Modifier.size(64.dp))
+					{
+						Icon(
+							modifier = Modifier.size(48.dp),
+							painter = painterResource(id = R.drawable.ic_image_picker),
+							contentDescription = "Image picker",
+							tint = AppTheme.colors.primaryColor.copy(alpha = 0.7f))
+					}
+				}
+			}
+
+
+			Column(
+				modifier = Modifier
+					.padding(vertical = 60.dp)
+					.fillMaxWidth())
+			{
+				HorizontalDivider(
+					thickness = 1.dp,
+					color = AppTheme.colors.colorGrey.copy(alpha = 0.3f))
+			}
+
+
 			//Save button
 			Row(
 				modifier = Modifier
-					.fillMaxWidth()
-					.padding(top = 60.dp))
+					.fillMaxWidth())
 			{
 				Button(
 					modifier = Modifier
