@@ -50,7 +50,7 @@ fun TagCheckboxComponent(
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding, vertical = 15.dp),
+				.padding(vertical = 15.dp),
 			verticalAlignment = Alignment.CenterVertically)
 		{
 			Row(
