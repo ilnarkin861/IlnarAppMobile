@@ -66,6 +66,8 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.auth)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.paging.runtime.ktx)
     testImplementation(libs.junit)
