@@ -87,6 +87,7 @@ fun NotesScreen(
 	errorManager: NetworkErrorManager = koinInject())
 {
 	val title = stringResource(R.string.notes_title)
+	val noteFormTitle = rememberSaveable { mutableStateOf("") }
 	val noteCreateTitle = stringResource(R.string.note_create_title)
 	val noteUpdateTitle = stringResource(R.string.note_update_title)
 	val noteFilterTitle = stringResource(R.string.note_filter_title)
@@ -238,6 +239,8 @@ fun NotesScreen(
 										}
 									)
 
+									noteFormTitle.value = noteUpdateTitle
+
 									noteFormVisible = true
 								}
 							},
@@ -333,12 +336,15 @@ fun NotesScreen(
 							}
 						})
 
+					noteFormTitle.value = noteCreateTitle
+
 					noteViewModel.setActionType(ActionType.CREATE)
 
 					noteViewModel.clearNote()
 
 					noteFormVisible = true
-				}) {
+				})
+			{
 				Icon(
 					modifier = Modifier.size(25.dp),
 					painter = painterResource(R.drawable.ic_plus),
@@ -360,6 +366,7 @@ fun NotesScreen(
 		}
 	}
 
+
 	AlertComponent(
 		success = noteViewModelState.success,
 		message = noteViewModelState.message,
@@ -374,6 +381,7 @@ fun NotesScreen(
 	// Note form
 	if (noteFormVisible){
 		NoteFormComponent(
+			title = noteFormTitle.value,
 			note = noteViewModelState.data,
 			action = {note ->
 

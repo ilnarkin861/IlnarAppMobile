@@ -67,6 +67,7 @@ import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import ru.ilnarkin.ilnarapp.viewModels.ArchiveViewModel
 import ru.ilnarkin.ilnarapp.viewModels.NoteTypeViewModel
 import ru.ilnarkin.ilnarapp.viewModels.TagViewModel
+import ru.ilnarkin.ilnarapp.viewModels.TopBarViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -78,9 +79,11 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun NoteFormComponent(
 	note: Note? = null,
+	title: String,
 	noteTypeViewModel: NoteTypeViewModel = koinViewModel(),
 	archiveViewModel: ArchiveViewModel = koinViewModel(),
 	tagViewModel: TagViewModel = koinViewModel(),
+	topBarViewModel: TopBarViewModel = koinViewModel(),
 	action: suspend (note: Note) -> Unit,
 	close: () -> Unit)
 {
@@ -132,6 +135,8 @@ fun NoteFormComponent(
 		unfocusedTextColor = AppTheme.colors.textColor
 	)
 
+	var fileManagerVisible by rememberSaveable { mutableStateOf(false) }
+
 
 	LaunchedEffect(Unit) {
 
@@ -163,6 +168,17 @@ fun NoteFormComponent(
 		}
 
 		catch (_: Exception){}
+	}
+
+
+	LaunchedEffect(Unit) {
+		topBarViewModel.update(
+			title = title,
+			showBack = true,
+			onBack = {
+				close()
+			}
+		)
 	}
 
 
@@ -549,7 +565,9 @@ fun NoteFormComponent(
 					horizontalArrangement = Arrangement.Center)
 				{
 					IconButton(
-						onClick = { /* Handle click */ },
+						onClick = {
+							fileManagerVisible = true
+						},
 						modifier = Modifier.size(64.dp))
 					{
 						Icon(
@@ -664,6 +682,23 @@ fun NoteFormComponent(
 					.fillMaxWidth()
 					.padding(bottom = 80.dp)) {  }
 		}
+	}
+
+
+	if (fileManagerVisible){
+		FileManagerComponent(
+			filesChanged = {},
+			close = {
+				fileManagerVisible = false
+				topBarViewModel.update(
+					title = title,
+					showBack = true,
+					onBack = {
+						close()
+					}
+				)
+			}
+		)
 	}
 
 
