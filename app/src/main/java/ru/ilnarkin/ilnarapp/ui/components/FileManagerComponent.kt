@@ -17,20 +17,29 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -42,6 +51,7 @@ import ru.ilnarkin.ilnarapp.viewModels.FileViewModel
 import ru.ilnarkin.ilnarapp.viewModels.TopBarViewModel
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FileManagerComponent(
 	fileViewModel: FileViewModel = koinViewModel(),
@@ -49,13 +59,14 @@ fun FileManagerComponent(
 	filesChanged: (files: List<FileInfo>) -> Unit,
 	close: () -> Unit)
 {
-	val selectedFiles by fileViewModel.selectedFiles.collectAsState()
+	val selectedFilesState by fileViewModel.selectedFiles.collectAsState()
 	val listState = rememberLazyGridState()
 	val lazyPagingItems = fileViewModel.filesFlow.collectAsLazyPagingItems()
 	val loadState = lazyPagingItems.loadState
 	val isInitialLoading = loadState.refresh is LoadState.Loading
 	val isPaginationLoading = loadState.append is LoadState.Loading
 	val isEmptyFiles = loadState.refresh is LoadState.NotLoading && lazyPagingItems.itemCount == 0
+	var uploadDialogVisible by rememberSaveable { mutableStateOf(false) }
 
 
 	LaunchedEffect(Unit) {
@@ -70,10 +81,10 @@ fun FileManagerComponent(
 	}
 
 
-	LaunchedEffect(selectedFiles.size) {
-		if (selectedFiles.isNotEmpty()) {
+	LaunchedEffect(selectedFilesState.size) {
+		if (selectedFilesState.isNotEmpty()) {
 			topBarViewModel.update(
-				title = "Выбрано: ${selectedFiles.size}",
+				title = "Выбрано: ${selectedFilesState.size}",
 				showBack = true,
 				isSelectionMode = true,
 				onBack = { fileViewModel.clearSelection() },
@@ -143,18 +154,18 @@ fun FileManagerComponent(
 					{ index ->
 
 						val url = lazyPagingItems[index]?.url ?: return@items
-						val isSelected = remember(selectedFiles) { selectedFiles.contains(lazyPagingItems[index]) }
+						val isSelected = remember(selectedFilesState) { selectedFilesState.contains(lazyPagingItems[index]) }
 
 						FileItemComponent(
 							url,
 							isSelected,
 							onClick = {
-								if (!selectedFiles.isEmpty()){
+								if (!selectedFilesState.isEmpty()){
 									lazyPagingItems[index]?.let { fileViewModel.toggleSelection(it) }
 								}
 							},
 							onLongClick = {
-								if (selectedFiles.isEmpty()){
+								if (selectedFilesState.isEmpty()){
 									lazyPagingItems[index]?.let { fileViewModel.toggleSelection(it) }
 								}
 							}
@@ -196,13 +207,35 @@ fun FileManagerComponent(
 			elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
 
 			onClick = {
-
+				uploadDialogVisible = true
 			})
 		{
 			Icon(
 				modifier = Modifier.size(25.dp),
 				painter = painterResource(R.drawable.ic_plus),
 				contentDescription = "Добавить")
+		}
+	}
+
+
+	if (uploadDialogVisible){
+		BasicAlertDialog(
+			onDismissRequest = {},
+			properties = DialogProperties(
+				dismissOnBackPress = false,
+				dismissOnClickOutside = false))
+		{
+			Surface(
+				shape = MaterialTheme.shapes.small,
+				tonalElevation = AlertDialogDefaults.TonalElevation)
+			{
+				FileUploadComponent(
+					upload = {},
+					close = {
+						uploadDialogVisible = false
+					}
+				)
+			}
 		}
 	}
 }

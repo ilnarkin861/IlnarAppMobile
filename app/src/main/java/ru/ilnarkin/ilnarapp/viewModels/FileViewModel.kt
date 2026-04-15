@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import ru.ilnarkin.ilnarapp.models.SelectedFileInfo
 import ru.ilnarkin.ilnarapp.models.FileInfo
 import ru.ilnarkin.ilnarapp.pagingSources.FilePagingSource
 import ru.ilnarkin.ilnarapp.repositories.FileRepository
@@ -16,9 +17,12 @@ import ru.ilnarkin.ilnarapp.repositories.FileRepository
 
 class FileViewModel(private val fileRepository: FileRepository): ViewModel() {
 	var currentPagingSource: FilePagingSource? = null
-
 	private val _selectedFiles = MutableStateFlow<Set<FileInfo>>(emptySet())
 	val selectedFiles = _selectedFiles.asStateFlow()
+
+	private val _localSelectedFiles = MutableStateFlow<List<SelectedFileInfo>>(emptyList())
+
+	val localSelectedFiles = _localSelectedFiles.asStateFlow()
 
 
 	@OptIn(ExperimentalCoroutinesApi::class)
@@ -46,7 +50,24 @@ class FileViewModel(private val fileRepository: FileRepository): ViewModel() {
 		}
 	}
 
+
 	fun clearSelection(){
 		_selectedFiles.value = emptySet()
 	}
+
+
+	fun addLocalSelectedFile(file: SelectedFileInfo) {
+		_localSelectedFiles.value = _localSelectedFiles.value + file
+	}
+
+
+	fun removeLocalSelectedFile(file: SelectedFileInfo) {
+		_localSelectedFiles.value = _localSelectedFiles.value - file
+	}
+
+
+	fun clearLocalSelectedFiles(){
+		_localSelectedFiles.value = emptyList()
+	}
+
 }
