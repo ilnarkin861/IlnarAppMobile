@@ -4,6 +4,9 @@ import android.util.Patterns
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
+import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
 import ru.ilnarkin.ilnarapp.R
 
 
@@ -36,4 +39,31 @@ fun getInterFont(): FontFamily{
 
 fun validEmail(email: String): Boolean{
 	return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+
+
+fun getFileName(context: Context, uri: Uri): String {
+	var result: String? = null
+	if (uri.scheme == "content") {
+		val cursor = context.contentResolver.query(uri, null, null, null, null)
+		try {
+			if (cursor != null && cursor.moveToFirst()) {
+				val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+				if (index != -1) {
+					result = cursor.getString(index)
+				}
+			}
+		} finally {
+			cursor?.close()
+		}
+	}
+
+	if (result == null) {
+		result = uri.path
+		val cut = result?.lastIndexOf('/') ?: -1
+		if (cut != -1) {
+			result = result?.substring(cut + 1)
+		}
+	}
+	return result ?: "unknown_file"
 }
