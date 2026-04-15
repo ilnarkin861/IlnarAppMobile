@@ -40,7 +40,6 @@ fun ItemFormComponent(
 	action: suspend (text: String) -> Unit,
 	close: () -> Unit)
 {
-
 	val scope = rememberCoroutineScope()
 	var saving by rememberSaveable { mutableStateOf(false) }
 	val updatedItemText = rememberSaveable { mutableStateOf(itemText?: "") }
@@ -52,7 +51,10 @@ fun ItemFormComponent(
 		Column(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 40.dp))
+				.padding(top = 30.dp,
+					start = AppTheme.dimensions.containerHorizontalPadding,
+					end = AppTheme.dimensions.containerHorizontalPadding,
+					bottom = 40.dp))
 		{
 			Row(
 				modifier = Modifier

@@ -42,10 +42,10 @@ fun FileItemComponent(
 		)
 	{
 		AsyncImage(
+			modifier = Modifier.fillMaxSize(),
 			model = url,
 			contentDescription = null,
 			contentScale = ContentScale.Crop,
-			modifier = Modifier.fillMaxSize(),
 			placeholder = ColorPainter(Color.LightGray),
 			error = ColorPainter(Color.Red)
 		)
