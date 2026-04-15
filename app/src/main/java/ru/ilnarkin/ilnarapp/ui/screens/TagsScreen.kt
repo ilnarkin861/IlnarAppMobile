@@ -253,7 +253,7 @@ fun TagsScreen(
 			modifier = Modifier
 				.align(Alignment.BottomEnd)
 				.absolutePadding(bottom = 20.dp, right = 20.dp)
-				.alpha(0.6f),
+				.alpha(0.7f),
 			containerColor = AppTheme.colors.primaryColor,
 			contentColor = Color.White,
 			shape = CircleShape,

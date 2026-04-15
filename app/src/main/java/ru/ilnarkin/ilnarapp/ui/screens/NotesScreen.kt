@@ -318,7 +318,7 @@ fun NotesScreen(
 			}
 
 			FloatingActionButton(
-				modifier = Modifier.alpha(0.6f),
+				modifier = Modifier.alpha(0.7f),
 				containerColor = AppTheme.colors.primaryColor,
 				contentColor = Color.White,
 				shape = CircleShape,
