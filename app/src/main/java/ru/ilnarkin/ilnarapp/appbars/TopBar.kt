@@ -55,22 +55,45 @@ fun TopBar (navController: NavController)
 				style = AppTheme.typography.appBarTitle)
 		},
 		actions = {
-			IconButton(
-				modifier = Modifier
-					.padding(end = 10.dp)
-					.size(30.dp),
-				colors = IconButtonDefaults.iconButtonColors(contentColor = AppTheme.colors.primaryColor),
-				onClick = {
-					navController.navigate(NavRoutes.PinLockScreen.route) {
-						popUpTo(0) { inclusive = true }
 
-						launchSingleTop = true
-					}
-				})
-			{
-				Icon(
-					painter = painterResource(R.drawable.ic_logout),
-					contentDescription = "")
+			if (uiState.isSelectionMode){
+				IconButton(
+					modifier = Modifier
+						.padding(end = 10.dp)
+						.size(40.dp),
+					colors = IconButtonDefaults.iconButtonColors(contentColor = AppTheme.colors.primaryColor),
+					onClick = {
+						uiState.onChangeClick()
+					})
+				{
+					Icon(
+						modifier = Modifier
+							.size(30.dp),
+						painter = painterResource(R.drawable.ic_check),
+						contentDescription = "")
+				}
+			}
+
+			else{
+				IconButton(
+					modifier = Modifier
+						.padding(end = 10.dp)
+						.size(40.dp),
+					colors = IconButtonDefaults.iconButtonColors(contentColor = AppTheme.colors.primaryColor),
+					onClick = {
+						navController.navigate(NavRoutes.PinLockScreen.route) {
+							popUpTo(0) { inclusive = true }
+
+							launchSingleTop = true
+						}
+					})
+				{
+					Icon(
+						modifier = Modifier
+							.size(30.dp),
+						painter = painterResource(R.drawable.ic_logout),
+						contentDescription = "")
+				}
 			}
 		}
 	)

@@ -1,8 +1,8 @@
 package ru.ilnarkin.ilnarapp.viewModels
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import ru.ilnarkin.ilnarapp.ui.TopBarState
 
@@ -12,11 +12,20 @@ class TopBarViewModel : ViewModel() {
 		private set
 
 
-	fun update(title: String, showBack: Boolean = false, onBack: () -> Unit = {}) {
+	fun update(title: String,
+			   showBack: Boolean = false,
+			   isSelectionMode: Boolean = false,
+			   onBack: () -> Unit = {},
+			   onChange: () -> Unit = {},
+			   onDeleteSelected: () -> Unit = {}) {
+
 		uiState = uiState.copy(
 			title = title,
 			showBackButton = showBack,
-			onBackClick = onBack
+			onBackClick = onBack,
+			onChangeClick = onChange,
+			isSelectionMode = isSelectionMode,
+			onDeleteSelectedClick = onDeleteSelected
 		)
 	}
 
@@ -24,5 +33,4 @@ class TopBarViewModel : ViewModel() {
 	fun reset() {
 		uiState = TopBarState()
 	}
-
 }

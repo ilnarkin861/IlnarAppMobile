@@ -2,11 +2,15 @@ package ru.ilnarkin.ilnarapp.ui.components
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -66,6 +70,31 @@ fun FileManagerComponent(
 	}
 
 
+	LaunchedEffect(selectedFiles.size) {
+		if (selectedFiles.isNotEmpty()) {
+			topBarViewModel.update(
+				title = "Выбрано: ${selectedFiles.size}",
+				showBack = true,
+				isSelectionMode = true,
+				onBack = { fileViewModel.clearSelection() },
+				onChange = {}
+			)
+		}
+
+		else {
+			topBarViewModel.update(
+				title = "Изображения",
+				showBack = true,
+				isSelectionMode = false,
+				onBack = {
+					fileViewModel.clearSelection()
+					close()
+				}
+			)
+		}
+	}
+
+
 	Box(
 		modifier = Modifier
 			.fillMaxSize()
@@ -73,7 +102,8 @@ fun FileManagerComponent(
 			.padding(horizontal = AppTheme.dimensions.containerHorizontalPadding))
 	{
 		BackHandler {
-			// если только не идет загрузка
+			// добавить проверку, закрывать если только не идет загрузка
+			fileViewModel.clearSelection()
 			close()
 		}
 
@@ -97,7 +127,6 @@ fun FileManagerComponent(
 			}
 		}
 
-
 		else{
 			Column(
 				modifier = Modifier.fillMaxSize())
@@ -110,7 +139,8 @@ fun FileManagerComponent(
 				{
 					items(
 						count = lazyPagingItems.itemCount,
-						key = lazyPagingItems.itemKey { it.id }) { index ->
+						key = lazyPagingItems.itemKey { it.id })
+					{ index ->
 
 						val url = lazyPagingItems[index]?.url ?: return@items
 						val isSelected = remember(selectedFiles) { selectedFiles.contains(lazyPagingItems[index]) }
@@ -130,6 +160,26 @@ fun FileManagerComponent(
 							}
 						)
 					}
+
+					if (isPaginationLoading) {
+						item {
+							Row(
+								modifier = Modifier
+									.padding(vertical = 20.dp)
+									.fillMaxWidth()
+									.height(25.dp),
+								horizontalArrangement = Arrangement.Center)
+							{
+								ProgressIndicatorComponent(25, AppTheme.colors.colorGrey)
+							}
+						}
+					}
+
+					item {
+						Row(
+							modifier = Modifier.padding(bottom = 80.dp)
+						) {  }
+					}
 				}
 			}
 		}
@@ -139,7 +189,7 @@ fun FileManagerComponent(
 			modifier = Modifier
 				.align(Alignment.BottomEnd)
 				.absolutePadding(bottom = 20.dp, right = 20.dp)
-				.alpha(0.8f),
+				.alpha(0.7f),
 			containerColor = AppTheme.colors.primaryColor,
 			contentColor = Color.White,
 			shape = CircleShape,
@@ -150,8 +200,8 @@ fun FileManagerComponent(
 			})
 		{
 			Icon(
-				modifier = Modifier.size(40.dp),
-				painter = painterResource(R.drawable.ic_choice_image),
+				modifier = Modifier.size(25.dp),
+				painter = painterResource(R.drawable.ic_plus),
 				contentDescription = "Добавить")
 		}
 	}
