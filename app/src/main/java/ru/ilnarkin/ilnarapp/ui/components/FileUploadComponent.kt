@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -39,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
@@ -169,7 +171,7 @@ fun FileUploadComponent(
 					Column(
 						modifier = Modifier
 							.fillMaxWidth()
-							.height(250.dp)
+							.heightIn(max = 250.dp)
 							.verticalScroll(rememberScrollState()))
 					{
 						selectedFilesState.forEach { file ->
@@ -177,7 +179,8 @@ fun FileUploadComponent(
 								file = file,
 								delete = {file ->
 									fileViewModel.removeLocalSelectedFile(file)
-								})
+								}
+							)
 						}
 					}
 				}
@@ -238,10 +241,7 @@ fun FileUploadComponent(
 							style = AppTheme.typography.textButton)
 					}
 				}
-
 			}
-
 		}
-
 	}
 }
