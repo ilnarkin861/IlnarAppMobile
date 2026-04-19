@@ -8,6 +8,7 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.header
@@ -39,6 +40,12 @@ val networkModule = module {
 		val context = androidContext()
 
 		HttpClient(CIO) {
+
+			install(HttpTimeout) {
+				requestTimeoutMillis = 180_000
+				connectTimeoutMillis = 30_000
+				socketTimeoutMillis = 180_000
+			}
 
 			install(ContentNegotiation) { json(
 				Json {
