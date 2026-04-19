@@ -48,7 +48,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.models.FileInfo
@@ -65,7 +64,6 @@ fun FileManagerComponent(
 	filesChanged: (files: List<FileInfo>) -> Unit,
 	close: () -> Unit)
 {
-	val scope = rememberCoroutineScope()
 	val state by fileViewModel.uiState.collectAsState()
 	val selectedFilesState by fileViewModel.selectedFiles.collectAsState()
 	val listState = rememberLazyGridState()
