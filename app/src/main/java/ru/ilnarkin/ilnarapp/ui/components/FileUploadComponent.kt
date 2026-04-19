@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.getFileName
@@ -52,9 +54,10 @@ import ru.ilnarkin.ilnarapp.viewModels.FileViewModel
 @Composable
 fun FileUploadComponent(
 	fileViewModel: FileViewModel = koinViewModel(),
-	upload: () -> Unit,
+	onUpload: suspend () -> Unit,
 	close: () -> Unit)
 {
+	val state by fileViewModel.uiState.collectAsState()
 	val context = LocalContext.current
 	val launcher = rememberLauncherForActivityResult(
 		contract = ActivityResultContracts.OpenMultipleDocuments(),
@@ -66,6 +69,8 @@ fun FileUploadComponent(
 			}
 		}
 	)
+
+	val scope = rememberCoroutineScope()
 
 	val selectedFilesState by fileViewModel.localSelectedFiles.collectAsState()
 
@@ -87,7 +92,7 @@ fun FileUploadComponent(
 	{
 
 		BackHandler {
-			if (!uploading){
+			if (!state.loading){
 				fileViewModel.clearLocalSelectedFiles()
 				close()
 			}
@@ -177,7 +182,9 @@ fun FileUploadComponent(
 							SelectedFileComponent(
 								file = file,
 								delete = {file ->
-									fileViewModel.removeLocalSelectedFile(file)
+									if (!state.loading){
+										fileViewModel.removeLocalSelectedFile(file)
+									}
 								}
 							)
 						}
@@ -201,9 +208,17 @@ fun FileUploadComponent(
 								containerColor = AppTheme.colors.primaryColor,
 								disabledContainerColor = AppTheme.colors.primaryColor.copy(alpha = 0.8f)),
 							onClick = {
-							})
+								scope.launch {
+									val result = fileViewModel.upload()
+
+									if (result){
+										onUpload()
+									}
+								}
+							}
+						)
 						{
-							if (uploading){
+							if (state.loading){
 								CircularProgressIndicator(
 									modifier = Modifier.size(20.dp),
 									strokeWidth = 2.dp,
@@ -220,7 +235,7 @@ fun FileUploadComponent(
 					}
 				}
 
-				if (!uploading){
+				if (!state.loading){
 					Row(
 						modifier = Modifier
 							.fillMaxWidth()

@@ -1,5 +1,6 @@
 package ru.ilnarkin.ilnarapp.ui.components
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,8 +32,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -43,6 +46,9 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.models.FileInfo
@@ -59,6 +65,8 @@ fun FileManagerComponent(
 	filesChanged: (files: List<FileInfo>) -> Unit,
 	close: () -> Unit)
 {
+	val scope = rememberCoroutineScope()
+	val state by fileViewModel.uiState.collectAsState()
 	val selectedFilesState by fileViewModel.selectedFiles.collectAsState()
 	val listState = rememberLazyGridState()
 	val lazyPagingItems = fileViewModel.filesFlow.collectAsLazyPagingItems()
@@ -230,7 +238,24 @@ fun FileManagerComponent(
 				tonalElevation = AlertDialogDefaults.TonalElevation)
 			{
 				FileUploadComponent(
-					upload = {},
+					onUpload = {
+
+						Log.d("onUpload", "onUpload")
+
+						fileViewModel.refreshData()
+
+						snapshotFlow { lazyPagingItems.loadState.refresh }
+							.filter { it is LoadState.Loading }
+							.first()
+
+						snapshotFlow { lazyPagingItems.loadState.refresh }
+							.filter { it is LoadState.NotLoading }
+							.first()
+
+						listState.animateScrollToItem(0)
+
+						uploadDialogVisible = false
+					},
 					close = {
 						uploadDialogVisible = false
 					}
@@ -238,4 +263,12 @@ fun FileManagerComponent(
 			}
 		}
 	}
+
+
+	AlertComponent(
+		success = state.success,
+		message = state.message,
+		visible = state.showAlert,
+		action = { fileViewModel.dismissAlert()	}
+	)
 }
