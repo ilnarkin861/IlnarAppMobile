@@ -48,6 +48,6 @@ val appModule = module {
 	single { NoteTypeRepository(get()) }
 	single { NoteRepository(get()) }
 	single { UserRepository(get(), "$API_URL/$USER_ENDPOINT") }
-	single { FileRepository(get(), "$API_URL/$FILES_ENDPOINT") }
+	single { FileRepository(androidContext(), get(), "$API_URL/$FILES_ENDPOINT") }
 	single { TopBarViewModel() }
 }
