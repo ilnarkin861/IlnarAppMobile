@@ -32,7 +32,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -94,7 +93,12 @@ fun FileManagerComponent(
 				showBack = true,
 				isSelectionMode = true,
 				onBack = { fileViewModel.clearSelection() },
-				onChange = {}
+				onChange = {
+					Log.d("selectedFiles", selectedFilesState.size.toString())
+					filesChanged(selectedFilesState.toList())
+					fileViewModel.clearSelection()
+					close()
+				}
 			)
 		}
 

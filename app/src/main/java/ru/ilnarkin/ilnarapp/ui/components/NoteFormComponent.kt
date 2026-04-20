@@ -1,6 +1,7 @@
 package ru.ilnarkin.ilnarapp.ui.components
 
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -123,6 +124,8 @@ fun NoteFormComponent(
 	val addedTags = remember { note?.tags?.toMutableStateList() ?: mutableStateListOf()}
 	var selectedTagsCount by remember { mutableIntStateOf(tagViewModel.getSelectedTags().count()) }
 	val uploadableTags = mutableListOf<Tag>()
+
+	val noteImages = remember { note?.noteImages?.toMutableStateList() ?: mutableStateListOf()}
 
 	val inputColors = OutlinedTextFieldDefaults.colors(
 		unfocusedBorderColor = AppTheme.colors.inputsBorderColor,
@@ -558,6 +561,25 @@ fun NoteFormComponent(
 						style = AppTheme.typography.formInputText.copy(fontWeight = FontWeight.Bold))
 				}
 
+
+				Column(
+					modifier = Modifier.fillMaxWidth())
+				{
+					noteImages.forEachIndexed { index, image ->
+						NoteImageComponent(
+							image,
+							delete = {
+								noteImages.remove(image)
+							}
+						)
+
+						if (index != noteImages.count() -1){
+							HorizontalDivider(thickness = 1.dp, color = AppTheme.colors.borderColor)
+						}
+					}
+				}
+
+
 				Row(
 					modifier = Modifier
 						.fillMaxWidth()
@@ -620,8 +642,11 @@ fun NoteFormComponent(
 								noteType = selectedNoteType!!,
 								date = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(noteDate),
 								archive = selectedArchive,
-								tags =  uploadableTags
+								tags =  uploadableTags,
+								noteImages = noteImages
 							)
+
+							Log.d("noteImages", noteImages.joinToString())
 
 							if(note != null){
 								updatableNote.id = note.id
@@ -633,6 +658,7 @@ fun NoteFormComponent(
 									action(updatableNote)
 								} finally {
 									tagViewModel.clearSelectedTags()
+									noteImages.clear()
 									saving = false
 								}
 							}
@@ -687,7 +713,9 @@ fun NoteFormComponent(
 
 	if (fileManagerVisible){
 		FileManagerComponent(
-			filesChanged = {},
+			filesChanged = {files ->
+				noteImages.addAll(files)
+			},
 			close = {
 				fileManagerVisible = false
 				topBarViewModel.update(

@@ -11,5 +11,6 @@ data  class Note (
 	var noteType: NoteType,
 	var date: String,
 	var archive: Archive? = null,
-	var tags: MutableList<Tag> = mutableListOf()
+	var tags: MutableList<Tag> = mutableListOf(),
+	var noteImages: MutableList<FileInfo> = mutableListOf(),
 ) : AppModel
