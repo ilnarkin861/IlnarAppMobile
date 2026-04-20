@@ -32,8 +32,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import ru.ilnarkin.ilnarapp.R
 import ru.ilnarkin.ilnarapp.helpers.DEFAULT_NOTE_TITLE
@@ -124,7 +126,8 @@ fun NoteItemComponent(
 				modifier = Modifier
 					.padding(top = 20.dp)
 					.fillMaxWidth(),
-				verticalAlignment = Alignment.CenterVertically)
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.SpaceBetween)
 			{
 				Row(verticalAlignment = Alignment.CenterVertically)
 				{
@@ -189,6 +192,29 @@ fun NoteItemComponent(
 									tint = AppTheme.colors.dangerColor)
 							}
 						}
+					}
+				}
+
+				Row(
+					modifier = Modifier.alpha(0.5f),
+					verticalAlignment = Alignment.CenterVertically) {
+					Row (
+						modifier = Modifier.padding(end = 5.dp)
+					){
+						Icon(
+							modifier = Modifier.size(25.dp),
+							painter = painterResource(R.drawable.ic_images),
+							contentDescription = "",
+							tint = AppTheme.colors.primaryColor)
+					}
+
+					Row {
+						Text(
+							text = note.noteImages.size.toString(),
+							color = AppTheme.colors.primaryColor,
+							fontSize = 13.sp,
+							fontWeight = FontWeight.SemiBold
+						)
 					}
 				}
 			}
