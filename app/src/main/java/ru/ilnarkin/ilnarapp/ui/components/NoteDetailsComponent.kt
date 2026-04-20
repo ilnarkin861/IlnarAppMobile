@@ -4,11 +4,18 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -16,8 +23,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import java.time.LocalDate
@@ -28,9 +39,9 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun NoteDetailsComponent(note: Note?)
 {
-
 	val titleColor = if (note?.title != null) AppTheme.colors.titleColor else AppTheme.colors.titleColor.copy(alpha = 0.4f)
 	val containerPadding = AppTheme.dimensions.containerHorizontalPadding
+	val listState = rememberLazyGridState()
 
 
 	Column(
@@ -103,7 +114,7 @@ fun NoteDetailsComponent(note: Note?)
 
 		if(!note.tags.isEmpty()){
 			FlowRow (
-				modifier = Modifier.padding(top = 30.dp),
+				modifier = Modifier.padding(top = 30.dp, bottom = 40.dp),
 				horizontalArrangement = Arrangement.spacedBy(10.dp),
 				verticalArrangement = Arrangement.spacedBy(8.dp))
 			{
@@ -119,6 +130,34 @@ fun NoteDetailsComponent(note: Note?)
 						text = tag.title,
 						style = AppTheme.typography.noteDetailsTags,
 						color = AppTheme.colors.primaryColor)
+				}
+			}
+		}
+
+		if (note.noteImages.isNotEmpty()){
+			LazyVerticalGrid(
+				modifier = Modifier.weight(1f),
+				state = listState,
+				columns = GridCells.Fixed(2),
+				contentPadding = PaddingValues(bottom = 30.dp))
+			{
+				items(note.noteImages){image ->
+
+					Box(
+						modifier = Modifier
+							.padding(4.dp)
+							.aspectRatio(1f)
+					)
+					{
+						AsyncImage(
+							modifier = Modifier.fillMaxSize(),
+							model = image.url,
+							contentDescription = null,
+							contentScale = ContentScale.Crop,
+							placeholder = ColorPainter(Color.LightGray),
+							error = ColorPainter(Color.Red)
+						)
+					}
 				}
 			}
 		}
