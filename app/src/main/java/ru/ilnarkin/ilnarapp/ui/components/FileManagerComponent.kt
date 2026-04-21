@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
@@ -156,37 +157,33 @@ fun FileManagerComponent(
 					modifier = Modifier.weight(1f),
 					state = listState,
 					columns = GridCells.Fixed(3),
-					contentPadding = PaddingValues(top = 20.dp))
+					contentPadding = PaddingValues(top = 20.dp, bottom = 80.dp))
 				{
 					items(
 						count = lazyPagingItems.itemCount,
-						key = lazyPagingItems.itemKey { it.id })
-					{ index ->
+						key = lazyPagingItems.itemKey { it.id }){ index ->
 
 						val url = lazyPagingItems[index]?.url ?: return@items
 						val isSelected = remember(selectedFilesState) { selectedFilesState.contains(lazyPagingItems[index]) }
 
-						Row(modifier = Modifier.fillMaxWidth())
-						{
-							FileItemComponent(
-								url,
-								isSelected,
-								onClick = {
-									if (!selectedFilesState.isEmpty()){
-										lazyPagingItems[index]?.let { fileViewModel.toggleSelection(it) }
-									}
-								},
-								onLongClick = {
-									if (selectedFilesState.isEmpty()){
-										lazyPagingItems[index]?.let { fileViewModel.toggleSelection(it) }
-									}
+						FileItemComponent(
+							url,
+							isSelected,
+							onClick = {
+								if (!selectedFilesState.isEmpty()){
+									lazyPagingItems[index]?.let { fileViewModel.toggleSelection(it) }
 								}
-							)
-						}
+							},
+							onLongClick = {
+								if (selectedFilesState.isEmpty()){
+									lazyPagingItems[index]?.let { fileViewModel.toggleSelection(it) }
+								}
+							}
+						)
 					}
 
 					if (isPaginationLoading) {
-						item {
+						item(span = { GridItemSpan(maxLineSpan)}){
 							Row(
 								modifier = Modifier
 									.padding(vertical = 20.dp)
@@ -197,12 +194,6 @@ fun FileManagerComponent(
 								ProgressIndicatorComponent(25, AppTheme.colors.colorGrey)
 							}
 						}
-					}
-
-					item {
-						Row(
-							modifier = Modifier.padding(bottom = 80.dp)
-						) {  }
 					}
 				}
 			}
