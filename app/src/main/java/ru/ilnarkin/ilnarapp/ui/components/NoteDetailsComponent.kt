@@ -23,6 +23,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -146,6 +147,7 @@ fun NoteDetailsComponent(note: Note?)
 					Box(
 						modifier = Modifier
 							.padding(4.dp)
+							.clip(shape = RoundedCornerShape(10.dp))
 							.aspectRatio(1f)
 					)
 					{

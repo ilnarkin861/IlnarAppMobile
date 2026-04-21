@@ -2,6 +2,7 @@ package ru.ilnarkin.ilnarapp.ui.components
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -83,7 +85,29 @@ fun NoteItemComponent(
 				end = 15.dp,
 				bottom = 20.dp))
 		{
-			Row {
+
+			if (note.noteImages.isEmpty()){
+				Row(
+					modifier = Modifier
+						.fillMaxWidth(),
+					horizontalArrangement = Arrangement.Center)
+				{
+					Image(
+						modifier = Modifier
+							.clip(shape = RoundedCornerShape(10.dp)),
+						painter = painterResource(R.drawable.placeholder),
+						contentDescription = "Logo",
+						contentScale = ContentScale.Crop)
+				}
+			}
+
+			else{
+				NoteImageGrid(note.noteImages)
+			}
+
+			Row(
+				modifier = Modifier.padding(top = 25.dp))
+			{
 				Text(
 					text = note.title ?: DEFAULT_NOTE_TITLE,
 					style = AppTheme.typography.noteCardTitle,

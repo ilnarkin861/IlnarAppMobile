@@ -153,9 +153,9 @@ fun FileManagerComponent(
 				modifier = Modifier.fillMaxSize())
 			{
 				LazyVerticalGrid(
+					modifier = Modifier.weight(1f),
 					state = listState,
 					columns = GridCells.Fixed(3),
-					modifier = Modifier.weight(1f),
 					contentPadding = PaddingValues(top = 20.dp))
 				{
 					items(
@@ -166,20 +166,23 @@ fun FileManagerComponent(
 						val url = lazyPagingItems[index]?.url ?: return@items
 						val isSelected = remember(selectedFilesState) { selectedFilesState.contains(lazyPagingItems[index]) }
 
-						FileItemComponent(
-							url,
-							isSelected,
-							onClick = {
-								if (!selectedFilesState.isEmpty()){
-									lazyPagingItems[index]?.let { fileViewModel.toggleSelection(it) }
+						Row(modifier = Modifier.fillMaxWidth())
+						{
+							FileItemComponent(
+								url,
+								isSelected,
+								onClick = {
+									if (!selectedFilesState.isEmpty()){
+										lazyPagingItems[index]?.let { fileViewModel.toggleSelection(it) }
+									}
+								},
+								onLongClick = {
+									if (selectedFilesState.isEmpty()){
+										lazyPagingItems[index]?.let { fileViewModel.toggleSelection(it) }
+									}
 								}
-							},
-							onLongClick = {
-								if (selectedFilesState.isEmpty()){
-									lazyPagingItems[index]?.let { fileViewModel.toggleSelection(it) }
-								}
-							}
-						)
+							)
+						}
 					}
 
 					if (isPaginationLoading) {
