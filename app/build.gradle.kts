@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.zoomable)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

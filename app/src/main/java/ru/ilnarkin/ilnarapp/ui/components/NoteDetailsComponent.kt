@@ -3,6 +3,7 @@ package ru.ilnarkin.ilnarapp.ui.components
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +23,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -43,6 +49,8 @@ fun NoteDetailsComponent(note: Note?)
 	val titleColor = if (note?.title != null) AppTheme.colors.titleColor else AppTheme.colors.titleColor.copy(alpha = 0.4f)
 	val containerPadding = AppTheme.dimensions.containerHorizontalPadding
 	val listState = rememberLazyGridState()
+	var imageCarouselVisible by remember { mutableStateOf(false) }
+	var imageInitialIndex by remember { mutableIntStateOf(1) }
 
 
 	Column(
@@ -142,14 +150,20 @@ fun NoteDetailsComponent(note: Note?)
 				columns = GridCells.Fixed(2),
 				contentPadding = PaddingValues(bottom = 30.dp))
 			{
-				items(note.noteImages){image ->
+				itemsIndexed(note.noteImages){index, image ->
 
 					Box(
 						modifier = Modifier
 							.padding(4.dp)
 							.clip(shape = RoundedCornerShape(10.dp))
 							.aspectRatio(1f)
-					)
+							.clickable(
+								onClick = {
+									imageInitialIndex = index
+									imageCarouselVisible = true
+								}
+							)
+						)
 					{
 						AsyncImage(
 							modifier = Modifier.fillMaxSize(),
@@ -162,6 +176,17 @@ fun NoteDetailsComponent(note: Note?)
 					}
 				}
 			}
+		}
+	}
+
+
+	if (imageCarouselVisible) {
+		note?.let {
+			ImageCarouselComponent(
+				initialIndex = imageInitialIndex,
+				images = it.noteImages,
+				onClose = { imageCarouselVisible = false }
+			)
 		}
 	}
 }

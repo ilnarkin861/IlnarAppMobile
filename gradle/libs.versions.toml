@@ -22,6 +22,7 @@ uiTextGoogleFonts = "1.10.4"
 koinAndroid = "4.1.1"
 koinAndroidxNavigation = "4.1.1"
 koinAndroidxCompose = "4.1.1"
+zoomable = "2.11.1"
 
 
 [libraries]
@@ -55,6 +56,7 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndroid" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidxCompose" }
 koin-androidx-navigation = { module = "io.insert-koin:koin-androidx-navigation", version.ref = "koinAndroidxNavigation" }
+zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
