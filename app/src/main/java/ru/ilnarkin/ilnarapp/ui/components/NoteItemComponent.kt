@@ -186,7 +186,7 @@ fun NoteItemComponent(
 							Icon(modifier = Modifier.size(25.dp),
 								painter = painterResource(R.drawable.ic_edit),
 								contentDescription = "",
-								tint = AppTheme.colors.colorGrey)
+								tint = AppTheme.colors.primaryColor)
 						}
 					}
 					Row(
@@ -229,13 +229,13 @@ fun NoteItemComponent(
 							modifier = Modifier.size(25.dp),
 							painter = painterResource(R.drawable.ic_images),
 							contentDescription = "",
-							tint = AppTheme.colors.primaryColor)
+							tint = AppTheme.colors.colorGrey)
 					}
 
 					Row {
 						Text(
 							text = note.noteImages.size.toString(),
-							color = AppTheme.colors.primaryColor,
+							color = AppTheme.colors.colorGrey,
 							fontSize = 13.sp,
 							fontWeight = FontWeight.SemiBold
 						)
