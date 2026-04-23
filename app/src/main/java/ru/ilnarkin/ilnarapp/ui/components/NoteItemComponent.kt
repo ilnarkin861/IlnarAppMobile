@@ -169,7 +169,7 @@ fun NoteItemComponent(
 								horizontalArrangement = Arrangement.Center,
 								verticalAlignment = Alignment.CenterVertically)
 							{
-								ProgressIndicatorComponent(25, AppTheme.colors.colorGrey)
+								ProgressIndicatorComponent(25, AppTheme.colors.primaryColor)
 							}
 						}
 						IconButton(onClick = {
