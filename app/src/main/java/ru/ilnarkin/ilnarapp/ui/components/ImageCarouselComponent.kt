@@ -3,6 +3,7 @@ package ru.ilnarkin.ilnarapp.ui.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -75,8 +76,10 @@ fun ImageCarouselComponent(
 						.statusBarsPadding()
 						.align(Alignment.TopEnd)
 						.padding(15.dp)
+						.size(30.dp)
 				) {
 					Icon(
+						modifier = Modifier.size(30.dp),
 						painter = painterResource(R.drawable.ic_close),
 						contentDescription = "Close",
 						tint = Color.White
