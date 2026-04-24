@@ -86,11 +86,11 @@ class FileViewModel(private val fileRepository: FileRepository): ViewModel() {
 			false
 		}
 
-		catch (e: Exception){
+		catch (_: Exception){
 			_uiState.update { it.copy(
 				success = false,
 				showAlert = true,
-				message = e.toString()
+				message = "Ошибка при загрузке файла"
 			)}
 
 			false
