@@ -36,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import ru.ilnarkin.ilnarapp.helpers.DEFAULT_NOTE_TITLE
 import ru.ilnarkin.ilnarapp.models.Note
 import ru.ilnarkin.ilnarapp.ui.theme.AppTheme
 import java.time.LocalDate
@@ -62,7 +63,7 @@ fun NoteDetailsComponent(note: Note?)
 		Row {
 			Text(
 				color = titleColor,
-				text = note?.title ?: "Без названия",
+				text = note?.title ?: DEFAULT_NOTE_TITLE,
 				style = AppTheme.typography.noteDetailsTitle)
 		}
 
